@@ -1,0 +1,711 @@
+1
+00:00:00,000 --> 00:00:05,350
+[MUSIC].
+
+2
+00:00:05,350 --> 00:00:11,209
+Welcome to the next part of the module on
+Android concurrency frameworks,
+
+3
+00:00:11,209 --> 00:00:16,139
+which continues our discussion of the
+Android Handler class.
+
+4
+00:00:17,800 --> 00:00:21,840
+This part explains how the handler class
+enables the posting and processing
+
+5
+00:00:21,840 --> 00:00:25,840
+of runnable objects via the Message Queue
+associated with the thread's looper.
+
+6
+00:00:27,490 --> 00:00:29,488
+It also shows how Handlers and runnables
+are
+
+7
+00:00:29,488 --> 00:00:32,899
+applied in Android applications and its
+hammer concurrency framework.
+
+8
+00:00:34,700 --> 00:00:37,274
+The Handler class defines methods that
+enable
+
+9
+00:00:37,274 --> 00:00:39,584
+programs to post a runnable to, or remove
+
+10
+00:00:39,584 --> 00:00:42,488
+a posted runnable from the message queue
+associated
+
+11
+00:00:42,488 --> 00:00:44,556
+with a handler as shown at this link.
+
+12
+00:00:44,556 --> 00:00:45,280
+[BLANK_AUDIO]
+
+13
+00:00:46,750 --> 00:00:49,592
+The Handler and its thread specific looper
+collaborate to
+
+14
+00:00:49,592 --> 00:00:53,470
+dequeue each posted runnable and dispatch
+its run hook method.
+
+15
+00:00:53,470 --> 00:00:55,780
+In accordance with the command processor
+
+16
+00:00:55,780 --> 00:00:58,486
+pattern, which packages a piece of
+application
+
+17
+00:00:58,486 --> 00:01:01,456
+functionality, as well as its
+parameterization and
+
+18
+00:01:01,456 --> 00:01:04,500
+object to execute it in another context.
+
+19
+00:01:04,500 --> 00:01:07,170
+For example, at a later point in time, in
+a different
+
+20
+00:01:07,170 --> 00:01:10,750
+process, in a different thread, et cetera,
+as described at this link.
+
+21
+00:01:12,060 --> 00:01:15,379
+There's several variance of post, some of
+which are highlighted on this slide.
+
+22
+00:01:16,610 --> 00:01:19,940
+A runnable can be posted to a Handler in
+several ways.
+
+23
+00:01:19,940 --> 00:01:23,100
+For example, it can be added to the front
+or rear of the
+
+24
+00:01:23,100 --> 00:01:26,470
+message queue and processed as soon as the
+queue is ready to do so.
+
+25
+00:01:27,520 --> 00:01:31,830
+Alternatively, a delay can be specified
+using relative time, which indicates
+
+26
+00:01:31,830 --> 00:01:35,550
+how much time must elapse before the
+runnable can be processed.
+
+27
+00:01:35,550 --> 00:01:38,278
+Or finally, a delay can be specified using
+absolute
+
+28
+00:01:38,278 --> 00:01:41,710
+time, which indicates when the runnable
+should be processed.
+
+29
+00:01:42,920 --> 00:01:45,040
+The latter two methods allow programs to
+implement
+
+30
+00:01:45,040 --> 00:01:48,140
+time outs, ticks, and other timing related
+behavior.
+
+31
+00:01:49,840 --> 00:01:51,642
+There're also several variances of the
+
+32
+00:01:51,642 --> 00:01:53,868
+handler's remove method that delete any
+pending
+
+33
+00:01:53,868 --> 00:01:55,617
+posts of the designated runnables that
+
+34
+00:01:55,617 --> 00:01:57,841
+still reside on the underlying message
+queue.
+
+35
+00:01:57,841 --> 00:01:58,341
+[MUSIC].
+
+36
+00:02:05,160 --> 00:02:07,435
+Now that we've shown the key post related
+
+37
+00:02:07,435 --> 00:02:10,555
+methods in the Android handler class,
+we'll analyze an
+
+38
+00:02:10,555 --> 00:02:12,895
+example of how to post a runnable command
+to
+
+39
+00:02:12,895 --> 00:02:16,590
+an activity, via it's run on UI thread
+method.
+
+40
+00:02:16,590 --> 00:02:19,762
+Which uses an internal handler object to
+ensure this runnable
+
+41
+00:02:19,762 --> 00:02:22,710
+is executed in the context of the user
+interface thread.
+
+42
+00:02:23,960 --> 00:02:26,970
+Since this example examines a lot of code,
+you may want to
+
+43
+00:02:26,970 --> 00:02:31,600
+download the Android open source release
+available at this link and follow along.
+
+44
+00:02:33,200 --> 00:02:36,040
+This example is based on the Android
+activity class.
+
+45
+00:02:36,040 --> 00:02:40,540
+Which provides a single focused thing that
+a user can do, as described at this link.
+
+46
+00:02:41,940 --> 00:02:44,910
+The activity class defines dozens of call
+back hook methods
+
+47
+00:02:44,910 --> 00:02:47,180
+and life cycle methods, as shown at this
+path name.
+
+48
+00:02:49,010 --> 00:02:52,310
+These methods perform their computation in
+the user interface thread.
+
+49
+00:02:53,660 --> 00:02:56,650
+To allow background threads to execute
+actions in the user interface
+
+50
+00:02:56,650 --> 00:03:01,170
+thread, the activity class defines a run
+on UI thread method.
+
+51
+00:03:01,170 --> 00:03:04,626
+An action passed to this method must be
+implemented as a Runnable
+
+52
+00:03:04,626 --> 00:03:08,338
+command, as depicted in this code snippet
+from an earlier video that
+
+53
+00:03:08,338 --> 00:03:11,666
+showed how the Strategy pattern can be
+applied in the Ping Pong
+
+54
+00:03:11,666 --> 00:03:15,720
+application to print ping and pong strings
+to the user interface thread.
+
+55
+00:03:16,930 --> 00:03:19,134
+Internally, the run on UI thread method
+uses
+
+56
+00:03:19,134 --> 00:03:21,686
+an instance of a Handler that's associated
+with the
+
+57
+00:03:21,686 --> 00:03:24,412
+user interface threads looper to execute
+the specified
+
+58
+00:03:24,412 --> 00:03:27,080
+action in the context of the user
+interface thread.
+
+59
+00:03:28,140 --> 00:03:30,090
+If the thread calling run-on UI thread is
+the
+
+60
+00:03:30,090 --> 00:03:33,850
+user interface thread itself, the action
+is run immediately.
+
+61
+00:03:33,850 --> 00:03:37,040
+If it's not the user interface thread
+itself however, the action is
+
+62
+00:03:37,040 --> 00:03:40,550
+posted to the message queue of the user
+interface thread via the handler.
+
+63
+00:03:41,890 --> 00:03:44,630
+Naturally, this use of the Handler's post
+
+64
+00:03:44,630 --> 00:03:47,600
+method is not limited to the activity
+class.
+
+65
+00:03:47,600 --> 00:03:50,787
+It's a common Android idiom that will
+apply throughout this module.
+
+66
+00:03:50,787 --> 00:03:51,287
+[MUSIC].
+
+67
+00:03:58,270 --> 00:04:01,184
+Now that we've analyzed the activities run
+on UI thread
+
+68
+00:04:01,184 --> 00:04:05,120
+method, we'll examine the implementation
+of the handlers post method.
+
+69
+00:04:06,340 --> 00:04:08,388
+We also show how the Android handler,
+
+70
+00:04:08,388 --> 00:04:11,268
+looper, and message queue classes,
+collaborate to
+
+71
+00:04:11,268 --> 00:04:15,720
+use and implement a portion of the hammer
+frame work outlined in an earlier video.
+
+72
+00:04:17,000 --> 00:04:19,090
+Although you needn't understand all these
+steps to
+
+73
+00:04:19,090 --> 00:04:21,720
+use the HaMeR framework effectively, it's
+useful to
+
+74
+00:04:21,720 --> 00:04:24,740
+know how it works, since common and
+generalizable
+
+75
+00:04:24,740 --> 00:04:26,460
+concurrency patterns and framework
+
+76
+00:04:26,460 --> 00:04:28,520
+techniques appear throughout its
+implementation.
+
+77
+00:04:29,980 --> 00:04:32,970
+When an action is posted to the activity
+from a background thread,
+
+78
+00:04:32,970 --> 00:04:34,540
+the handler's post method adds the
+
+79
+00:04:34,540 --> 00:04:36,610
+runnable action to the looper's message
+queue.
+
+80
+00:04:37,740 --> 00:04:39,871
+This method performs several steps.
+
+81
+00:04:39,871 --> 00:04:42,010
+Many of which are shared with the send
+
+82
+00:04:42,010 --> 00:04:44,620
+message methods as shown at this path
+name.
+
+83
+00:04:45,790 --> 00:04:49,820
+First, post calls the get post message
+method, which obtains a message from
+
+84
+00:04:49,820 --> 00:04:54,005
+a factory and then capsulates the runnable
+as a callback field in the message.
+
+85
+00:04:54,005 --> 00:04:54,699
+[BLANK_AUDIO]
+
+86
+00:04:56,690 --> 00:04:59,571
+Post then inserts this encapsulated
+runnable into
+
+87
+00:04:59,571 --> 00:05:01,648
+the message queue, via a call to send
+
+88
+00:05:01,648 --> 00:05:04,127
+message delayed, with a delay of 0, which
+
+89
+00:05:04,127 --> 00:05:07,110
+ultimately calls the send message at time
+method.
+
+90
+00:05:08,430 --> 00:05:12,330
+This method first stores the thread
+specific loopers message queue in a local
+
+91
+00:05:12,330 --> 00:05:17,560
+variable, and then sets the target of the
+encapsulated runnable to be this handler.
+
+92
+00:05:17,560 --> 00:05:21,820
+Which the looper uses later, to dispatch
+the Runnable's Run Hook Method.
+
+93
+00:05:23,270 --> 00:05:26,740
+Finally, the encapsulated runnable is then
+queued on the looper's message queue.
+
+94
+00:05:28,170 --> 00:05:30,608
+At this point, we switch our focus from
+the background
+
+95
+00:05:30,608 --> 00:05:33,540
+thread to the user interface thread,
+starting with its looper.
+
+96
+00:05:34,640 --> 00:05:37,730
+The looper's loop method collaborates with
+the message queue
+
+97
+00:05:37,730 --> 00:05:40,760
+and handler classes as described in a
+previous video.
+
+98
+00:05:42,510 --> 00:05:45,377
+In particular, loop calls dispatch message
+to process
+
+99
+00:05:45,377 --> 00:05:49,210
+an encapsulated Runnable, via the
+handler's handle callback method.
+
+100
+00:05:50,460 --> 00:05:53,110
+This method then invokes the encapsulated
+Runnables
+
+101
+00:05:53,110 --> 00:05:55,290
+run hook method to execute the command.
+
+102
+00:05:56,910 --> 00:05:59,302
+Run executes in the thread associated with
+the handler
+
+103
+00:05:59,302 --> 00:06:02,150
+instance, which in this case, is the user
+interface thread.
+
+104
+00:06:03,870 --> 00:06:06,130
+Note the inversion of control in the path
+through this code.
+
+105
+00:06:07,190 --> 00:06:10,724
+The looper runs the user interface
+thread's event loop and encapsulated
+
+106
+00:06:10,724 --> 00:06:12,320
+runnables are executed by the run
+
+107
+00:06:12,320 --> 00:06:14,930
+hook methods provided by application
+developers.
+
+108
+00:06:16,250 --> 00:06:20,354
+We'll explore the entire code path used by
+the hammer framework to post, schedule,
+
+109
+00:06:20,354 --> 00:06:22,577
+and dispatch runnables later in this
+module,
+
+110
+00:06:22,577 --> 00:06:25,040
+when we present the command processor
+pattern.
+
+111
+00:06:26,280 --> 00:06:29,428
+[MUSIC].
+
+112
+00:06:29,428 --> 00:06:33,250
+In summary, the post methods in the
+handler class
+
+113
+00:06:33,250 --> 00:06:38,110
+form a key portion of the Android hammer
+framework.
+
+114
+00:06:38,110 --> 00:06:40,420
+In particular, they provide the means to
+
+115
+00:06:40,420 --> 00:06:42,928
+end queue and later process runnables
+posted
+
+116
+00:06:42,928 --> 00:06:47,200
+from within a single thread to itself or
+posted from one thread to another.
+
+117
+00:06:48,290 --> 00:06:50,590
+They're often used to send runnable
+commands from one
+
+118
+00:06:50,590 --> 00:06:53,890
+or more background threads to the user
+interface thread.
+
+119
+00:06:53,890 --> 00:06:56,309
+In fact, the collaboration between
+handler's
+
+120
+00:06:56,309 --> 00:06:58,138
+post methods and the message queue,
+
+121
+00:06:58,138 --> 00:07:00,203
+and looper classes implement the command
+
+122
+00:07:00,203 --> 00:07:02,890
+processor pattern as described in upcoming
+videos.
+
+123
+00:07:04,010 --> 00:07:06,145
+In practice, the post methods of handler
+
+124
+00:07:06,145 --> 00:07:09,195
+often leverage Java's local class feature,
+which allows
+
+125
+00:07:09,195 --> 00:07:12,611
+runnable commands to reference variables
+in lexically enclosing
+
+126
+00:07:12,611 --> 00:07:16,360
+classes, or variables in a lexically
+enclosing method.
+
+127
+00:07:16,360 --> 00:07:19,006
+As shown by the highlighted variables in
+this code snippet
+
+128
+00:07:19,006 --> 00:07:21,855
+from the ping pong application, shown in
+the earlier video.
+
+129
+00:07:21,855 --> 00:07:22,460
+[BLANK_AUDIO].
+
+130
+00:07:24,050 --> 00:07:27,431
+In this example, the M text view data
+member in the Android
+
+131
+00:07:27,431 --> 00:07:29,984
+platform strategy class is accessed within
+
+132
+00:07:29,984 --> 00:07:32,630
+the runhook method of the runnable
+command.
+
+133
+00:07:34,120 --> 00:07:38,743
+These job on Android capabilities provide
+a variant of closures, which allow a
+
+134
+00:07:38,743 --> 00:07:41,296
+method to access non local variables, even
+
+135
+00:07:41,296 --> 00:07:45,310
+when invoked outside its immediate lexical
+scope.
+
+136
+00:07:45,310 --> 00:07:46,134
+As described, this link.
+
+137
+00:07:46,134 --> 00:07:46,634
+[BLANK_AUDIO].
+
+138
+00:07:48,230 --> 00:07:50,609
+Java support for closures is also covered
+at this link.
+
+139
+00:07:52,050 --> 00:07:55,510
+The handler's use of runnable commands
+centralizes the processing
+
+140
+00:07:55,510 --> 00:07:58,520
+logic at the point where the post method
+is invoked.
+
+141
+00:07:58,520 --> 00:08:01,770
+So there's no need to write separate
+receiver logic to handle the post.
+
+142
+00:08:02,790 --> 00:08:07,470
+In contrast, the handler's send message
+methods require developers to explicitly
+
+143
+00:08:07,470 --> 00:08:11,091
+extend the handle message hook method as
+shown in the next video.
+
+144
+00:08:11,091 --> 00:08:11,830
+[BLANK_AUDIO].
+
+145
+00:08:13,840 --> 00:08:17,744
+To showcase the command processing
+features of handler, we analyzed an
+
+146
+00:08:17,744 --> 00:08:21,840
+example of the Android activity class run
+on UI thread method.
+
+147
+00:08:21,840 --> 00:08:26,952
+Which uses an internal handler object, to
+ensure runnable actions passed to it from
+
+148
+00:08:26,952 --> 00:08:31,912
+background threads, are executed in the
+context of the user interface thread.
+
+149
+00:08:31,912 --> 00:08:39,949
+[MUSIC]
+

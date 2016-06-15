@@ -1,0 +1,629 @@
+1
+00:00:00,000 --> 00:00:07,896
+[MUSIC].
+
+2
+00:00:07,896 --> 00:00:12,380
+Welcome to the next part of the module on
+Android Concurrency frameworks.
+
+3
+00:00:12,380 --> 00:00:14,730
+Which covers the looper class.
+
+4
+00:00:14,730 --> 00:00:18,630
+This part explains how the looper class
+provides a thread-specific event loop.
+
+5
+00:00:18,630 --> 00:00:21,916
+That waits for and dispatches messages to
+handlers, and shows
+
+6
+00:00:21,916 --> 00:00:26,250
+how loopers, are applied in Android
+applications and concurrency frameworks.
+
+7
+00:00:27,840 --> 00:00:29,460
+A looper contains the synchronized message
+
+8
+00:00:29,460 --> 00:00:31,540
+queue that's used to process messages
+placed
+
+9
+00:00:31,540 --> 00:00:35,010
+on the queue by one or more threads, as
+described at this link.
+
+10
+00:00:36,620 --> 00:00:39,180
+This queue can be used to implement a
+thread, specific of
+
+11
+00:00:39,180 --> 00:00:43,770
+that loop, which is a key portion of an
+event-driven programming model.
+
+12
+00:00:43,770 --> 00:00:45,330
+Where the control flow of the thread
+
+13
+00:00:45,330 --> 00:00:48,780
+is determined by messages to corresponding
+user actions.
+
+14
+00:00:48,780 --> 00:00:54,270
+Such as touch screen presses, sensor
+outputs, or messages from other threads.
+
+15
+00:00:54,270 --> 00:00:55,680
+As described at these links.
+
+16
+00:00:57,070 --> 00:00:58,940
+Only one looper is allowed per thread.
+
+17
+00:01:00,240 --> 00:01:02,400
+This constraint is enforced by the
+thread-specific
+
+18
+00:01:02,400 --> 00:01:05,190
+storage pattern as described in an
+upcoming video.
+
+19
+00:01:06,630 --> 00:01:08,555
+Multiple loopers can run concurrently in
+
+20
+00:01:08,555 --> 00:01:11,340
+multiple threads, and communicate by
+passing messages.
+
+21
+00:01:12,650 --> 00:01:14,610
+The key method is defined by the looper
+class are
+
+22
+00:01:14,610 --> 00:01:17,500
+prepare, loop and quit as shown at this
+path name.
+
+23
+00:01:18,870 --> 00:01:21,030
+Prepare is a static method that uses the
+
+24
+00:01:21,030 --> 00:01:24,100
+Java thread local class described at this
+link.
+
+25
+00:01:24,100 --> 00:01:26,430
+To initialize the current thread as a
+looper.
+
+26
+00:01:26,430 --> 00:01:30,330
+In accordance with a thread specific
+storage pattern described at this link.
+
+27
+00:01:31,390 --> 00:01:35,390
+Prepare must be called explicitly before
+running the event loop.
+
+28
+00:01:35,390 --> 00:01:38,200
+Followed by creating handlers that then
+reference this looper.
+
+29
+00:01:39,940 --> 00:01:43,112
+The loop static method, runs a threads
+event loop which waits
+
+30
+00:01:43,112 --> 00:01:46,840
+for messages to arrive on the looper's
+thread specific message queue.
+
+31
+00:01:48,460 --> 00:01:50,410
+The call to next on the message queue.
+
+32
+00:01:50,410 --> 00:01:53,370
+Can block waiting for messages to arrive.
+
+33
+00:01:53,370 --> 00:01:55,840
+Using the Linux e pole scalable I/O event
+
+34
+00:01:55,840 --> 00:01:58,580
+notification mechanism, as shown at this
+path net.
+
+35
+00:02:00,290 --> 00:02:02,650
+Once the next message is received, the
+loop
+
+36
+00:02:02,650 --> 00:02:05,330
+method dispatches the message to its
+target handler.
+
+37
+00:02:06,830 --> 00:02:09,050
+Note the inversion of control here.
+
+38
+00:02:09,050 --> 00:02:12,026
+The looper runs the threads event loop,
+and messages are
+
+39
+00:02:12,026 --> 00:02:16,050
+processed via call backs to handlers
+provided by application developers.
+
+40
+00:02:17,530 --> 00:02:20,670
+Quit initiates the shutdown of a loopers
+event loop.
+
+41
+00:02:20,670 --> 00:02:24,940
+Quit doesn't immediately terminate the
+loop but instead it queues a special empty
+
+42
+00:02:24,940 --> 00:02:29,089
+message that informs the looper to shut
+down, when it processes this message.
+
+43
+00:02:30,780 --> 00:02:33,705
+The actual task of managing the queue is
+done by
+
+44
+00:02:33,705 --> 00:02:38,130
+a handler which is responsible for adding,
+removing and dispatching
+
+45
+00:02:38,130 --> 00:02:41,805
+messages in the message queue to their
+intended targets as
+
+46
+00:02:41,805 --> 00:02:45,674
+described in this link and covered in the
+upcoming video.
+
+47
+00:02:45,674 --> 00:02:50,706
+[MUSIC].
+
+48
+00:02:50,706 --> 00:02:54,760
+We will now examine one way in which
+Android software uses loopers.
+
+49
+00:02:54,760 --> 00:02:58,160
+By default a Java thread, and thus and
+Android thread described in this
+
+50
+00:02:58,160 --> 00:03:03,150
+link, which is a Java thread does not have
+a looper associated with it.
+
+51
+00:03:03,150 --> 00:03:06,570
+Therefore if a thread needs looper
+behavior, one
+
+52
+00:03:06,570 --> 00:03:09,890
+approach is to program it directly into
+the thread.
+
+53
+00:03:09,890 --> 00:03:12,770
+Following the steps shown at this link.
+
+54
+00:03:12,770 --> 00:03:16,070
+For example, a canonical looper use case
+appears in the
+
+55
+00:03:16,070 --> 00:03:19,810
+video editor activity, covered earlier in
+the Java Semaphore video.
+
+56
+00:03:20,900 --> 00:03:22,980
+This activity contains a private class
+called
+
+57
+00:03:22,980 --> 00:03:25,130
+preview thread shown at this path name.
+
+58
+00:03:26,780 --> 00:03:28,786
+The first step in making preview thread a
+
+59
+00:03:28,786 --> 00:03:31,090
+looper, is to extend the Java thread
+class.
+
+60
+00:03:32,330 --> 00:03:34,320
+The constructor of preview thread then
+starts
+
+61
+00:03:34,320 --> 00:03:36,180
+itself to preview videos in the
+background.
+
+62
+00:03:37,490 --> 00:03:41,830
+When preview thread is started, its run
+hook method performs the next step
+
+63
+00:03:41,830 --> 00:03:44,480
+by calling loop or dot prepare, which
+
+64
+00:03:44,480 --> 00:03:46,520
+initializes the current thread as the
+looper.
+
+65
+00:03:48,000 --> 00:03:50,210
+The step after that involves creating one
+
+66
+00:03:50,210 --> 00:03:52,980
+or more handlers to process incoming
+messages.
+
+67
+00:03:54,360 --> 00:03:57,148
+The final step involves calling
+looper.loop to
+
+68
+00:03:57,148 --> 00:04:00,072
+run the event loop, process messages and
+dispatch
+
+69
+00:04:00,072 --> 00:04:03,200
+call backs to handlers, until the loopers
+explicitly
+
+70
+00:04:03,200 --> 00:04:05,620
+told to stop by calling its quit method.
+
+71
+00:04:06,750 --> 00:04:10,360
+Although, we show these steps in the
+context of the video editor activity.
+
+72
+00:04:10,360 --> 00:04:13,033
+This approach is applied to add loopers
+
+73
+00:04:13,033 --> 00:04:17,347
+to threads throughout Android middleware
+and applications.
+
+74
+00:04:17,347 --> 00:04:21,938
+[MUSIC].
+
+75
+00:04:21,938 --> 00:04:24,416
+Now that we've shown the key methods in
+the looper
+
+76
+00:04:24,416 --> 00:04:28,015
+class, and outlined a canonical
+application of this class in Android,
+
+77
+00:04:28,015 --> 00:04:31,791
+we'll show several examples of how
+Android's concurrency frameworks use
+
+78
+00:04:31,791 --> 00:04:36,850
+loopers for both the user interface
+thread, and background handler threads.
+
+79
+00:04:36,850 --> 00:04:39,553
+The user interface thread has a looper
+that it uses to receive
+
+80
+00:04:39,553 --> 00:04:43,200
+messages from itself, and other background
+threats as described at this link.
+
+81
+00:04:44,390 --> 00:04:47,140
+The message que in the user interface
+thread's looper help
+
+82
+00:04:47,140 --> 00:04:50,220
+serialize access to the user interface
+components such as views,
+
+83
+00:04:50,220 --> 00:04:52,640
+and menus and insures the only objects
+running on the
+
+84
+00:04:52,640 --> 00:04:56,180
+user interface thread have access to other
+objects in that thread.
+
+85
+00:04:56,180 --> 00:04:58,190
+As described at this link.
+
+86
+00:04:58,190 --> 00:05:00,490
+The User Interface thread's looper is
+implemented in
+
+87
+00:05:00,490 --> 00:05:02,910
+the ActivityThread class, as shown at this
+path name.
+
+88
+00:05:03,970 --> 00:05:07,938
+ActivityThread's main entry point method
+calls PrepareMainLoop, which
+
+89
+00:05:07,938 --> 00:05:11,640
+initializes the current thread as the
+application's main looper.
+
+90
+00:05:12,870 --> 00:05:15,679
+The Android runtime environment creates
+the main looper for an
+
+91
+00:05:15,679 --> 00:05:19,340
+application automatically, so there's no
+need to call this method directly.
+
+92
+00:05:20,800 --> 00:05:24,140
+Loopers can also be defined, and used in
+non user interface threads.
+
+93
+00:05:24,140 --> 00:05:28,200
+As found throughout Android's frameworks,
+applications and providers.
+
+94
+00:05:28,200 --> 00:05:30,660
+Their methods are typically called from
+within a run hook
+
+95
+00:05:30,660 --> 00:05:33,940
+method that performs some kind of service
+in a background thread.
+
+96
+00:05:35,220 --> 00:05:39,770
+This use case is such a common idiom, that
+Android defines a helper class.
+
+97
+00:05:39,770 --> 00:05:42,780
+Called handler thread, which starts a new
+thread
+
+98
+00:05:42,780 --> 00:05:45,460
+containing a looper as described at this
+link.
+
+99
+00:05:45,460 --> 00:05:50,630
+The handler thread class uses a template
+method pattern, described at this link, to
+
+100
+00:05:50,630 --> 00:05:53,160
+perform the fixed, prepare and loop steps
+
+101
+00:05:53,160 --> 00:05:55,540
+in the handler threads run template method
+algorithm.
+
+102
+00:05:56,780 --> 00:06:00,110
+Sub classes of handler thread can create
+their desired handlers.
+
+103
+00:06:00,110 --> 00:06:03,449
+By over riding the on looper prepared hook
+method, which plays
+
+104
+00:06:03,449 --> 00:06:07,211
+the role of the primitive operation in the
+template method pattern.
+
+105
+00:06:07,211 --> 00:06:09,767
+The handler thread start method must still
+
+106
+00:06:09,767 --> 00:06:12,536
+be called explicitly to spawn the thread
+which
+
+107
+00:06:12,536 --> 00:06:14,808
+invokes its run hook method, as shown
+
+108
+00:06:14,808 --> 00:06:17,814
+in this example from the Android intent
+service.
+
+109
+00:06:17,814 --> 00:06:20,695
+Which handles asynchronous requests,
+expresses
+
+110
+00:06:20,695 --> 00:06:22,638
+and tents on demand, as described
+
+111
+00:06:22,638 --> 00:06:26,010
+at this link, and covered in the next
+section of this MOOC.
+
+112
+00:06:27,700 --> 00:06:29,588
+Handler threads are used extensively
+
+113
+00:06:29,588 --> 00:06:33,062
+throughout Android's frameworks,
+applications and providers.
+
+114
+00:06:33,062 --> 00:06:38,334
+[MUSIC].
+
+115
+00:06:38,334 --> 00:06:42,720
+In summary, a thread can be programmed to
+contain a looper.
+
+116
+00:06:42,720 --> 00:06:45,210
+Which in turn, contains a message to you.
+
+117
+00:06:45,210 --> 00:06:48,090
+These objects collaborate to provide
+applications with
+
+118
+00:06:48,090 --> 00:06:50,070
+a thread specific event loop that waits
+
+119
+00:06:50,070 --> 00:06:52,350
+for and dispatches messages to handlers,
+in
+
+120
+00:06:52,350 --> 00:06:56,110
+the user interface thread or in background
+threads.
+
+121
+00:06:56,110 --> 00:06:59,000
+A loop is often invisible to application
+software components.
+
+122
+00:06:59,000 --> 00:07:01,710
+Which typically acts the user interface
+threads implicit looper
+
+123
+00:07:01,710 --> 00:07:05,590
+by handlers, as described next two videos
+in this module.
+
+124
+00:07:07,020 --> 00:07:09,880
+Explicitly program loopers are typically
+used in background
+
+125
+00:07:09,880 --> 00:07:13,340
+threads but applications that needed more
+sophisticated concurrency model.
+
+126
+00:07:13,340 --> 00:07:16,450
+Then the default single threaded model
+described at this link.
+
+127
+00:07:17,500 --> 00:07:20,320
+As shown at these path names, loopers are
+used throughout
+
+128
+00:07:20,320 --> 00:07:23,380
+Android's open source applications,
+application
+
+129
+00:07:23,380 --> 00:07:26,740
+frameworks and core concurrency
+frameworks.
+
+130
+00:07:26,740 --> 00:07:30,565
+In particular, loopers playing a central
+role in providing
+
+131
+00:07:30,565 --> 00:07:35,075
+inversion of control to Android's hammer
+and async task frameworks.
+
+132
+00:07:35,075 --> 00:07:43,299
+[MUSIC]
+

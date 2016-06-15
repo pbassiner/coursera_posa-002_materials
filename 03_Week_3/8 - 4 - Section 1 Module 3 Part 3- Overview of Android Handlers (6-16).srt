@@ -1,0 +1,530 @@
+1
+00:00:00,000 --> 00:00:02,536
+[MUSIC]
+
+2
+00:00:02,536 --> 00:00:07,024
+[BLANK_AUDIO].
+
+3
+00:00:07,024 --> 00:00:10,104
+Welcome to the next part of the module on
+Android
+
+4
+00:00:10,104 --> 00:00:15,189
+concurrency frameworks, which provides an
+overview of the Handler class.
+
+5
+00:00:16,240 --> 00:00:20,266
+This part explains how the handler class
+enables the sending and processing of
+
+6
+00:00:20,266 --> 00:00:22,096
+message and runnable objects in the
+
+7
+00:00:22,096 --> 00:00:24,660
+message cue associated with a threads
+looper.
+
+8
+00:00:26,090 --> 00:00:27,880
+It also shows how handlers are
+
+9
+00:00:27,880 --> 00:00:30,419
+applied in Android applications and
+concurrency frameworks.
+
+10
+00:00:31,910 --> 00:00:35,350
+Each thread-specific looper contains a
+synchronized MessageQueue
+
+11
+00:00:35,350 --> 00:00:37,820
+that's used to process messages and
+runnables
+
+12
+00:00:37,820 --> 00:00:39,330
+placed on the queue by one or
+
+13
+00:00:39,330 --> 00:00:42,610
+more threads, as described in the previous
+video.
+
+14
+00:00:43,950 --> 00:00:46,860
+However, the actual management of the
+MessageQueue is
+
+15
+00:00:46,860 --> 00:00:48,959
+done by instances of the Android handler
+class.
+
+16
+00:00:49,990 --> 00:00:54,120
+Each of which is associated with a single
+thread, and is responsible for adding and
+
+17
+00:00:54,120 --> 00:00:57,778
+removing messages in the thread-specific
+Looper's MessageQueue, as
+
+18
+00:00:57,778 --> 00:01:00,780
+well as dispatching messages to their
+intended targets.
+
+19
+00:01:00,780 --> 00:01:02,760
+As described at this link.
+
+20
+00:01:04,720 --> 00:01:08,320
+A Handler is associated with a particular
+Looper, which defaults to
+
+21
+00:01:08,320 --> 00:01:11,460
+the Looper for the current thread in which
+the Handler was created.
+
+22
+00:01:12,490 --> 00:01:15,230
+Though a different Looper can be passed as
+a parameter
+
+23
+00:01:15,230 --> 00:01:19,030
+to the Handler constructor, which stores
+it in a data member,.
+
+24
+00:01:19,030 --> 00:01:22,480
+And uses it to control which thread
+manages operations on the Handler.
+
+25
+00:01:24,300 --> 00:01:27,650
+A Handler provides several capabilities to
+applications.
+
+26
+00:01:27,650 --> 00:01:30,890
+For example, it can be used to send
+Message objects, and or post
+
+27
+00:01:30,890 --> 00:01:32,630
+Runnable objects to a Looper in the
+
+28
+00:01:32,630 --> 00:01:35,830
+Handler's thread, or in a different
+thread.
+
+29
+00:01:35,830 --> 00:01:39,736
+In either case, the Looper's MessageQueue
+enqueues, schedules, and
+
+30
+00:01:39,736 --> 00:01:42,949
+dequeues these objects, and collaborates
+with a Handler to
+
+31
+00:01:42,949 --> 00:01:45,154
+execute them at some point in the future
+in
+
+32
+00:01:45,154 --> 00:01:48,130
+the context of the thread associated with
+a Handler.
+
+33
+00:01:49,350 --> 00:01:52,130
+A Handler and Looper also collaborate to
+serialize
+
+34
+00:01:52,130 --> 00:01:54,260
+the processing of messages within the
+thread they're
+
+35
+00:01:54,260 --> 00:01:57,180
+associated with, which can be used to
+simplify
+
+36
+00:01:57,180 --> 00:02:00,880
+concurrency control by eliminating the
+need for synchronization mechanisms.
+
+37
+00:02:00,880 --> 00:02:03,430
+As long as the appropriate patterns and
+framework
+
+38
+00:02:03,430 --> 00:02:06,060
+design rules are followed, as described at
+this link.
+
+39
+00:02:07,700 --> 00:02:11,220
+Objects running in different threads can
+interact via their Handlers.
+
+40
+00:02:11,220 --> 00:02:13,515
+For example, they can exchange messages
+via Handler
+
+41
+00:02:13,515 --> 00:02:16,079
+and message cues associated with each
+other's Loopers.
+
+42
+00:02:17,680 --> 00:02:21,035
+Android concurrency frame works use the
+Handler, MessageQueue
+
+43
+00:02:21,035 --> 00:02:24,268
+and Looper classes to implement key
+concurrency patterns such
+
+44
+00:02:24,268 --> 00:02:27,196
+as active object, command processor, and
+the half sink
+
+45
+00:02:27,196 --> 00:02:30,050
+how they sink, as discussed later, in this
+module.
+
+46
+00:02:36,080 --> 00:02:38,360
+The Handler class has a large number of
+methods.
+
+47
+00:02:38,360 --> 00:02:41,180
+Over two dozen, as shown at this link.
+
+48
+00:02:41,180 --> 00:02:44,140
+These methods can be grouped into four
+main categories,
+
+49
+00:02:44,140 --> 00:02:47,790
+which correspond to various POSA and Gang
+of Four patterns.
+
+50
+00:02:47,790 --> 00:02:50,680
+We briefly outline each category here.
+
+51
+00:02:50,680 --> 00:02:52,846
+The first category of Handler methods
+enable
+
+52
+00:02:52,846 --> 00:02:55,180
+programs to post or remove a runnable.
+
+53
+00:02:55,180 --> 00:02:57,007
+By inserting it into or deleting it
+
+54
+00:02:57,007 --> 00:03:00,860
+from the MessageQueue associated with the
+Handler.
+
+55
+00:03:00,860 --> 00:03:04,341
+When a runnable is posted, the Handler and
+its thread specific Looper
+
+56
+00:03:04,341 --> 00:03:08,870
+then collaborate to dequeue each runnable
+and dispatch its run hook method.
+
+57
+00:03:08,870 --> 00:03:10,760
+In accordance with the command processor
+
+58
+00:03:10,760 --> 00:03:13,029
+pattern, described in these upcoming
+videos.
+
+59
+00:03:14,300 --> 00:03:16,760
+The second category of Handler methods,
+allows
+
+60
+00:03:16,760 --> 00:03:19,280
+programs to send or remove a message.
+
+61
+00:03:19,280 --> 00:03:21,296
+Again, by inserting it into, or deleting
+
+62
+00:03:21,296 --> 00:03:23,940
+it from the MessageQueue associated with
+the Handler.
+
+63
+00:03:25,260 --> 00:03:27,795
+When a message is sent, it contains a
+bundle of
+
+64
+00:03:27,795 --> 00:03:31,890
+data that will subsequently be processed
+by the Handler's handleMessage
+
+65
+00:03:31,890 --> 00:03:35,270
+hook method, in accordance with a message
+passing variant of
+
+66
+00:03:35,270 --> 00:03:39,089
+the active object pattern, as described in
+these upcoming videos.
+
+67
+00:03:40,730 --> 00:03:42,900
+The third category of Handler methods are
+
+68
+00:03:42,900 --> 00:03:46,980
+factories that create the messages passed
+to sendMessage.
+
+69
+00:03:46,980 --> 00:03:50,250
+In accordance with creational patterns,
+described at this link.
+
+70
+00:03:51,790 --> 00:03:54,328
+The fourth and final category of Handler
+methods is used
+
+71
+00:03:54,328 --> 00:03:57,500
+to dispatch and handle messages by the
+handleMessage hook method.
+
+72
+00:03:58,650 --> 00:04:00,450
+This method must be overridden.
+
+73
+00:04:00,450 --> 00:04:04,685
+To receive and process messages enqueued
+via send message.
+
+74
+00:04:04,685 --> 00:04:07,325
+The handleMessage hook method runs in the
+context of
+
+75
+00:04:07,325 --> 00:04:11,450
+the thread specific Looper, associated
+with the Handler instance.
+
+76
+00:04:11,450 --> 00:04:13,450
+Again, in accordance with the message
+
+77
+00:04:13,450 --> 00:04:15,670
+passing variant of the active object
+pattern.
+
+78
+00:04:16,900 --> 00:04:19,010
+This overview just scratches the surface
+of
+
+79
+00:04:19,010 --> 00:04:22,140
+the many methods associated with each
+category.
+
+80
+00:04:22,140 --> 00:04:23,450
+Which we elaborate upon.
+
+81
+00:04:23,450 --> 00:04:25,120
+In the next two parts of the module.
+
+82
+00:04:25,120 --> 00:04:28,817
+[MUSIC]
+
+83
+00:04:28,817 --> 00:04:34,960
+In summary, background threads and the
+user interface thread in
+
+84
+00:04:34,960 --> 00:04:38,960
+Android, often need to communicate to
+perform their operations concurrently.
+
+85
+00:04:38,960 --> 00:04:40,440
+And or coordinate their behavior.
+
+86
+00:04:41,720 --> 00:04:44,980
+The HaMeR framework uses the Handler class
+to support these interactions.
+
+87
+00:04:46,430 --> 00:04:48,878
+The Handler allows one or more background
+threads to send
+
+88
+00:04:48,878 --> 00:04:52,140
+messages or post runnables to the user
+interface threads MessageQueue.
+
+89
+00:04:53,200 --> 00:04:56,249
+As well as allow a thread to send messages
+or post runnables to itself.
+
+90
+00:04:57,510 --> 00:05:01,750
+Moreover, background threads can also
+interact via Handlers.
+
+91
+00:05:01,750 --> 00:05:04,190
+The post methods are generally used when
+the sender knows
+
+92
+00:05:04,190 --> 00:05:07,130
+what operations to perform, as shown in
+this upcoming video.
+
+93
+00:05:07,130 --> 00:05:11,063
+The sendMethods methods are generally used
+when the receiver knows
+
+94
+00:05:11,063 --> 00:05:14,730
+what operations to perform, as shown in
+this upcoming video.
+
+95
+00:05:16,970 --> 00:05:20,060
+Handlers are widely applied in Android
+applications.
+
+96
+00:05:20,060 --> 00:05:22,710
+Application frameworks and concurrency
+frameworks.
+
+97
+00:05:23,780 --> 00:05:26,020
+In the HaMeR framework, Handlers
+collaborate
+
+98
+00:05:26,020 --> 00:05:28,316
+with Loopers and MessageQueues to
+implement key
+
+99
+00:05:28,316 --> 00:05:30,948
+framework characteristics, such as their
+support for
+
+100
+00:05:30,948 --> 00:05:33,468
+inversion of control, concurrency to main
+specific
+
+101
+00:05:33,468 --> 00:05:36,604
+structure, and functionality like
+synchronized MessageQueues
+
+102
+00:05:36,604 --> 00:05:39,068
+and thread tools, and semi-completed
+portions of
+
+103
+00:05:39,068 --> 00:05:41,476
+concurrent applications whose run and
+handle hook
+
+104
+00:05:41,476 --> 00:05:45,030
+messages can be overridden by application
+developers.
+
+105
+00:05:45,030 --> 00:05:46,770
+As described in the next two videos.
+
+106
+00:05:48,570 --> 00:05:51,050
+The AsyncTask framework also uses Handlers
+for
+
+107
+00:05:51,050 --> 00:05:54,290
+similar purposes, as shown in these
+upcoming videos.
+
+108
+00:05:55,840 --> 00:05:57,590
+Other sources explain how to use Handlers
+
+109
+00:05:57,590 --> 00:06:00,900
+in Android concurrency frameworks and
+concurrent applications.
+
+110
+00:06:00,900 --> 00:06:06,410
+As described at this link.
+
+111
+00:06:06,410 --> 00:06:11,329
+[MUSIC]
+

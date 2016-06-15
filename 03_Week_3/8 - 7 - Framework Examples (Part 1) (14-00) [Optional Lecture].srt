@@ -1,0 +1,1149 @@
+1
+00:00:00,000 --> 00:00:02,977
+[BLANK_AUDIO].
+
+2
+00:00:02,977 --> 00:00:09,991
+Hello, and welcome to part one of the
+Frameworks Examples module.
+
+3
+00:00:09,991 --> 00:00:12,711
+In this module, we're going to present
+
+4
+00:00:12,711 --> 00:00:16,391
+an overview of scope, commonality, and
+variability
+
+5
+00:00:16,391 --> 00:00:19,191
+analysis, as a method for developing and
+
+6
+00:00:19,191 --> 00:00:24,160
+applying software product lines, and most
+importantly, frameworks.
+
+7
+00:00:25,420 --> 00:00:28,260
+We'll then going to give a quick overview
+of scope
+
+8
+00:00:28,260 --> 00:00:32,307
+commonality and variability analysis
+applied to Android and ACE,
+
+9
+00:00:32,307 --> 00:00:35,857
+which are open source platforms we'll be
+using throughout
+
+10
+00:00:35,857 --> 00:00:40,009
+the course to demonstrate the concepts of
+patterns and frameworks.
+
+11
+00:00:41,490 --> 00:00:45,400
+Before we talk about scope commonality and
+variability analysis, however.
+
+12
+00:00:45,400 --> 00:00:50,040
+Let's first give a quick summary of what a
+software product line is.
+
+13
+00:00:50,040 --> 00:00:54,580
+A software product line is a form of
+systematic software reuse.
+
+14
+00:00:54,580 --> 00:01:00,196
+It's basically a set of software intensive
+systems that share common managed sets of
+
+15
+00:01:00,196 --> 00:01:03,238
+features, that satisfies specific needs of
+a
+
+16
+00:01:03,238 --> 00:01:06,970
+particular market segment, or mission, or
+domain.
+
+17
+00:01:08,180 --> 00:01:11,010
+Software product-lines are developed from
+a common
+
+18
+00:01:11,010 --> 00:01:13,580
+set of core assets, in a prescribed way.
+
+19
+00:01:14,750 --> 00:01:17,360
+As we'll see throughout this entire
+module,
+
+20
+00:01:17,360 --> 00:01:21,530
+but especially this first part, frameworks
+and patterns,.
+
+21
+00:01:21,530 --> 00:01:23,210
+Can help to develop and define and
+
+22
+00:01:23,210 --> 00:01:27,680
+improve software product-lines by
+factoring out many
+
+23
+00:01:27,680 --> 00:01:32,090
+reusable general purpose and domain
+specific services
+
+24
+00:01:32,090 --> 00:01:35,670
+from the responsibility of the application
+developers.
+
+25
+00:01:35,670 --> 00:01:37,130
+If you take a look at this URL,
+
+26
+00:01:37,130 --> 00:01:41,320
+you'll see a lot more information about
+software product-lines.
+
+27
+00:01:41,320 --> 00:01:44,540
+By some of the groups at the software
+engineering institute who
+
+28
+00:01:44,540 --> 00:01:48,980
+have pioneered and propagated this
+prospective for a number of years.
+
+29
+00:01:50,490 --> 00:01:54,770
+So let's talk now about scope commonality
+and variability analysis.
+
+30
+00:01:54,770 --> 00:01:59,418
+Key software product line and framework
+structures and behaviors
+
+31
+00:01:59,418 --> 00:02:04,600
+can be captured using scope commonality
+and variability analysis.
+
+32
+00:02:04,600 --> 00:02:09,200
+It's basically a way to look for things
+that are going to be common and therefore
+
+33
+00:02:09,200 --> 00:02:13,170
+fixed and stable and worthwhile to build
+your
+
+34
+00:02:13,170 --> 00:02:16,590
+overall solution around because they don't
+change a lot.
+
+35
+00:02:16,590 --> 00:02:18,540
+As well as identifying things that can
+
+36
+00:02:18,540 --> 00:02:20,939
+change, that can vary, the so called
+variabilities.
+
+37
+00:02:22,170 --> 00:02:25,482
+One of the key themes we'll see here is to
+find ways to take
+
+38
+00:02:25,482 --> 00:02:28,518
+the variabilities, and provide a common
+interface
+
+39
+00:02:28,518 --> 00:02:30,450
+to them so that when they change,
+
+40
+00:02:30,450 --> 00:02:35,073
+it doesn't break other parts of the
+product line, or the applications, or the
+
+41
+00:02:35,073 --> 00:02:37,557
+frameworks that are using, that are using
+
+42
+00:02:37,557 --> 00:02:41,099
+these techniques in order to achieve
+systematic reuse.
+
+43
+00:02:42,910 --> 00:02:46,550
+We're going to be applying scope,
+commonalty, and variability analysis to
+
+44
+00:02:46,550 --> 00:02:51,560
+guide the development and application of
+software product lines and frameworks.
+
+45
+00:02:51,560 --> 00:02:53,880
+If you take a look at the URL at the
+bottom of
+
+46
+00:02:53,880 --> 00:02:57,400
+this slide, you'll see a paper written a
+couple of years ago
+
+47
+00:02:57,400 --> 00:03:01,730
+that goes into more detail about the
+method of scope, commonality, and
+
+48
+00:03:01,730 --> 00:03:04,330
+variability analysis, and I highly
+encourage you to take a look at this.
+
+49
+00:03:04,330 --> 00:03:06,859
+It provides a good grounding for what
+we're about to talk about.
+
+50
+00:03:08,220 --> 00:03:09,690
+So lets talk about how we might apply
+
+51
+00:03:09,690 --> 00:03:12,790
+scope commonality and variability analysis
+to, to Android.
+
+52
+00:03:12,790 --> 00:03:16,420
+The scope, defines a domain and context
+
+53
+00:03:16,420 --> 00:03:19,390
+of Android and its various frameworks and
+components.
+
+54
+00:03:20,810 --> 00:03:26,075
+Android naturally is targeted toward
+resource constraint mobile devices,
+
+55
+00:03:26,075 --> 00:03:31,260
+Where they may have limited power, limited
+memory, limited processors.
+
+56
+00:03:31,260 --> 00:03:35,120
+At least limited, compared to laptops and
+desktops or servers.
+
+57
+00:03:35,120 --> 00:03:38,522
+Limited network access, perhaps over,
+wireless links,
+
+58
+00:03:38,522 --> 00:03:40,810
+perhaps over cellular networks and so on.
+
+59
+00:03:40,810 --> 00:03:43,420
+And there also may be some limits on, on
+the
+
+60
+00:03:43,420 --> 00:03:46,660
+price point, People may want to provide a
+range of different alternatives.
+
+61
+00:03:46,660 --> 00:03:48,450
+Some for the very high end users.
+
+62
+00:03:48,450 --> 00:03:51,530
+Some for the more bargain price sensitive
+users.
+
+63
+00:03:53,500 --> 00:03:56,640
+Android's also focusing of course on touch
+screen modalities.
+
+64
+00:03:56,640 --> 00:03:59,410
+Interacting by touching the screen with
+your finger, with
+
+65
+00:03:59,410 --> 00:04:02,910
+various gestures, as opposed to
+interacting with a physical keyboard.
+
+66
+00:04:02,910 --> 00:04:04,560
+There are some physical keyboards on
+Android
+
+67
+00:04:04,560 --> 00:04:06,900
+devices, but they are distinctly in the
+minority.
+
+68
+00:04:08,400 --> 00:04:10,849
+Android also provides a largely open
+
+69
+00:04:10,849 --> 00:04:14,370
+source vendor and hardware agnostic
+eco-system.
+
+70
+00:04:14,370 --> 00:04:18,300
+And I say largely, because it turns out
+there are some reasons, some good reasons
+
+71
+00:04:18,300 --> 00:04:20,055
+and some technical reasons why some parts
+of
+
+72
+00:04:20,055 --> 00:04:23,160
+a=Android are not available in open source
+form.
+
+73
+00:04:23,160 --> 00:04:26,520
+And the architecture of Android actually
+applies scope commonality
+
+74
+00:04:26,520 --> 00:04:30,970
+and variable analysis to determine which
+parts are fixed.
+
+75
+00:04:30,970 --> 00:04:33,478
+The interfaces for example, and which
+parts vary,
+
+76
+00:04:33,478 --> 00:04:36,810
+the implementations for specific devices,
+for specific censors.
+
+77
+00:04:37,920 --> 00:04:41,320
+Android is also targeted towards the
+
+78
+00:04:41,320 --> 00:04:44,920
+installed base of JAVA application
+developers.
+
+79
+00:04:44,920 --> 00:04:48,860
+There's lots of people out today who
+understand how to write JAVA applications.
+
+80
+00:04:48,860 --> 00:04:51,056
+It is possible to write C and C++ services
+
+81
+00:04:51,056 --> 00:04:54,780
+and applications in an Android using the
+native development kit.
+
+82
+00:04:54,780 --> 00:04:56,580
+But that is not a common thing to do, most
+
+83
+00:04:56,580 --> 00:04:59,520
+people who are developing apps are doing
+in a Java.
+
+84
+00:04:59,520 --> 00:05:02,780
+You can find out more about Android by
+taking a look at this URL.
+
+85
+00:05:04,330 --> 00:05:06,360
+So let's talk about some of the
+commonalities of Android.
+
+86
+00:05:06,360 --> 00:05:09,010
+These are the things, common attributes
+that you will find
+
+87
+00:05:09,010 --> 00:05:12,340
+on all the different incarnations that
+Android and its various frameworks.
+
+88
+00:05:12,340 --> 00:05:16,460
+At the core, are the common framework
+components
+
+89
+00:05:16,460 --> 00:05:18,740
+we've talked about several times
+throughout the course.
+
+90
+00:05:18,740 --> 00:05:24,130
+Things like activities, services, content
+providers, broadcast receivers and so on.
+
+91
+00:05:24,130 --> 00:05:25,920
+And then there's a set of common
+
+92
+00:05:25,920 --> 00:05:31,230
+applications frameworks that, extend and
+instantiate and enhance.
+
+93
+00:05:31,230 --> 00:05:34,290
+Build upon these core framework components
+to provide
+
+94
+00:05:34,290 --> 00:05:37,240
+reusable services that you need on mobile
+devices.
+
+95
+00:05:37,240 --> 00:05:40,290
+Things like, knowing where you are,
+location managers.
+
+96
+00:05:40,290 --> 00:05:47,140
+Things for handling telephony services,
+instant messaging through SMS or MMS.
+
+97
+00:05:47,140 --> 00:05:49,580
+Things like being able to download
+packages
+
+98
+00:05:49,580 --> 00:05:50,890
+from an app store and being able to
+
+99
+00:05:50,890 --> 00:05:54,249
+install them on your phone in a, in a
+secure and signed way, and so on.
+
+100
+00:05:55,300 --> 00:05:58,650
+And the Android also provides a number of
+common infrastructure elements.
+
+101
+00:05:58,650 --> 00:06:02,470
+The intense framework which is used to
+disseminate events between
+
+102
+00:06:02,470 --> 00:06:06,840
+producers and consumers using publisher
+subscriber and observer like patterns.
+
+103
+00:06:06,840 --> 00:06:11,832
+The binder driver and binder frameworks
+which are used for highly optimized
+
+104
+00:06:11,832 --> 00:06:16,356
+local interprocess communication between
+application activities
+
+105
+00:06:16,356 --> 00:06:19,710
+and services running on the same device.
+
+106
+00:06:19,710 --> 00:06:21,940
+There's also common infrastructure with
+respect to
+
+107
+00:06:21,940 --> 00:06:24,450
+the hardware extraction layer we just
+talked about.
+
+108
+00:06:24,450 --> 00:06:26,910
+There's also common device driver
+frameworks that
+
+109
+00:06:26,910 --> 00:06:30,120
+come from the Linux portion of Android.
+
+110
+00:06:30,120 --> 00:06:32,058
+So there's a lot of commonality going on
+
+111
+00:06:32,058 --> 00:06:33,939
+here, which is great, because it makes it
+a
+
+112
+00:06:33,939 --> 00:06:35,991
+lot easier to learn Android, and to extend
+
+113
+00:06:35,991 --> 00:06:38,520
+it in very stylized ways for your
+particular needs.
+
+114
+00:06:39,590 --> 00:06:42,410
+There also, of course, are some
+variabilities, these are the
+
+115
+00:06:42,410 --> 00:06:47,120
+attributes that are maybe unique to
+particular instantiation of Android.
+
+116
+00:06:47,120 --> 00:06:50,890
+For example there's a number of different
+product dependent components.
+
+117
+00:06:50,890 --> 00:06:54,860
+Different vendors provides different kinds
+of look and feel user interphase
+
+118
+00:06:54,860 --> 00:07:00,430
+to wrap their branded skins around the
+more generic Android infrastructure.
+
+119
+00:07:00,430 --> 00:07:03,292
+There's also of course, a need to be able
+to have different kind
+
+120
+00:07:03,292 --> 00:07:07,040
+of sensors or hardware devices, things
+like different kinds of cameras and so on.
+
+121
+00:07:07,040 --> 00:07:09,370
+And there's a need to be able to have
+different
+
+122
+00:07:09,370 --> 00:07:13,140
+types of drivers, possibly at the hardware
+obstruction layer implementation.
+
+123
+00:07:13,140 --> 00:07:16,340
+That factor out these differences which
+are often proprietary.
+
+124
+00:07:16,340 --> 00:07:18,680
+There are also a number of different
+
+125
+00:07:18,680 --> 00:07:22,620
+ways of assembling components that are
+product dependent.
+
+126
+00:07:22,620 --> 00:07:27,580
+So for example, different vendors may
+bundle different subsets of applications.
+
+127
+00:07:27,580 --> 00:07:30,500
+Some vendors may have their own maps
+applications.
+
+128
+00:07:30,500 --> 00:07:32,920
+Some vendors may have their own email
+application.
+
+129
+00:07:32,920 --> 00:07:36,120
+Some vendors may prefer to use the open
+source versions that
+
+130
+00:07:36,120 --> 00:07:39,430
+come bundled with the Android open source
+release and so on.
+
+131
+00:07:39,430 --> 00:07:42,762
+And, of course, there's also different
+assemblies for
+
+132
+00:07:42,762 --> 00:07:47,200
+different types of telephony protocols
+CDMA versus GSM.
+
+133
+00:07:47,200 --> 00:07:51,815
+Various kinds of hardware and software and
+operating system configurations
+
+134
+00:07:51,815 --> 00:07:55,880
+based on footprint or price, performance
+form factors and so on.
+
+135
+00:07:57,460 --> 00:08:01,870
+As you can see, the bulk of the discussion
+we've applied so far for scope commonality
+
+136
+00:08:01,870 --> 00:08:05,320
+and variability analysis has focused
+largely on macro-level
+
+137
+00:08:05,320 --> 00:08:08,540
+issues, sort of the overall architecture
+of Android.
+
+138
+00:08:08,540 --> 00:08:11,040
+As we discuss this topic a little further,
+
+139
+00:08:11,040 --> 00:08:13,320
+we'll all start, we'll also start to drill
+down
+
+140
+00:08:13,320 --> 00:08:17,670
+recursively and apply this commonality and
+variability analysis to
+
+141
+00:08:17,670 --> 00:08:20,540
+the various frameworks and components to
+Android as well.
+
+142
+00:08:22,180 --> 00:08:25,834
+Let's shift gears a little bit and talk
+about how we could apply scope
+
+143
+00:08:25,834 --> 00:08:28,732
+commonality and variability to another
+platform, In
+
+144
+00:08:28,732 --> 00:08:33,120
+this case, the adaptive communication
+environment, or ACE.
+
+145
+00:08:33,120 --> 00:08:38,230
+ACE is essentially a set of C++ libraries,
+and toolkits, and
+
+146
+00:08:38,230 --> 00:08:42,450
+frameworks, and so on, that we've been
+developing for over 20 years.
+
+147
+00:08:42,450 --> 00:08:44,660
+ACE is designed primarily, its scope is
+
+148
+00:08:44,660 --> 00:08:50,130
+primarily in the layer of object-oriented
+host-infrastructure middleware.
+
+149
+00:08:50,130 --> 00:08:51,170
+If you recall our earlier
+
+150
+00:08:51,170 --> 00:08:54,600
+discussions about middleware layers, host
+infrastructure
+
+151
+00:08:54,600 --> 00:08:58,330
+middleware is the layer that sits on top
+of the operating systems
+
+152
+00:08:58,330 --> 00:09:00,530
+and underlying protocols to shield the
+
+153
+00:09:00,530 --> 00:09:03,670
+higher level middleware services and
+applications
+
+154
+00:09:03,670 --> 00:09:06,940
+from the accidental complexities and
+diversity
+
+155
+00:09:06,940 --> 00:09:09,059
+of those lower level system APIs.
+
+156
+00:09:10,100 --> 00:09:11,980
+It provides a number of different
+capabilities,
+
+157
+00:09:11,980 --> 00:09:14,115
+it encapsulates some of the tedious and
+
+158
+00:09:14,115 --> 00:09:17,030
+error-prone aspects of programming on
+different operating
+
+159
+00:09:17,030 --> 00:09:20,770
+system by refactoring and providing a
+portability visage.
+
+160
+00:09:20,770 --> 00:09:23,410
+And it also goes one step further
+
+161
+00:09:23,410 --> 00:09:27,040
+to provide a way of encapsulating and
+enhancing.
+
+162
+00:09:27,040 --> 00:09:29,990
+THe C-APIs, with easier to program, easier
+to
+
+163
+00:09:29,990 --> 00:09:34,520
+compose, easier to understand, object
+oriented C++ interfaces.
+
+164
+00:09:34,520 --> 00:09:36,530
+Things called wrapper facades, that we'll
+talk about in a moment.
+
+165
+00:09:38,260 --> 00:09:41,230
+Like Android, ACE is also available
+completely in open source
+
+166
+00:09:41,230 --> 00:09:46,320
+form, it's got vendor and hardware and
+operating system, agnostic ecosystem.
+
+167
+00:09:46,320 --> 00:09:51,920
+The main difference is that, unlike
+Android, ACE is focused on C++ developers.
+
+168
+00:09:51,920 --> 00:09:55,214
+Primarily on developers who are trying to
+build infrastructure
+
+169
+00:09:55,214 --> 00:09:58,909
+software, various kind of reusable
+services, middleware and so on.
+
+170
+00:09:58,909 --> 00:10:00,799
+And or applications that have to run
+
+171
+00:10:00,799 --> 00:10:03,697
+in distributed real time embedded systems,
+which are
+
+172
+00:10:03,697 --> 00:10:06,217
+typically mission critical and where the
+right
+
+173
+00:10:06,217 --> 00:10:10,130
+answer delivered too late, becomes the
+wrong answer.
+
+174
+00:10:10,130 --> 00:10:13,110
+You can learn more about ACE by taking a
+look at this URL.
+
+175
+00:10:14,260 --> 00:10:15,620
+So let's talk a little bit about some
+
+176
+00:10:15,620 --> 00:10:18,080
+of the commonality, and the commonalities
+in ACE.
+
+177
+00:10:18,080 --> 00:10:21,570
+Things that you're going to find on all
+the different instantiations.
+
+178
+00:10:21,570 --> 00:10:25,830
+One of the things it provides is a
+portability layer.
+
+179
+00:10:25,830 --> 00:10:28,218
+An operating system adaptation layer.
+
+180
+00:10:28,218 --> 00:10:33,540
+It provides POSIX-like API's that shields
+the higher layers of
+
+181
+00:10:33,540 --> 00:10:36,750
+ACE and other middle wed that may rest
+upon it,
+
+182
+00:10:36,750 --> 00:10:40,140
+as well as any applications developed
+using its services and
+
+183
+00:10:40,140 --> 00:10:44,090
+components from the low level platform
+specific details and dependencies.
+
+184
+00:10:45,230 --> 00:10:50,830
+On top of this obstruction layer, our set
+of C++ wrapper facades.
+
+185
+00:10:50,830 --> 00:10:53,890
+These wrapper facades provide an object
+oriented interface
+
+186
+00:10:53,890 --> 00:10:56,950
+to operating system services, things like
+local and remote
+
+187
+00:10:56,950 --> 00:11:00,490
+inter-process communication, concurrency,
+synchronization,
+
+188
+00:11:00,490 --> 00:11:02,110
+event demultiplexing, and the
+
+189
+00:11:02,110 --> 00:11:05,874
+multiplexing, file system interfaces,
+dynamic linking and so on.
+
+190
+00:11:05,874 --> 00:11:10,158
+These wrapper facades implement something
+called the wrapper facade pattern,
+
+191
+00:11:10,158 --> 00:11:12,980
+and we'll talk more about this later in
+the course.
+
+192
+00:11:14,070 --> 00:11:17,943
+And finally, ACE also provides a set of
+C++ frameworks.
+
+193
+00:11:17,943 --> 00:11:21,330
+These C++ frameworks handle a wide variety
+of different design
+
+194
+00:11:21,330 --> 00:11:25,210
+dimensions that we've talked about earlier
+in this, in this, course.
+
+195
+00:11:25,210 --> 00:11:26,944
+They handle things like synchronous and
+
+196
+00:11:26,944 --> 00:11:29,990
+asynchronous event de-multiplexing and
+event handling.
+
+197
+00:11:29,990 --> 00:11:32,614
+Various forms of concurrency, layered
+service
+
+198
+00:11:32,614 --> 00:11:35,430
+composition and processing, various forms
+of
+
+199
+00:11:35,430 --> 00:11:38,630
+connection setup, and service handler
+initialization,
+
+200
+00:11:38,630 --> 00:11:41,190
+static and dynamic configuration and so
+on.
+
+201
+00:11:41,190 --> 00:11:43,890
+And it basically makes it possible to
+write
+
+202
+00:11:43,890 --> 00:11:46,665
+a lot less application code, and let ACE
+and
+
+203
+00:11:46,665 --> 00:11:49,515
+the frameworks do much of the heavy
+lifting on
+
+204
+00:11:49,515 --> 00:11:52,740
+your behalf in a very efficient and
+portable way.
+
+205
+00:11:53,920 --> 00:11:56,725
+There also, of course, are some
+variabilties, there
+
+206
+00:11:56,725 --> 00:11:59,630
+are product and domain dependent
+components in ACE.
+
+207
+00:11:59,630 --> 00:12:03,030
+Many of the implementations depend very
+heavily on the specific
+
+208
+00:12:03,030 --> 00:12:06,770
+details of the underlying oper, the
+operating systems and protocols.
+
+209
+00:12:06,770 --> 00:12:10,900
+And they try to factor out those, those
+various diversities and heterogenaities
+
+210
+00:12:10,900 --> 00:12:14,260
+so that the interface is seen by the
+application developers are common.
+
+211
+00:12:14,260 --> 00:12:17,850
+But naturally the frameworks and the
+platform implementations have to
+
+212
+00:12:17,850 --> 00:12:22,280
+be full aware of these kinds of
+diversities and variabilites.
+
+213
+00:12:22,280 --> 00:12:26,190
+There are also various types of product
+dependent component assemblies with these.
+
+214
+00:12:26,190 --> 00:12:30,030
+Not all users want to use all parts of
+this large platform.
+
+215
+00:12:30,030 --> 00:12:32,631
+So it's possible to go in and subset
+different parts of ACE,
+
+216
+00:12:32,631 --> 00:12:35,825
+extract out the pieces you need, leave
+behind the ones you don't want.
+
+217
+00:12:35,825 --> 00:12:38,465
+Which is important for people running in
+memory
+
+218
+00:12:38,465 --> 00:12:41,963
+constraint and processor constraint, real
+time and embedded
+
+219
+00:12:41,963 --> 00:12:44,339
+systems where they can afford the luxury
+of
+
+220
+00:12:44,339 --> 00:12:47,419
+the whole ensellada of all these pieces of
+software.
+
+221
+00:12:47,419 --> 00:12:50,635
+As with Android, we'll talk later about
+applying scope
+
+222
+00:12:50,635 --> 00:12:54,127
+commonality and variability analysis to
+other parts of ACE.
+
+223
+00:12:54,127 --> 00:12:57,715
+This has mostly been a macro-level tour to
+high-level to the various pieces.
+
+224
+00:12:57,715 --> 00:13:01,251
+We'll also drill down later and talk more
+specifically about
+
+225
+00:13:01,251 --> 00:13:06,541
+commonality and variability in its various
+application frameworks a.services as well.
+
+226
+00:13:07,950 --> 00:13:11,460
+So to wrap up this section, scope
+commonality and variability
+
+227
+00:13:11,460 --> 00:13:17,030
+analysis is an advanced technique for
+insuring systematic software reuse.
+
+228
+00:13:18,140 --> 00:13:22,210
+This method helps developers alleviate
+problems that arise when
+
+229
+00:13:22,210 --> 00:13:25,970
+maintaining lots of different versions of
+the same product.
+
+230
+00:13:25,970 --> 00:13:29,540
+Especially when these products have large
+amounts of similar software that was
+
+231
+00:13:29,540 --> 00:13:34,360
+often created in an ad hoc way to satisfy
+new and diverse requirements.
+
+232
+00:13:34,360 --> 00:13:38,280
+And scope commonality and variability
+analysis helps you to refactor a
+
+233
+00:13:38,280 --> 00:13:41,270
+lot of that commonality to make it
+cleaner, easier to maintain.
+
+234
+00:13:42,610 --> 00:13:45,145
+As we discussed here, the frameworks that
+are
+
+235
+00:13:45,145 --> 00:13:48,265
+provided in ACE and Android, for software
+product lines
+
+236
+00:13:48,265 --> 00:13:51,320
+that enable the systematic software use,
+across a wide
+
+237
+00:13:51,320 --> 00:13:55,530
+range of different apps and infrastructure
+environments and platforms.
+

@@ -1,0 +1,180 @@
+1
+00:00:05,310 --> 00:00:06,023
+[MUSIC]
+
+2
+00:00:06,023 --> 00:00:12,430
+Welcome to the module on Android
+Concurrency Frameworks.
+
+3
+00:00:12,430 --> 00:00:14,198
+Although the standard Java threading,
+
+4
+00:00:14,198 --> 00:00:16,590
+synchronizer, and coordination features,
+covered
+
+5
+00:00:16,590 --> 00:00:18,046
+in the previous module, provide
+
+6
+00:00:18,046 --> 00:00:21,430
+the foundation for android's concurrency
+mechanisms.
+
+7
+00:00:21,430 --> 00:00:23,926
+They can be tedious and error prone to
+use, and
+
+8
+00:00:23,926 --> 00:00:28,726
+don't shield application developers from
+Android's design constraints, such as its
+
+9
+00:00:28,726 --> 00:00:31,926
+non-thread safe GUI libraries and its
+limits on the amount
+
+10
+00:00:31,926 --> 00:00:35,265
+of time, the one and only user interface
+thread can block.
+
+11
+00:00:35,265 --> 00:00:38,361
+Therefore, to ensure that concurrency can
+be used
+
+12
+00:00:38,361 --> 00:00:43,660
+correctly, efficiently and scalably in
+applications in middleware.
+
+13
+00:00:43,660 --> 00:00:45,954
+As well as to alleviate the complexity of
+its
+
+14
+00:00:45,954 --> 00:00:50,480
+design constraints, Android provides
+several concurrency frameworks, that allow
+
+15
+00:00:50,480 --> 00:00:53,518
+background threads to run in parallel on
+multiple cores,
+
+16
+00:00:53,518 --> 00:00:56,880
+and communicate in various was with its
+user interface thread.
+
+17
+00:00:58,130 --> 00:01:01,660
+This module focuses on two Android
+concurrency frameworks.
+
+18
+00:01:01,660 --> 00:01:05,860
+First, we cover its Handlers, Runnables,
+and Messages, or Hammer framework,
+
+19
+00:01:05,860 --> 00:01:09,280
+which provides a loosely connected set of
+classes, that allow long
+
+20
+00:01:09,280 --> 00:01:12,640
+duration operations to run in one or more
+background threads, and
+
+21
+00:01:12,640 --> 00:01:17,500
+then publish the results of these
+operations to the user interface thread.
+
+22
+00:01:17,500 --> 00:01:21,100
+Second, we cover Android ASCII task
+framework, which provides a more
+
+23
+00:01:21,100 --> 00:01:25,060
+tightly connected set of classes, that
+executes long duration operations in
+
+24
+00:01:25,060 --> 00:01:28,240
+one or more background threads, and
+publish the results to the
+
+25
+00:01:28,240 --> 00:01:30,520
+user interface thread without manipulating
+
+26
+00:01:30,520 --> 00:01:33,720
+threads, handlers, messages, or runnables
+explicitly.
+
+27
+00:01:35,060 --> 00:01:37,820
+We'll explore the structure and
+functionality of these frameworks,
+
+28
+00:01:37,820 --> 00:01:40,890
+and show how to apply them, to develop
+concurrent programs.
+
+29
+00:01:40,890 --> 00:01:44,465
+Such as a threaded downloads application
+that implements three concurrency
+
+30
+00:01:44,465 --> 00:01:48,410
+models, using the Android hammer, and a
+sync task frameworks.
+
+31
+00:01:48,410 --> 00:01:51,000
+We also demonstrate how Android
+concurrency frameworks are
+
+32
+00:01:51,000 --> 00:01:54,050
+applied to its middle ware and packaged
+applications.
+
+33
+00:01:54,050 --> 00:01:57,185
+As well as how its frameworks are
+enhanced, by the application of
+
+34
+00:01:57,185 --> 00:02:01,720
+Gang of Four patterns, such as Template
+Method, Strategy, and Factory Method.
+
+35
+00:02:01,720 --> 00:02:04,780
+And POSA patterns, such as Active Object,
+Command
+
+36
+00:02:04,780 --> 00:02:08,390
+Processor, Half-sync / Half-Async and
+Thread Specific Storage.
+
+37
+00:02:08,390 --> 00:02:18,390
+[MUSIC]
+
