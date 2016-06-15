@@ -1,0 +1,1349 @@
+1
+00:00:00,614 --> 00:00:03,116
+[BLANK_AUDIO].
+
+2
+00:00:03,116 --> 00:00:05,871
+Welcome to part two of the module on
+
+3
+00:00:05,871 --> 00:00:10,670
+the benefits and limitations of patterns
+and frameworks.
+
+4
+00:00:12,010 --> 00:00:17,120
+In part one, we went through the benefits
+and limitations of patterns.
+
+5
+00:00:18,590 --> 00:00:21,106
+In this part we're going to con, continue
+our
+
+6
+00:00:21,106 --> 00:00:25,310
+discussion, focusing on the benefits and
+limitations of frameworks.
+
+7
+00:00:26,920 --> 00:00:30,460
+There's a number of benefits of
+frameworks.
+
+8
+00:00:30,460 --> 00:00:33,931
+One of the most important ones, which is a
+nice
+
+9
+00:00:33,931 --> 00:00:38,915
+segue from our discussion of patterns, is
+that frameworks help to
+
+10
+00:00:38,915 --> 00:00:44,967
+guide application developers through the
+steps that are necessary to ensure the
+
+11
+00:00:44,967 --> 00:00:52,120
+successful creation and development of
+software, by emphasizing design reuse.
+
+12
+00:00:52,120 --> 00:00:55,710
+And invariably, this design reuse is
+captured
+
+13
+00:00:55,710 --> 00:00:58,049
+and characterized in the form of patterns.
+
+14
+00:00:59,830 --> 00:01:03,270
+For example, when we developed our
+implementation
+
+15
+00:01:03,270 --> 00:01:06,100
+of real time CORBA, by that point,
+
+16
+00:01:06,100 --> 00:01:08,335
+myself and my design team was very
+
+17
+00:01:08,335 --> 00:01:13,930
+well-versed in the patterns for building
+communication middleware.
+
+18
+00:01:13,930 --> 00:01:19,324
+And so when we went to build our
+implementation, we used those patterns as
+
+19
+00:01:19,324 --> 00:01:21,412
+a guide to help us address key
+
+20
+00:01:21,412 --> 00:01:24,022
+common recurring themes, roles,
+
+21
+00:01:24,022 --> 00:01:27,842
+relationships, interactions and
+conventions.
+
+22
+00:01:27,842 --> 00:01:30,987
+That we learned from other domains and
+apply
+
+23
+00:01:30,987 --> 00:01:35,670
+them into the domain of real-time
+communication middleware.
+
+24
+00:01:35,670 --> 00:01:37,758
+But reuse of design is not enough, as we
+had
+
+25
+00:01:37,758 --> 00:01:41,100
+talked about before in the last part of
+this module.
+
+26
+00:01:41,100 --> 00:01:46,300
+Reuse of design is crucial, it's
+necessary, but it's not sufficient.
+
+27
+00:01:46,300 --> 00:01:48,570
+And the reason, of course, is it takes
+
+28
+00:01:48,570 --> 00:01:52,130
+too much work to reimplement those designs
+by hand.
+
+29
+00:01:53,300 --> 00:01:57,434
+So one of the nice things that frameworks
+do, is they go one step
+
+30
+00:01:57,434 --> 00:02:00,710
+further, and they provide a reusable
+collection
+
+31
+00:02:00,710 --> 00:02:04,390
+of components that are integrated and work
+together.
+
+32
+00:02:04,390 --> 00:02:06,898
+To provide a reusable architecture and
+
+33
+00:02:06,898 --> 00:02:11,180
+implementation for a family of related
+applications.
+
+34
+00:02:11,180 --> 00:02:13,864
+So in other words, the frameworks actually
+take the
+
+35
+00:02:13,864 --> 00:02:17,550
+patterns and other aspects of design and
+other insights.
+
+36
+00:02:17,550 --> 00:02:22,260
+And they actually allow you to create
+working software that leverages
+
+37
+00:02:22,260 --> 00:02:25,230
+prior investment, prior implementation
+work,
+
+38
+00:02:25,230 --> 00:02:28,250
+prior optimization efforts, and so on.
+
+39
+00:02:28,250 --> 00:02:32,190
+Thereby helping to amortize the software
+development costs.
+
+40
+00:02:32,190 --> 00:02:35,130
+So, of course, when we went to build our
+real time
+
+41
+00:02:35,130 --> 00:02:39,450
+core middleware, we had the benefit of not
+only the patterns.
+
+42
+00:02:39,450 --> 00:02:41,870
+But we also had the reification or the
+
+43
+00:02:41,870 --> 00:02:46,160
+instantiation of those patterns in the ACE
+frameworks.
+
+44
+00:02:46,160 --> 00:02:48,480
+And so many parts of our middleware
+
+45
+00:02:48,480 --> 00:02:51,920
+was implemented using ACE, which provided
+some of
+
+46
+00:02:51,920 --> 00:02:57,520
+the lower-level infrastructure components
+for event handling, concurrency,
+
+47
+00:02:57,520 --> 00:03:02,100
+synchronization, service access and
+control and so on.
+
+48
+00:03:02,100 --> 00:03:04,570
+And that was one of the reasons why we
+were able
+
+49
+00:03:04,570 --> 00:03:09,240
+to produce such a high quality solution in
+such a short time.
+
+50
+00:03:09,240 --> 00:03:13,120
+That was so portable and so optimized,
+because we weren't starting from scratch.
+
+51
+00:03:14,520 --> 00:03:18,040
+Another very important benefit of
+frameworks is the
+
+52
+00:03:18,040 --> 00:03:22,700
+ability to reuse the validation and
+testing efforts.
+
+53
+00:03:22,700 --> 00:03:24,850
+What are the things that makes it hard to
+build software?
+
+54
+00:03:24,850 --> 00:03:26,610
+It's not hard to build software.
+
+55
+00:03:26,610 --> 00:03:28,760
+It's hard to build software that's going
+to be correct.
+
+56
+00:03:28,760 --> 00:03:30,430
+It's going to be portable.
+
+57
+00:03:30,430 --> 00:03:32,790
+It's going to be portable to different
+operating environments.
+
+58
+00:03:32,790 --> 00:03:35,330
+Portable to different configurations of
+the operating
+
+59
+00:03:35,330 --> 00:03:37,910
+systems, the network protocol stacks and
+so on.
+
+60
+00:03:37,910 --> 00:03:40,970
+And then making sure that you've shaken
+all the legs.
+
+61
+00:03:40,970 --> 00:03:45,190
+All the errors out of the error legs, and
+gotten the problems out of the code.
+
+62
+00:03:45,190 --> 00:03:47,334
+Well, needless to say, this is a very
+
+63
+00:03:47,334 --> 00:03:51,740
+tedious and time-consuming set of quality
+assurance operations.
+
+64
+00:03:51,740 --> 00:03:55,026
+And so, one of the great things about
+frameworks is they help to
+
+65
+00:03:55,026 --> 00:03:57,072
+amortize the QA activity, the quality
+
+66
+00:03:57,072 --> 00:04:00,760
+assurance activity, the testing and the
+validation.
+
+67
+00:04:00,760 --> 00:04:02,839
+And one of the things we've done
+
+68
+00:04:02,839 --> 00:04:06,073
+extensively in our work with frameworks is
+we've
+
+69
+00:04:06,073 --> 00:04:09,846
+built automated regression tests
+environments, such as
+
+70
+00:04:09,846 --> 00:04:12,665
+the one that's shown here on this slide.
+
+71
+00:04:12,665 --> 00:04:16,193
+Where we run our software, middleware,
+frameworks, on
+
+72
+00:04:16,193 --> 00:04:19,793
+a whole variety of different test
+platforms with different
+
+73
+00:04:19,793 --> 00:04:22,529
+operating systems, different compilers,
+
+74
+00:04:22,529 --> 00:04:25,769
+different configurations, turning on
+threading,
+
+75
+00:04:25,769 --> 00:04:29,330
+turning off threading, and so on and so
+forth.
+
+76
+00:04:29,330 --> 00:04:31,952
+And then having the ability to
+automatically
+
+77
+00:04:31,952 --> 00:04:35,195
+determine, through testing, which of our
+regression
+
+78
+00:04:35,195 --> 00:04:40,230
+tests are working, and which ones are
+failing at any given point in time.
+
+79
+00:04:40,230 --> 00:04:44,078
+And of course, by displaying all of this
+information in a nice
+
+80
+00:04:44,078 --> 00:04:47,408
+web accessible dashboard-like manner, it's
+easy
+
+81
+00:04:47,408 --> 00:04:49,945
+for the development team to track this.
+
+82
+00:04:49,945 --> 00:04:51,697
+To make sure that if a problem
+
+83
+00:04:51,697 --> 00:04:56,515
+occurs, it's quickly identified, quickly
+remediated, thereby allowing
+
+84
+00:04:56,515 --> 00:04:58,997
+the end users of the software the benefit
+
+85
+00:04:58,997 --> 00:05:03,028
+of all this automated or semi-automated
+regression testing.
+
+86
+00:05:04,164 --> 00:05:07,128
+Once again, frameworks are invaluable if
+you
+
+87
+00:05:07,128 --> 00:05:10,320
+build this kind of infrastructure, because
+that
+
+88
+00:05:10,320 --> 00:05:13,056
+amortizes those tedious and error prone QA
+
+89
+00:05:13,056 --> 00:05:16,080
+processes and the effort required to do
+them.
+
+90
+00:05:17,660 --> 00:05:21,160
+There are, however, a number of
+limitations with frameworks.
+
+91
+00:05:21,160 --> 00:05:24,460
+And we have to be front and center about
+this, so people don't get
+
+92
+00:05:24,460 --> 00:05:26,620
+fooled into thinking it's a magic panacea
+
+93
+00:05:26,620 --> 00:05:29,290
+to solve all the problems of software
+development.
+
+94
+00:05:30,460 --> 00:05:32,968
+One of the key challenges with developing
+and
+
+95
+00:05:32,968 --> 00:05:36,466
+applying frameworks is that many
+application developers find
+
+96
+00:05:36,466 --> 00:05:39,106
+it difficult to use them, because they're
+not
+
+97
+00:05:39,106 --> 00:05:44,010
+necessarily familiar with some of the
+object-oriented language features.
+
+98
+00:05:44,010 --> 00:05:46,518
+Like, inheritance and dynamic binding, or
+
+99
+00:05:46,518 --> 00:05:49,590
+even in some cases parameterized types,
+templates.
+
+100
+00:05:49,590 --> 00:05:51,390
+And, they may also, not be familiar with
+
+101
+00:05:51,390 --> 00:05:54,750
+some of the patterns that the frameworks
+embody.
+
+102
+00:05:54,750 --> 00:05:56,180
+Which means that they've got an awful lot
+
+103
+00:05:56,180 --> 00:05:59,940
+of complex surface area to try to
+navigate.
+
+104
+00:06:02,210 --> 00:06:06,510
+Another key challenge here, is that the
+way in which you build frameworks.
+
+105
+00:06:06,510 --> 00:06:08,680
+Which is a process called scope,
+
+106
+00:06:08,680 --> 00:06:12,010
+commonality and variability analysis,
+requires a
+
+107
+00:06:12,010 --> 00:06:14,650
+great degree of design expertise and
+
+108
+00:06:14,650 --> 00:06:17,440
+domain knowledge from the development
+team.
+
+109
+00:06:17,440 --> 00:06:21,328
+And sometimes software developers,
+especially those who have
+
+110
+00:06:21,328 --> 00:06:24,208
+a language-centered view of the world, may
+be
+
+111
+00:06:24,208 --> 00:06:26,656
+very facile with C++ or Java, but they
+
+112
+00:06:26,656 --> 00:06:30,780
+may not be familiar with the issues of
+multi-threading.
+
+113
+00:06:30,780 --> 00:06:34,630
+Or they may not be familiar with the
+issues of real time processing
+
+114
+00:06:34,630 --> 00:06:37,290
+or dealing with partial failures, or
+causal
+
+115
+00:06:37,290 --> 00:06:41,010
+ordering, or distributive deadlock and so
+on.
+
+116
+00:06:41,010 --> 00:06:45,850
+And a good framework is by very nature
+domain specific.
+
+117
+00:06:45,850 --> 00:06:48,010
+And that implies the people who build it
+
+118
+00:06:48,010 --> 00:06:49,740
+have a great degree of knowledge of the
+domain.
+
+119
+00:06:51,530 --> 00:06:55,055
+Another challenge with frameworks along
+these lines,
+
+120
+00:06:55,055 --> 00:06:57,230
+is that if you have the situation of
+
+121
+00:06:57,230 --> 00:07:00,005
+trying to implement and apply a framework
+in
+
+122
+00:07:00,005 --> 00:07:04,699
+a non-object-oriented language, things can
+get very complicated.
+
+123
+00:07:05,760 --> 00:07:08,796
+Because a lot of the things you would take
+for granted
+
+124
+00:07:08,796 --> 00:07:11,981
+in a language like Java or C#, or python,
+or C++.
+
+125
+00:07:11,981 --> 00:07:14,527
+In terms of abstractions like inheritance,
+
+126
+00:07:14,527 --> 00:07:17,274
+dynamic binding, parameterization and so
+on,
+
+127
+00:07:17,274 --> 00:07:18,815
+are often missing or done in
+
+128
+00:07:18,815 --> 00:07:22,270
+a very different way in
+non-object-oriented languages.
+
+129
+00:07:22,270 --> 00:07:24,880
+So there's going to be a lot more code
+
+130
+00:07:24,880 --> 00:07:27,800
+that you're going to have to write and
+learn.
+
+131
+00:07:27,800 --> 00:07:31,595
+And the language itself won't always guide
+you as cleanly to make
+
+132
+00:07:31,595 --> 00:07:34,355
+the right implementation and design
+choices,
+
+133
+00:07:34,355 --> 00:07:37,550
+thereby making the results more complex.
+
+134
+00:07:37,550 --> 00:07:39,900
+It's just a very simple example of this.
+
+135
+00:07:39,900 --> 00:07:41,750
+This isn't really a complicated framework.
+
+136
+00:07:41,750 --> 00:07:45,402
+It's just an illustration of the use of
+the strategy
+
+137
+00:07:45,402 --> 00:07:49,054
+pattern applied in the context of C for
+the standard C
+
+138
+00:07:49,054 --> 00:07:53,702
+library function qsort, where you can
+strategize the way in which
+
+139
+00:07:53,702 --> 00:07:58,840
+comparisons are done by passing in a
+pointer to a function.
+
+140
+00:07:58,840 --> 00:08:01,684
+If we were programming this in STL or
+Java,
+
+141
+00:08:01,684 --> 00:08:04,923
+it would be much easier to make this
+solution type
+
+142
+00:08:04,923 --> 00:08:08,873
+safe, easier to understand and so on, once
+you understood
+
+143
+00:08:08,873 --> 00:08:13,710
+the patterns of STL or the patterns of
+generic programming.
+
+144
+00:08:13,710 --> 00:08:15,276
+When we do it in C, it's a little
+
+145
+00:08:15,276 --> 00:08:18,410
+bit lower level, it's a little more error
+prone.
+
+146
+00:08:18,410 --> 00:08:22,730
+Accidental complexity can rise up and bite
+you when you least expect it.
+
+147
+00:08:22,730 --> 00:08:24,870
+So it's not that you can't implement
+
+148
+00:08:24,870 --> 00:08:27,870
+and use frameworks written in non-object
+oriented languages.
+
+149
+00:08:27,870 --> 00:08:31,632
+It's just that the surface area is much
+more complex, and there's
+
+150
+00:08:31,632 --> 00:08:35,200
+a lot more dark corners and sharp edges
+you have to contend with.
+
+151
+00:08:36,940 --> 00:08:38,980
+Let's say that you're not trying to build
+
+152
+00:08:38,980 --> 00:08:41,840
+a framework, you're just trying to apply
+one.
+
+153
+00:08:41,840 --> 00:08:44,240
+Well, there's some limitations and
+challenges here as well.
+
+154
+00:08:45,654 --> 00:08:48,975
+It's often a nontrivial task to figure out
+how to
+
+155
+00:08:48,975 --> 00:08:53,754
+evaluate some framework you're considering
+for use, in terms of its
+
+156
+00:08:53,754 --> 00:08:57,642
+applicability, it terms of its quality, in
+terms of its
+
+157
+00:08:57,642 --> 00:09:02,610
+footprint, in terms of its cost, etc, for
+a particular domain.
+
+158
+00:09:02,610 --> 00:09:06,612
+This takes a while, sometimes people don't
+have funds to spend time
+
+159
+00:09:06,612 --> 00:09:11,380
+doing the trade study analyses to figure
+out what's the right solution.
+
+160
+00:09:11,380 --> 00:09:15,060
+Even though, inevitably, there probably is
+one somewhere.
+
+161
+00:09:15,060 --> 00:09:19,950
+Either in a closed or open source manner
+they could apply to some other problem.
+
+162
+00:09:19,950 --> 00:09:20,760
+And that takes time.
+
+163
+00:09:22,500 --> 00:09:27,428
+Another potential problem, or limitation
+with frameworks, is that their
+
+164
+00:09:27,428 --> 00:09:33,340
+use of so called inversion of control, can
+make debugging somewhat tricky.
+
+165
+00:09:33,340 --> 00:09:37,680
+Inversion of control is one of the key
+driving characteristics
+
+166
+00:09:37,680 --> 00:09:40,650
+of a framework, and what it typically
+implies, as we've
+
+167
+00:09:40,650 --> 00:09:44,980
+talked about before, is registering some
+kind of function, or
+
+168
+00:09:44,980 --> 00:09:50,120
+object, or component which gets called
+back by the framework.
+
+169
+00:09:50,120 --> 00:09:53,480
+When something interesting happens that
+the framework has detected.
+
+170
+00:09:53,480 --> 00:09:57,640
+And that's typically the way that
+frameworks are organized, by inversion
+
+171
+00:09:57,640 --> 00:10:03,050
+of control, rather than self-directed
+applications that are driven by callbacks.
+
+172
+00:10:03,050 --> 00:10:06,170
+Well, this is very powerful, but it also
+means that when
+
+173
+00:10:06,170 --> 00:10:10,690
+something goes wrong, and you're stepping
+through your code and debugger.
+
+174
+00:10:10,690 --> 00:10:15,070
+You'll often find long sequences of
+backtraces that you know little or
+
+175
+00:10:15,070 --> 00:10:19,670
+nothing about, and may not even have the
+source code to adequately debug.
+
+176
+00:10:19,670 --> 00:10:23,393
+Because the framework was written by
+someone else, and they
+
+177
+00:10:23,393 --> 00:10:27,930
+own the main focus of control for most of
+the application.
+
+178
+00:10:27,930 --> 00:10:29,640
+This takes a little getting used to.
+
+179
+00:10:29,640 --> 00:10:33,384
+It's one reason why open source techniques
+can often be very appropriate because you
+
+180
+00:10:33,384 --> 00:10:36,870
+can actually dig down if you need to and
+find out what's going on.
+
+181
+00:10:36,870 --> 00:10:40,360
+It's also a good place to use common tools
+such as
+
+182
+00:10:40,360 --> 00:10:45,440
+valgrind that can be applied to detect
+memory corruption in your software.
+
+183
+00:10:45,440 --> 00:10:47,790
+Sometimes, you'll have a mistake in your
+code
+
+184
+00:10:47,790 --> 00:10:51,140
+that won't manifest itself until the
+framework does something.
+
+185
+00:10:51,140 --> 00:10:53,344
+And then it looks like it's the
+framework's
+
+186
+00:10:53,344 --> 00:10:55,664
+fault, but it's really because the objects
+or
+
+187
+00:10:55,664 --> 00:10:57,578
+the functions or the data has got, have
+
+188
+00:10:57,578 --> 00:11:01,180
+gotten corrupted somehow from some other
+application-level mistake.
+
+189
+00:11:02,510 --> 00:11:05,449
+This leads into one of the other
+limitations with frameworks.
+
+190
+00:11:06,650 --> 00:11:09,680
+Even though I mentioned before that it's
+possible to
+
+191
+00:11:09,680 --> 00:11:13,380
+do a lot of validation reuse, run
+regression test
+
+192
+00:11:13,380 --> 00:11:16,680
+suites, be able to do various kinds of
+validation
+
+193
+00:11:16,680 --> 00:11:21,340
+and verification in an automated way to
+amortize those costs.
+
+194
+00:11:21,340 --> 00:11:25,529
+Sometimes, especially in a highly
+parameterized framework, it's
+
+195
+00:11:25,529 --> 00:11:28,156
+very difficult to know that the framework
+is
+
+196
+00:11:28,156 --> 00:11:31,280
+correct or not, because it only manifests
+problems
+
+197
+00:11:31,280 --> 00:11:36,100
+when you instantiate the framework
+components in particular ways.
+
+198
+00:11:36,100 --> 00:11:38,150
+And if you don't account for those
+different
+
+199
+00:11:38,150 --> 00:11:40,640
+variabilities in the test suites that you
+do,
+
+200
+00:11:40,640 --> 00:11:44,180
+there could be latent bugs, latent defects
+lurking
+
+201
+00:11:44,180 --> 00:11:46,880
+in your framework code for a long time.
+
+202
+00:11:46,880 --> 00:11:52,574
+That only manifest themselves when some
+unsuspecting application developer applies
+
+203
+00:11:52,574 --> 00:11:56,670
+thing in a way not anticipated by the
+testing team.
+
+204
+00:11:56,670 --> 00:11:59,050
+This of course is just another variation
+on the
+
+205
+00:11:59,050 --> 00:12:04,510
+old cliché that you can't test correctness
+into a program.
+
+206
+00:12:04,510 --> 00:12:09,150
+Testing only finds the presence of bugs,
+it doesn't prove the absence of bugs.
+
+207
+00:12:09,150 --> 00:12:13,110
+So this of course argues in favor of other
+techniques, model
+
+208
+00:12:13,110 --> 00:12:15,890
+checking, static analysis, very thorough
+
+209
+00:12:15,890 --> 00:12:18,660
+regression test suites based on
+automation.
+
+210
+00:12:18,660 --> 00:12:22,880
+The use of continuous integration
+facilities, like cruise
+
+211
+00:12:22,880 --> 00:12:26,880
+control and other, other tools to automate
+the testing.
+
+212
+00:12:26,880 --> 00:12:30,840
+It also argues in favor of the use of
+test-driven development methods, where
+
+213
+00:12:30,840 --> 00:12:35,430
+you write your regression tests ahead of
+time, prior to writing the software.
+
+214
+00:12:35,430 --> 00:12:37,824
+Many of these concepts are very popular in
+the
+
+215
+00:12:37,824 --> 00:12:41,120
+agile world, but they apply to other
+methodologies as well.
+
+216
+00:12:41,120 --> 00:12:44,108
+And another problem you often run into
+with
+
+217
+00:12:44,108 --> 00:12:48,009
+frameworks is that performance can be
+degraded, due to
+
+218
+00:12:48,009 --> 00:12:51,744
+the very complex internal structures and
+many levels
+
+219
+00:12:51,744 --> 00:12:56,280
+of indirection that are often baked into
+the framework.
+
+220
+00:12:56,280 --> 00:13:00,043
+This is not inherent, there are many
+frameworks that have been
+
+221
+00:13:00,043 --> 00:13:04,920
+highly optimized for a wide variety of
+demanding mission critical domains.
+
+222
+00:13:04,920 --> 00:13:09,330
+Distributed real time embedded systems,
+cyberphysical systems and so on.
+
+223
+00:13:09,330 --> 00:13:11,710
+But if you're not careful, especially if
+you
+
+224
+00:13:11,710 --> 00:13:14,160
+use languages that don't really force you
+to
+
+225
+00:13:14,160 --> 00:13:17,790
+think carefully about all the optimization
+considerations, you
+
+226
+00:13:17,790 --> 00:13:20,010
+could end up with a fair amount of
+overhead.
+
+227
+00:13:20,010 --> 00:13:24,300
+That's one reason why people sometimes are
+reluctant to use off-the-shelf
+
+228
+00:13:24,300 --> 00:13:27,485
+frameworks, off-the-shelf middleware for
+these mode
+
+229
+00:13:27,485 --> 00:13:30,101
+mission critical real time embedded
+systems.
+
+230
+00:13:30,101 --> 00:13:34,521
+Because they're afraid that the additional
+overhead will prevent them from
+
+231
+00:13:34,521 --> 00:13:38,470
+being able to meet their end to end
+quality of service requirements.
+
+232
+00:13:39,840 --> 00:13:42,707
+I've written a paper that you can take a
+look at, at this
+
+233
+00:13:42,707 --> 00:13:47,510
+link, that talks in great detail about the
+benefits and limitations of frameworks.
+
+234
+00:13:47,510 --> 00:13:50,600
+And provide pointers to other literature
+and other
+
+235
+00:13:50,600 --> 00:13:53,280
+places you can find more information about
+this topic.
+
+236
+00:13:55,230 --> 00:13:59,901
+So to summarize this particular discussion
+of frameworks.
+
+237
+00:13:59,901 --> 00:14:03,033
+Key insight, key advice: don't blindly
+
+238
+00:14:03,033 --> 00:14:07,940
+apply frameworks, don't blindly apply
+patterns.
+
+239
+00:14:07,940 --> 00:14:13,490
+The abstraction and indirection that they
+provide, which are good, often,
+
+240
+00:14:13,490 --> 00:14:19,180
+can sometimes lead to increased
+complexity, cost, confusion.
+
+241
+00:14:19,180 --> 00:14:20,500
+One reason why it's so important
+
+242
+00:14:20,500 --> 00:14:24,099
+to document your software frameworks using
+patterns.
+
+243
+00:14:25,890 --> 00:14:28,940
+As a general rule of thumb, understanding
+patterns can be very
+
+244
+00:14:28,940 --> 00:14:32,930
+effective to help learn how to better
+develop and apply frameworks.
+
+245
+00:14:32,930 --> 00:14:35,160
+I've done this throughout my career.
+
+246
+00:14:35,160 --> 00:14:37,920
+This is a, this is a synergisttic process.
+
+247
+00:14:37,920 --> 00:14:40,780
+As you build more frameworks, as you build
+more applications
+
+248
+00:14:40,780 --> 00:14:43,035
+with frameworks, you'll understand
+patterns
+
+249
+00:14:43,035 --> 00:14:45,028
+better, you'll discover new patterns.
+
+250
+00:14:45,028 --> 00:14:49,916
+Those patterns can make you more effective
+at being able to develop new frameworks.
+
+251
+00:14:49,916 --> 00:14:53,780
+A lot of the work that we've done over the
+years with ACE
+
+252
+00:14:53,780 --> 00:14:55,208
+and the ACE orb or Dow
+
+253
+00:14:55,208 --> 00:15:00,460
+has involved applying frameworks, learning
+the patterns.
+
+254
+00:15:00,460 --> 00:15:02,930
+Using the patterns and insights of
+patterns to improve and
+
+255
+00:15:02,930 --> 00:15:06,770
+enhance and extend the frameworks, it's a
+nice control feedback loop.
+
+256
+00:15:08,050 --> 00:15:11,845
+You can also view patterns as essentially
+abstract descriptions
+
+257
+00:15:11,845 --> 00:15:15,950
+of frameworks, that enable broad reuse of
+software architecture.
+
+258
+00:15:16,950 --> 00:15:20,078
+Architecture has a number of different
+definitions,
+
+259
+00:15:20,078 --> 00:15:22,662
+one common one is it's basically
+describing
+
+260
+00:15:22,662 --> 00:15:25,586
+the key components and their interactions,
+their
+
+261
+00:15:25,586 --> 00:15:29,310
+structure and the control flow between the
+components.
+
+262
+00:15:29,310 --> 00:15:31,460
+And patterns do a great job of being
+
+263
+00:15:31,460 --> 00:15:36,350
+able to identify and justify why those
+interactions occur.
+
+264
+00:15:39,080 --> 00:15:45,186
+Likewise, frameworks can be viewed as
+concrete realizations of patterns, or more
+
+265
+00:15:45,186 --> 00:15:52,330
+likely, pattern languages, that facilitate
+direct reuse of detailed design and code.
+
+266
+00:15:52,330 --> 00:15:55,040
+So you can see why these two techniques
+work together so effectively.
+
+267
+00:15:55,040 --> 00:16:00,739
+One gives you the abstraction reuse, the
+other gives you the implementation reuse.
+
+268
+00:16:02,340 --> 00:16:05,080
+Apart they have, certainly have benefits.
+
+269
+00:16:05,080 --> 00:16:06,960
+Together, they're even more powerful.
+
+270
+00:16:08,110 --> 00:16:12,928
+It's also important to remember that
+patterns and frameworks done right, is
+
+271
+00:16:12,928 --> 00:16:18,210
+even more challenging and complex than
+trying to do good object-oriented design.
+
+272
+00:16:18,210 --> 00:16:23,270
+Good object-oriented design is something
+that takes years to master.
+
+273
+00:16:23,270 --> 00:16:26,915
+Knowledge of patterns is crucial, but
+knowing how to
+
+274
+00:16:26,915 --> 00:16:30,722
+discover and document common useful
+patterns and how to
+
+275
+00:16:30,722 --> 00:16:35,258
+instantiate those patterns in the form of
+efficient, portable,
+
+276
+00:16:35,258 --> 00:16:40,380
+extensible frameworks, is even more
+difficult than doing designs.
+
+277
+00:16:40,380 --> 00:16:43,950
+So it should be no surprise that this is
+something that takes study.
+
+278
+00:16:43,950 --> 00:16:49,230
+One reason why, hopefully, you're watching
+this
+
+279
+00:16:49,230 --> 00:16:55,110
+course, so you can learn also to navigate
+through the maze
+
+280
+00:16:55,110 --> 00:17:01,059
+of complexity to become a much more
+effective developer.
+
+281
+00:17:01,059 --> 00:17:06,989
+[BLANK_AUDIO]
+

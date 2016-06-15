@@ -1,0 +1,2006 @@
+1
+00:00:03,120 --> 00:00:05,910
+Welcome to the next module of the course.
+
+2
+00:00:05,910 --> 00:00:08,880
+In this module we'll talk about some of
+
+3
+00:00:08,880 --> 00:00:13,424
+the benefits and limitations of patterns
+and frameworks.
+
+4
+00:00:13,424 --> 00:00:18,349
+We'll start by focusing on the benefits
+and limitations of patterns.
+
+5
+00:00:19,410 --> 00:00:21,660
+It would be great if I could tell you that
+
+6
+00:00:21,660 --> 00:00:26,170
+using patterns will make all your software
+development problems magically disappear.
+
+7
+00:00:26,170 --> 00:00:28,480
+But of course that's not the case.
+
+8
+00:00:28,480 --> 00:00:30,750
+However, there are a number of benefits
+
+9
+00:00:30,750 --> 00:00:33,920
+that patterns provide to the soft
+development process.
+
+10
+00:00:33,920 --> 00:00:35,279
+And let's start by summarizing those.
+
+11
+00:00:36,680 --> 00:00:40,880
+One of the key things that patterns help
+with is to capture and
+
+12
+00:00:40,880 --> 00:00:45,230
+abstract recurring software roles and
+relationships
+
+13
+00:00:45,230 --> 00:00:49,170
+to facilitate systematic reuse of
+successful designs.
+
+14
+00:00:50,360 --> 00:00:55,770
+I had my first major experience with this
+benefit back in the early 90s.
+
+15
+00:00:55,770 --> 00:01:00,048
+I'd been developing software components
+and frameworks for networking
+
+16
+00:01:00,048 --> 00:01:05,240
+concurrent systems, and I'd developed a
+framework called the reactor.
+
+17
+00:01:05,240 --> 00:01:09,235
+Which essentially allowed you to abstract
+away from low
+
+18
+00:01:09,235 --> 00:01:15,420
+level synchronous event demultiplexing
+functions like select or pull.
+
+19
+00:01:15,420 --> 00:01:21,000
+And provide a more object oriented
+extensible and easy to use framework,
+
+20
+00:01:21,000 --> 00:01:23,390
+where you'd register event handlers that
+
+21
+00:01:23,390 --> 00:01:26,180
+would get called back when events
+occurred.
+
+22
+00:01:26,180 --> 00:01:30,180
+And had been detected by these low level
+operating system mechanisms.
+
+23
+00:01:30,180 --> 00:01:34,550
+I've wrote several papers, one of which
+you can read at the URL below.
+
+24
+00:01:34,550 --> 00:01:37,760
+And had a fair amount of experience
+developing this particular
+
+25
+00:01:37,760 --> 00:01:41,220
+way of handling events in a, in a network
+system.
+
+26
+00:01:42,400 --> 00:01:44,020
+When I would go out and explain this to
+people
+
+27
+00:01:44,020 --> 00:01:47,760
+however, they would always get wrapped up
+in the implementation details.
+
+28
+00:01:47,760 --> 00:01:52,935
+We'd be talking about using arrays, or
+file descriptor sets, or linked lists,
+
+29
+00:01:52,935 --> 00:01:57,830
+and so on, and we'd often miss the more
+fundamental design abstractions.
+
+30
+00:01:58,900 --> 00:02:03,500
+When I became a reviewer for the Gang of
+Four book and learned about patterns,
+
+31
+00:02:03,500 --> 00:02:05,880
+I suddenly realized that I could recast my
+
+32
+00:02:05,880 --> 00:02:09,350
+reactor framework in the form of a
+pattern.
+
+33
+00:02:09,350 --> 00:02:15,100
+Thereby helping to more effectively reuse
+the key roles and relationships
+
+34
+00:02:15,100 --> 00:02:20,510
+that were endemic for many different
+realizations of this particular approach.
+
+35
+00:02:20,510 --> 00:02:24,640
+And so from there the reactor pattern
+description was born.
+
+36
+00:02:24,640 --> 00:02:28,430
+You can find a description of this pattern
+at the URL below.
+
+37
+00:02:28,430 --> 00:02:32,890
+And of course it also appears in various
+books such as the POSA 2 book.
+
+38
+00:02:32,890 --> 00:02:36,088
+The key benefit of looking at things from
+a design
+
+39
+00:02:36,088 --> 00:02:39,442
+pattern perspective was that it helped us
+to be able
+
+40
+00:02:39,442 --> 00:02:44,590
+to de-emphasize the unessential
+implementation details, and focus more on
+
+41
+00:02:44,590 --> 00:02:50,480
+the key abstractions that application
+developers would use to shield themselves.
+
+42
+00:02:50,480 --> 00:02:52,191
+From the low level details of event
+
+43
+00:02:52,191 --> 00:02:55,540
+de-multiplexing mechanisms provided by the
+operating system.
+
+44
+00:02:57,580 --> 00:03:01,700
+Patterns also help to record engineering
+trade offs and to be able to
+
+45
+00:03:01,700 --> 00:03:05,560
+systematically evaluate design
+alternatives, to thereby
+
+46
+00:03:05,560 --> 00:03:09,109
+enhance development and sustainment of
+software systems.
+
+47
+00:03:10,190 --> 00:03:11,901
+Towards the end of the 90s, I got
+
+48
+00:03:11,901 --> 00:03:15,620
+my first real experience with these
+benefits of patterns.
+
+49
+00:03:15,620 --> 00:03:20,337
+At the time we were developing an open
+source implementation of
+
+50
+00:03:20,337 --> 00:03:25,200
+real time CORBA, called The ACE ORB or TAO
+for short.
+
+51
+00:03:25,200 --> 00:03:27,950
+And we were confronted with some design
+trade offs.
+
+52
+00:03:27,950 --> 00:03:30,092
+Having to do with the way in which we
+would
+
+53
+00:03:30,092 --> 00:03:32,801
+structure the underlying concurrency
+mechanisms
+
+54
+00:03:32,801 --> 00:03:35,960
+for our real time CORBA implementation.
+
+55
+00:03:35,960 --> 00:03:40,380
+And by that point I was pretty well versed
+in, in patterns but I'd been looking at
+
+56
+00:03:40,380 --> 00:03:43,435
+them primarily in terms of design
+abstractions and what
+
+57
+00:03:43,435 --> 00:03:46,850
+we were confronting here was of course
+about design.
+
+58
+00:03:46,850 --> 00:03:48,870
+But it was also about performance.
+
+59
+00:03:48,870 --> 00:03:53,630
+Predictability, quality of service,
+avoiding various hazards
+
+60
+00:03:53,630 --> 00:03:57,060
+of real time programming such as priority
+inversion.
+
+61
+00:03:57,060 --> 00:04:01,450
+And so we took it upon ourselves to look
+carefully at some of the
+
+62
+00:04:01,450 --> 00:04:04,630
+design patterns available at the time to
+
+63
+00:04:04,630 --> 00:04:07,120
+determine which of them would most
+appropriate.
+
+64
+00:04:07,120 --> 00:04:11,208
+To structure the tradeoffs between
+different implementation and
+
+65
+00:04:11,208 --> 00:04:15,250
+design approaches for our implementation
+of real-time CORBA.
+
+66
+00:04:16,410 --> 00:04:19,485
+The two alternatives that we ended up
+settling on were known as the
+
+67
+00:04:19,485 --> 00:04:23,560
+Half-Sync/Half-Async model of concurrency
+which is
+
+68
+00:04:23,560 --> 00:04:27,630
+based not surprisingly on the
+Half-Sync/Half-Async pattern.
+
+69
+00:04:27,630 --> 00:04:29,440
+We'll talk more about this pattern later.
+
+70
+00:04:29,440 --> 00:04:31,840
+But in a nutshell, this pattern basically
+makes
+
+71
+00:04:31,840 --> 00:04:36,140
+it possible to separate your software into
+several layers.
+
+72
+00:04:36,140 --> 00:04:38,780
+One of which waits for events, in a single
+thread.
+
+73
+00:04:38,780 --> 00:04:42,420
+And then passes through a synchronized
+queue up to
+
+74
+00:04:42,420 --> 00:04:46,670
+a pool of threads that can process the
+events concurrently.
+
+75
+00:04:46,670 --> 00:04:50,680
+And the benefit of this particular
+approach is it's very scalable.
+
+76
+00:04:50,680 --> 00:04:53,730
+The downside is tends to incur some
+overhead
+
+77
+00:04:53,730 --> 00:04:57,860
+for context switching, synchronization,
+data movement and so on.
+
+78
+00:04:59,130 --> 00:05:00,680
+The alternative approach is based on
+
+79
+00:05:00,680 --> 00:05:02,790
+something called the leader followers
+pattern.
+
+80
+00:05:02,790 --> 00:05:06,240
+And this pattern allows a pool of threads
+
+81
+00:05:06,240 --> 00:05:10,860
+to take turns waiting on an event to
+multiplexer.
+
+82
+00:05:10,860 --> 00:05:12,040
+For activity to occur.
+
+83
+00:05:12,040 --> 00:05:14,770
+And when activity occurs, the leader
+
+84
+00:05:14,770 --> 00:05:18,550
+thread is responsible for handling the
+data
+
+85
+00:05:18,550 --> 00:05:20,720
+associated with that activity while one of
+
+86
+00:05:20,720 --> 00:05:23,350
+the follower threads becomes the new
+leader.
+
+87
+00:05:23,350 --> 00:05:27,300
+The benefit of this particular approach to
+concurrency is that
+
+88
+00:05:27,300 --> 00:05:32,200
+it makes the predictability much higher
+and it reduces context switching.
+
+89
+00:05:32,200 --> 00:05:35,120
+Synchronization and data movement
+overhead.
+
+90
+00:05:35,120 --> 00:05:36,940
+The downside is that it's harder
+
+91
+00:05:36,940 --> 00:05:39,900
+to implement certain queuing mechanisms
+because
+
+92
+00:05:39,900 --> 00:05:43,350
+of the way in which the pattern structures
+the various roles and relationships.
+
+93
+00:05:44,550 --> 00:05:47,510
+What we did ultimately for our particular
+use was choose the
+
+94
+00:05:47,510 --> 00:05:49,300
+leader followers pattern, because the real
+
+95
+00:05:49,300 --> 00:05:52,950
+time predictability and performance was
+paramount.
+
+96
+00:05:52,950 --> 00:05:55,170
+For the sponsors we were working with.
+
+97
+00:05:55,170 --> 00:05:57,480
+But the key point here was we were able to
+
+98
+00:05:57,480 --> 00:06:01,190
+use patterns as a way to systematically
+evaluate the trade offs
+
+99
+00:06:01,190 --> 00:06:04,970
+between alternative approaches and be able
+to document them in a
+
+100
+00:06:04,970 --> 00:06:08,860
+way that could be usable not just to build
+the software.
+
+101
+00:06:08,860 --> 00:06:10,750
+But also, to serve as a guide
+
+102
+00:06:10,750 --> 00:06:14,640
+for future sustainment and evolution by
+other developers
+
+103
+00:06:14,640 --> 00:06:20,050
+who might not have remembered the original
+reasons why we made the decisions we did.
+
+104
+00:06:20,050 --> 00:06:22,360
+There's a paper here at this URL that you
+can take a
+
+105
+00:06:22,360 --> 00:06:24,285
+look at, that provides more information
+
+106
+00:06:24,285 --> 00:06:26,679
+about these tradeoffs between the two
+patterns.
+
+107
+00:06:28,380 --> 00:06:30,930
+Another benefit of patterns is that they
+
+108
+00:06:30,930 --> 00:06:34,155
+help to improve a shared design vocabulary
+between
+
+109
+00:06:34,155 --> 00:06:36,630
+members of the team, thereby making it
+
+110
+00:06:36,630 --> 00:06:40,760
+easier to understand the architecture and
+the design.
+
+111
+00:06:40,760 --> 00:06:45,300
+Make it easier to do engineering and
+re-engineering efforts.
+
+112
+00:06:45,300 --> 00:06:47,970
+Make it easier for the team to
+communicate, because they have a
+
+113
+00:06:47,970 --> 00:06:50,670
+common way of expressing the key
+
+114
+00:06:50,670 --> 00:06:53,600
+design abstractions in their particular
+design space.
+
+115
+00:06:54,850 --> 00:06:58,220
+I learned this lesson many times
+throughout my career.
+
+116
+00:06:58,220 --> 00:07:02,440
+When we were building our implementation
+of, of real time CORBA.
+
+117
+00:07:02,440 --> 00:07:04,919
+There were lots of other implementations
+of
+
+118
+00:07:04,919 --> 00:07:08,080
+CORBA we were competing with at the time.
+
+119
+00:07:08,080 --> 00:07:12,140
+And many of those implementations were
+built by teams of developers who had
+
+120
+00:07:12,140 --> 00:07:17,840
+a lot more experience than myself, my grad
+students and my research staff.
+
+121
+00:07:17,840 --> 00:07:23,530
+But because we had based our solution on a
+family of patterns.
+
+122
+00:07:23,530 --> 00:07:29,270
+And we had documents, papers, books,
+annotated source code that captured those
+
+123
+00:07:29,270 --> 00:07:35,510
+patterns clearly, and we had frameworks
+like ACE that embodied those patterns.
+
+124
+00:07:35,510 --> 00:07:37,074
+It made it possible for us to
+
+125
+00:07:37,074 --> 00:07:42,110
+develop very efficient, very portable,
+very predictable middleware.
+
+126
+00:07:42,110 --> 00:07:44,218
+Much more rapidly and at much less cost,
+
+127
+00:07:44,218 --> 00:07:46,760
+thereby allowing us to compete with other
+groups
+
+128
+00:07:46,760 --> 00:07:48,930
+that didn't have the benefit of a pattern
+
+129
+00:07:48,930 --> 00:07:51,720
+oriented software approach to what we were
+doing.
+
+130
+00:07:52,810 --> 00:07:57,738
+If you take a look at this URL you'll find
+many other papers that document our
+
+131
+00:07:57,738 --> 00:08:03,139
+experiences using patterns to convey the
+design of our software to other people.
+
+132
+00:08:05,350 --> 00:08:09,380
+Another benefit of patterns is they
+provide a basis for automation.
+
+133
+00:08:10,580 --> 00:08:13,510
+In earlier sessions, we've talked about
+the proxy
+
+134
+00:08:13,510 --> 00:08:15,700
+pattern, and how the proxy pattern is a
+great
+
+135
+00:08:15,700 --> 00:08:18,960
+example of a recurring theme throughout
+the history
+
+136
+00:08:18,960 --> 00:08:23,140
+of software development and programming
+languages, and computer science.
+
+137
+00:08:23,140 --> 00:08:28,210
+Where conventions and patterns at one
+phase that prove useful,
+
+138
+00:08:28,210 --> 00:08:31,820
+later become automated in order to be able
+to provide built
+
+139
+00:08:31,820 --> 00:08:34,020
+in language features and tools, that do a
+lot of the
+
+140
+00:08:34,020 --> 00:08:38,300
+work more efficiently than having to write
+all the code manually.
+
+141
+00:08:39,830 --> 00:08:44,580
+Certainly this is one example of how
+patterns provide the basis for automation.
+
+142
+00:08:44,580 --> 00:08:47,980
+There are also other examples that are
+becoming popular as well.
+
+143
+00:08:47,980 --> 00:08:52,325
+Examples based on paradigms based on model
+driven engineering,
+
+144
+00:08:52,325 --> 00:08:56,749
+which use so called domain specific
+modeling languages to capture
+
+145
+00:08:56,749 --> 00:09:00,304
+key structures and behaviors in a domain
+specific way
+
+146
+00:09:00,304 --> 00:09:05,100
+using tools that can then perform various
+kinds of analysis.
+
+147
+00:09:05,100 --> 00:09:09,340
+And synthesis of code, without requiring
+the application
+
+148
+00:09:09,340 --> 00:09:12,230
+developers to have to write all that code
+manually.
+
+149
+00:09:12,230 --> 00:09:17,250
+Now obviously not all patterns lend
+themselves to automation.
+
+150
+00:09:17,250 --> 00:09:19,874
+But for those that do, and for those
+paradigms,
+
+151
+00:09:19,874 --> 00:09:23,900
+like model drive engineering that support
+such an automation.
+
+152
+00:09:23,900 --> 00:09:25,840
+It's a very powerful technique to improve
+
+153
+00:09:25,840 --> 00:09:28,370
+productivity and reduce many of the
+tedious
+
+154
+00:09:28,370 --> 00:09:31,810
+and error prone software defects and
+errors
+
+155
+00:09:31,810 --> 00:09:33,900
+that occur when writing code by hand.
+
+156
+00:09:35,210 --> 00:09:37,615
+There's an article I wrote a number or
+years
+
+157
+00:09:37,615 --> 00:09:40,930
+of ago that describes model driven
+engineering and places it
+
+158
+00:09:40,930 --> 00:09:44,765
+in the context of middleware and computer
+aided software engineering
+
+159
+00:09:44,765 --> 00:09:48,010
+and patterns that you might want to take a
+look at.
+
+160
+00:09:48,010 --> 00:09:49,860
+For, for more information on this topic.
+
+161
+00:09:51,440 --> 00:09:57,980
+Another benefit that patterns provide is
+they help us to transcend biases that
+
+162
+00:09:57,980 --> 00:10:03,290
+often arise when people are overly wedded
+to a particular programming language.
+
+163
+00:10:03,290 --> 00:10:04,380
+If you've got a bunch of software
+
+164
+00:10:04,380 --> 00:10:07,020
+developers together for any length of
+time.
+
+165
+00:10:07,020 --> 00:10:09,480
+One of the most interesting and
+controversial topics
+
+166
+00:10:09,480 --> 00:10:12,890
+you can bring up is their favorite
+programming language.
+
+167
+00:10:12,890 --> 00:10:15,418
+Just as people around the world debate
+
+168
+00:10:15,418 --> 00:10:18,578
+ad nauseum their favorite basketball
+player or
+
+169
+00:10:18,578 --> 00:10:21,343
+the greatest football or soccer player of
+
+170
+00:10:21,343 --> 00:10:24,600
+all time, or the greatest guitarist or
+singer.
+
+171
+00:10:25,600 --> 00:10:29,013
+So too, do people like to debate their
+favorite programming languages.
+
+172
+00:10:29,013 --> 00:10:31,650
+And that's all great when it's in good
+fun.
+
+173
+00:10:31,650 --> 00:10:34,359
+But often times you find people who get so
+wrapped up
+
+174
+00:10:34,359 --> 00:10:37,635
+in the details of the programming language
+and the features of
+
+175
+00:10:37,635 --> 00:10:40,974
+the language and certain ways in which
+they can express certain
+
+176
+00:10:40,974 --> 00:10:45,850
+concepts and design intent through a
+particular set of syntax and semantics.
+
+177
+00:10:45,850 --> 00:10:48,690
+That they lose sight of the bigger
+architectural issues.
+
+178
+00:10:48,690 --> 00:10:51,703
+And this is where patterns come in so
+handy.
+
+179
+00:10:51,703 --> 00:10:53,997
+Because patterns often help us to
+emphasize
+
+180
+00:10:53,997 --> 00:10:57,159
+what's really important, which are those
+recurring roles
+
+181
+00:10:57,159 --> 00:10:59,763
+and relationships at the design phase,
+which can
+
+182
+00:10:59,763 --> 00:11:03,680
+often be implemented in many different
+programming languages.
+
+183
+00:11:03,680 --> 00:11:05,910
+And with many different implementation
+techniques.
+
+184
+00:11:05,910 --> 00:11:07,620
+For many different purposes.
+
+185
+00:11:07,620 --> 00:11:09,330
+But focusing on the design helps
+
+186
+00:11:09,330 --> 00:11:12,670
+us transcend language-centric bias and
+myopia.
+
+187
+00:11:15,070 --> 00:11:18,470
+The other main benefit of patterns is they
+help to abstract
+
+188
+00:11:18,470 --> 00:11:24,274
+away from non-essential implementation
+details at the right point in time.
+
+189
+00:11:24,274 --> 00:11:26,380
+For example, in the design phase.
+
+190
+00:11:26,380 --> 00:11:28,190
+It's not always the case that you have to
+be
+
+191
+00:11:28,190 --> 00:11:32,630
+overly concerned with what operating
+system platform you're going to run on.
+
+192
+00:11:32,630 --> 00:11:35,980
+Or, whether you're going to use an array
+versus a linked list
+
+193
+00:11:35,980 --> 00:11:40,380
+to implement some of the internal data
+structures of a reactor.
+
+194
+00:11:40,380 --> 00:11:44,530
+Those are decisions you can defer 'til
+later on in detailed design.
+
+195
+00:11:44,530 --> 00:11:45,990
+Or in the implementation phase.
+
+196
+00:11:45,990 --> 00:11:48,540
+Or even during maintenance and
+sustainment,
+
+197
+00:11:48,540 --> 00:11:50,180
+if you architect your system properly.
+
+198
+00:11:50,180 --> 00:11:54,730
+And the nice thing about patterns is they
+help to separate concerns.
+
+199
+00:11:54,730 --> 00:11:57,890
+They help to focus on design as design.
+
+200
+00:11:58,960 --> 00:12:03,040
+Be able to communicate more effectively,
+so people can think more clearly about
+
+201
+00:12:03,040 --> 00:12:07,530
+how their software needs to unfold without
+being distracted by lots of issues.
+
+202
+00:12:07,530 --> 00:12:11,380
+That won't become necessary to consider
+until further downstream.
+
+203
+00:12:14,030 --> 00:12:16,580
+There also of course, are limitations with
+patterns.
+
+204
+00:12:17,900 --> 00:12:21,650
+One of the main limitations of patterns of
+course, is that even though they help you
+
+205
+00:12:21,650 --> 00:12:25,230
+become a more effective architect and
+designer, they
+
+206
+00:12:25,230 --> 00:12:29,230
+help you to communicate more effectively
+with your team.
+
+207
+00:12:29,230 --> 00:12:30,910
+They may even make you more fun at
+parties.
+
+208
+00:12:32,130 --> 00:12:35,760
+But they require human effort to
+implement.
+
+209
+00:12:35,760 --> 00:12:38,060
+Patterns don't write the code.
+
+210
+00:12:38,060 --> 00:12:41,160
+Someone has to write the code that embody
+those patterns.
+
+211
+00:12:41,160 --> 00:12:47,011
+And that can often be a Sisyphean effort
+that is very tedious and error prone.
+
+212
+00:12:47,011 --> 00:12:51,310
+I remember many times, as we were
+developing our middleware over the years.
+
+213
+00:12:51,310 --> 00:12:54,800
+We would apply certain patterns that we
+had learned about in
+
+214
+00:12:54,800 --> 00:12:56,820
+the literature or we ourselves have
+
+215
+00:12:56,820 --> 00:12:59,800
+discovered and documented through previous
+effort.
+
+216
+00:13:01,210 --> 00:13:04,850
+And even though we were very glad we had
+the patterns
+
+217
+00:13:04,850 --> 00:13:10,940
+to guide us, inevitably there would come a
+time when implementation, complexity.
+
+218
+00:13:10,940 --> 00:13:14,020
+Was the main challenge of our development
+effort.
+
+219
+00:13:14,020 --> 00:13:16,240
+Remember when we were developing some of
+our
+
+220
+00:13:16,240 --> 00:13:20,550
+middleware, using this leader followers
+pattern, I mentioned before.
+
+221
+00:13:20,550 --> 00:13:23,450
+And, even though we understood the
+pattern, as we started
+
+222
+00:13:23,450 --> 00:13:26,980
+to implement the pattern, in various kinds
+of real time context.
+
+223
+00:13:26,980 --> 00:13:31,050
+Where we had to move information between
+threads, running at different priorities.
+
+224
+00:13:31,050 --> 00:13:35,350
+There were some pretty nasty
+implementation considerations.
+
+225
+00:13:35,350 --> 00:13:38,330
+And so, even though the patterns helped to
+guide us,
+
+226
+00:13:38,330 --> 00:13:39,800
+we still had a lot of work ahead of us.
+
+227
+00:13:41,350 --> 00:13:42,990
+You might want to take a look at the URL
+
+228
+00:13:42,990 --> 00:13:46,290
+here to learn more about leader followers
+and some of the
+
+229
+00:13:46,290 --> 00:13:49,320
+many different variations you have to be
+considering when you
+
+230
+00:13:49,320 --> 00:13:52,429
+try to apply it in a range of different
+application domains.
+
+231
+00:13:54,820 --> 00:13:57,520
+Another limitation with patterns is that
+in
+
+232
+00:13:57,520 --> 00:14:01,660
+the wrong hands, patterns can be
+deceptively simple.
+
+233
+00:14:01,660 --> 00:14:04,790
+In the right hands, of course, in the
+hands of an expert.
+
+234
+00:14:04,790 --> 00:14:06,890
+In the hands of a senior architect.
+
+235
+00:14:06,890 --> 00:14:10,150
+Patterns are extremely helpful to separate
+concerns.
+
+236
+00:14:10,150 --> 00:14:13,980
+To move key challenges and key solutions
+at the
+
+237
+00:14:13,980 --> 00:14:17,590
+right point in the right phase of the
+software lifecycle.
+
+238
+00:14:17,590 --> 00:14:23,040
+But in the hands on an amateur or
+dilettante, these patterns can often lure
+
+239
+00:14:23,040 --> 00:14:27,669
+or lull people into thinking something
+hard is actually easier than it really is.
+
+240
+00:14:28,860 --> 00:14:30,380
+Many times, I've been working on
+
+241
+00:14:30,380 --> 00:14:34,950
+projects for mission-critical, distributed
+real-time, embedded systems.
+
+242
+00:14:34,950 --> 00:14:37,900
+And often, I'm surrounded by fantastic
+architects and
+
+243
+00:14:37,900 --> 00:14:41,100
+developers who understand the proper use
+of patterns.
+
+244
+00:14:41,100 --> 00:14:45,420
+Of course, as always, the pointy-haired
+boss, who doesn't really
+
+245
+00:14:45,420 --> 00:14:49,308
+understand the complexities of software,
+who hears part of the
+
+246
+00:14:49,308 --> 00:14:53,628
+story about how patterns can simplify
+development, and who therefore
+
+247
+00:14:53,628 --> 00:14:57,436
+comes to the conclusion that we can simply
+apply patterns.
+
+248
+00:14:57,436 --> 00:14:59,412
+Get rid of the need to have those
+
+249
+00:14:59,412 --> 00:15:03,668
+expensive A team members, and instead, use
+junior developers,
+
+250
+00:15:03,668 --> 00:15:07,392
+or even worse, start trying to outsource
+the development
+
+251
+00:15:07,392 --> 00:15:11,130
+to off the shelf technologies that are
+very inexpensive.
+
+252
+00:15:11,130 --> 00:15:16,030
+That appear at face value to implement the
+patterns but in fact, don't adequately
+
+253
+00:15:16,030 --> 00:15:18,410
+address many of the subtleties, many of
+
+254
+00:15:18,410 --> 00:15:22,330
+the quality of service considerations, and
+so on.
+
+255
+00:15:22,330 --> 00:15:23,140
+So you have to be careful.
+
+256
+00:15:23,140 --> 00:15:26,610
+Just because you can say things like,
+broker.
+
+257
+00:15:26,610 --> 00:15:29,349
+Or proxy, or publisher subscriber as a
+
+258
+00:15:29,349 --> 00:15:32,752
+design team doesn't necessarily qualify
+you to
+
+259
+00:15:32,752 --> 00:15:36,570
+understand how to apply these techniques
+effectively
+
+260
+00:15:36,570 --> 00:15:40,320
+for many of the more mission critical
+environments.
+
+261
+00:15:40,320 --> 00:15:45,229
+Where the right answer that's delivered
+too late becomes the wrong answer.
+
+262
+00:15:47,380 --> 00:15:52,590
+Another related challenge with patterns,
+is that limited knowledge of patterns
+
+263
+00:15:52,590 --> 00:15:57,330
+can often constrain the design options of
+an individual, or team.
+
+264
+00:15:58,550 --> 00:16:01,900
+Many times I've gone into projects as a
+consultant where
+
+265
+00:16:01,900 --> 00:16:06,630
+the team took some patterns training,
+several months or years ago.
+
+266
+00:16:06,630 --> 00:16:09,537
+And they probably learned about some of
+the patterns in the,
+
+267
+00:16:09,537 --> 00:16:12,740
+the Gang of Four book, or maybe one of the
+POSA books.
+
+268
+00:16:12,740 --> 00:16:15,830
+And they've been conscientiously applying
+those patterns to their code.
+
+269
+00:16:15,830 --> 00:16:20,418
+And when I come along at some point for a
+review, or some kind of analysis,
+
+270
+00:16:20,418 --> 00:16:23,230
+people will sometimes pull me aside and
+say,
+
+271
+00:16:23,230 --> 00:16:27,630
+before we learned patterns, design was a
+creative activity.
+
+272
+00:16:27,630 --> 00:16:29,600
+We could do all kinds of interesting
+things.
+
+273
+00:16:29,600 --> 00:16:32,630
+We could solve the problems in the way
+that made the most sense.
+
+274
+00:16:32,630 --> 00:16:35,440
+But since we started to study patterns, we
+feel like
+
+275
+00:16:35,440 --> 00:16:40,780
+we're locked into a Procrustean bed of
+very limited approaches.
+
+276
+00:16:40,780 --> 00:16:44,470
+And we keep seeming to apply, say, the
+broker.
+
+277
+00:16:44,470 --> 00:16:45,890
+Or the proxy.
+
+278
+00:16:45,890 --> 00:16:47,060
+Or the adaptor.
+
+279
+00:16:47,060 --> 00:16:47,690
+Or the observer.
+
+280
+00:16:47,690 --> 00:16:49,490
+Or the reactor.
+
+281
+00:16:49,490 --> 00:16:51,180
+And, and those are the only things we seem
+to
+
+282
+00:16:51,180 --> 00:16:53,500
+be able to do, and our ability to do more
+
+283
+00:16:53,500 --> 00:16:56,960
+creative solutions that really meet the
+needs of our sponsors
+
+284
+00:16:56,960 --> 00:17:00,310
+and customers seem a lot harder than they
+used to be.
+
+285
+00:17:00,310 --> 00:17:03,490
+Whenever I hear that, I, I sort of chuckle
+to myself.
+
+286
+00:17:03,490 --> 00:17:06,690
+When I was growing up, in high school I
+
+287
+00:17:06,690 --> 00:17:10,280
+played soccer, what the rest of the world
+calls football.
+
+288
+00:17:10,280 --> 00:17:14,180
+And I lived in the Washington DC area of
+the United States.
+
+289
+00:17:14,180 --> 00:17:16,660
+And many of the people who I played soccer
+
+290
+00:17:16,660 --> 00:17:19,530
+with were my friends from all around the
+world.
+
+291
+00:17:19,530 --> 00:17:21,980
+It was a very cosmopolitan place to grow
+up.
+
+292
+00:17:21,980 --> 00:17:24,900
+People were there from Asia, they were
+there from South America,
+
+293
+00:17:24,900 --> 00:17:27,730
+they were there from the Middle East, they
+were there from Africa.
+
+294
+00:17:27,730 --> 00:17:29,872
+And, we all had a great time playing
+together, as
+
+295
+00:17:29,872 --> 00:17:31,920
+15 to 16 year old boys, on the soccer
+team.
+
+296
+00:17:31,920 --> 00:17:34,620
+What do you think happens when you get a
+
+297
+00:17:34,620 --> 00:17:38,820
+bunch of teenager boys together, who are
+playing sports?
+
+298
+00:17:38,820 --> 00:17:39,590
+What do you learn to do?
+
+299
+00:17:39,590 --> 00:17:41,640
+Well, one of the first things we learned
+to
+
+300
+00:17:41,640 --> 00:17:45,210
+do, we learned to swear in each others
+languages.
+
+301
+00:17:45,210 --> 00:17:47,830
+So we could swear in Farsi, we could swear
+in Hindi,
+
+302
+00:17:47,830 --> 00:17:51,110
+we could swear in French, and German, and
+Spanish, and so on.
+
+303
+00:17:51,110 --> 00:17:55,680
+Did that mean that those languages were
+only suitable for swearing?
+
+304
+00:17:55,680 --> 00:17:56,780
+Of course not.
+
+305
+00:17:56,780 --> 00:18:00,080
+It meant that we had an extremely limited
+vocabulary
+
+306
+00:18:00,080 --> 00:18:03,730
+in which to express our thoughts in those
+languages.
+
+307
+00:18:03,730 --> 00:18:05,540
+And the same thing is true of patterns.
+
+308
+00:18:05,540 --> 00:18:09,880
+If you only know some of the Gang of Four
+patterns, or even if you know all of
+
+309
+00:18:09,880 --> 00:18:12,260
+the Gang of Four patterns, or even if you
+
+310
+00:18:12,260 --> 00:18:15,119
+know all of the POSA 2 patterns and that's
+it.
+
+311
+00:18:15,119 --> 00:18:18,419
+You're going to find yourself limited when
+you try to solve
+
+312
+00:18:18,419 --> 00:18:21,191
+larger problems because bigger problems
+require
+
+313
+00:18:21,191 --> 00:18:24,470
+a broader range of solution approaches.
+
+314
+00:18:24,470 --> 00:18:26,670
+So don't blame the patterns.
+
+315
+00:18:26,670 --> 00:18:29,710
+Blame the lack of knowledge, lack of
+breadth
+
+316
+00:18:29,710 --> 00:18:33,523
+and depth of knowledge, of the appropriate
+patterns.
+
+317
+00:18:33,523 --> 00:18:37,793
+One of the other issues with patterns,
+which is kind of ironic because it's a
+
+318
+00:18:37,793 --> 00:18:39,753
+flip side of one of the benefits,
+
+319
+00:18:39,753 --> 00:18:44,010
+is that sometimes patterns will neglect
+essential implementation.
+
+320
+00:18:44,010 --> 00:18:46,930
+And especially optimization details.
+
+321
+00:18:46,930 --> 00:18:50,990
+So you might not adequately address those
+things early enough in
+
+322
+00:18:50,990 --> 00:18:55,110
+the design to avoid programming yourself
+into a corner later on.
+
+323
+00:18:56,192 --> 00:19:00,176
+Just as a simple example, when
+implementing the reactor
+
+324
+00:19:00,176 --> 00:19:04,910
+pattern, which we documented in the early
+to mid 90s.
+
+325
+00:19:04,910 --> 00:19:09,256
+Initially the types of synchronous event
+demultiplexers that
+
+326
+00:19:09,256 --> 00:19:14,000
+were used were all so called level
+triggered demultiplexers.
+
+327
+00:19:14,000 --> 00:19:16,940
+What that means is that as long as there
+is data available,
+
+328
+00:19:16,940 --> 00:19:21,740
+the multiplexer will return immediately
+saying there is work for you to do.
+
+329
+00:19:21,740 --> 00:19:25,440
+The select mechanism, the select function
+works that way for example.
+
+330
+00:19:25,440 --> 00:19:28,062
+Later people began to add other kinds of
+event
+
+331
+00:19:28,062 --> 00:19:30,753
+demultiplexer semantics into common
+systems
+
+332
+00:19:30,753 --> 00:19:33,390
+that were so-called edge triggered.
+
+333
+00:19:33,390 --> 00:19:38,400
+Things like dev poll that occurs on some
+versions of Unix.
+
+334
+00:19:39,640 --> 00:19:43,300
+Unfortunately the edge triggered approach
+only
+
+335
+00:19:43,300 --> 00:19:47,400
+returns when some state transition occurs.
+
+336
+00:19:47,400 --> 00:19:52,670
+Which means you have to change some
+aspects of your pattern interface and
+
+337
+00:19:52,670 --> 00:19:55,140
+certainly your pattern implementation in
+order
+
+338
+00:19:55,140 --> 00:19:57,460
+to be able to reflect those differences.
+
+339
+00:19:57,460 --> 00:20:01,540
+So if you're not aware of these kinds of
+things early and you over commit yourself
+
+340
+00:20:01,540 --> 00:20:03,880
+to a particular approach based on the
+patterns
+
+341
+00:20:03,880 --> 00:20:07,020
+that you understand at a particular point
+in time.
+
+342
+00:20:07,020 --> 00:20:09,880
+You can get burned, later down the road.
+
+343
+00:20:09,880 --> 00:20:13,710
+A similar issue arose that we discussed in
+an earlier module with
+
+344
+00:20:13,710 --> 00:20:16,190
+the singleton pattern, which was
+originally
+
+345
+00:20:16,190 --> 00:20:20,630
+designed without consideration for
+concurrency and multi-threading.
+
+346
+00:20:20,630 --> 00:20:22,986
+And when those factors became important,
+as
+
+347
+00:20:22,986 --> 00:20:26,660
+people began to use singleton in those
+environments.
+
+348
+00:20:26,660 --> 00:20:31,860
+Some of the earlier details that have been
+swept under the rug became very important.
+
+349
+00:20:31,860 --> 00:20:35,820
+And actually, somewhat limiting, without
+further consideration.
+
+350
+00:20:38,090 --> 00:20:39,780
+You can take a look at this URL to find
+
+351
+00:20:39,780 --> 00:20:41,290
+out more information about edge
+
+352
+00:20:41,290 --> 00:20:44,799
+triggered versus level triggered event
+demultiplexing.
+
+353
+00:20:46,840 --> 00:20:49,750
+Another limitation with patterns is that
+not
+
+354
+00:20:49,750 --> 00:20:54,480
+all patterns are applicable to non-object
+oriented languages.
+
+355
+00:20:54,480 --> 00:20:58,090
+We sometimes like to think that the
+patterns are pretty interchangeable.
+
+356
+00:20:58,090 --> 00:21:04,420
+That if you understand patterns you can
+apply them in Java, or C#, or C++.
+
+357
+00:21:04,420 --> 00:21:07,862
+And that's largely true, with some
+exceptions.
+
+358
+00:21:07,862 --> 00:21:11,738
+But when you start trying to program in
+other languages, languages
+
+359
+00:21:11,738 --> 00:21:15,274
+like C, or Fortran, or Ada, or Prolog,
+much more different
+
+360
+00:21:15,274 --> 00:21:18,266
+from C++ or Java, you find that some of
+the pattern
+
+361
+00:21:18,266 --> 00:21:23,370
+abstractions just don't really map, or
+don't map in any sensible way.
+
+362
+00:21:23,370 --> 00:21:26,184
+For example, early versions of Ada don't
+really
+
+363
+00:21:26,184 --> 00:21:30,650
+support the concepts of inheritance to
+dynamic binding effectively.
+
+364
+00:21:30,650 --> 00:21:33,850
+So, common implementations of patterns
+that rely on those
+
+365
+00:21:33,850 --> 00:21:37,140
+language features have to be radically
+modified to use them.
+
+366
+00:21:38,140 --> 00:21:41,160
+Likewise, languages like Fortran and C
+lack certain features.
+
+367
+00:21:41,160 --> 00:21:44,460
+Fortran doesn't really have the concept of
+pointers.
+
+368
+00:21:44,460 --> 00:21:50,220
+C doesn't really have the concept of
+destructors or the concepts of classes.
+
+369
+00:21:50,220 --> 00:21:54,360
+You can always mimic these things with the
+languages using the mechanisms in a
+
+370
+00:21:54,360 --> 00:21:57,390
+building block way, but that can become
+
+371
+00:21:57,390 --> 00:21:58,900
+awfully complicated if you are not
+careful.
+
+372
+00:21:59,990 --> 00:22:04,110
+Likewise, sometimes even when it is
+possible to implement.
+
+373
+00:22:04,110 --> 00:22:05,410
+The patterns in different languages.
+
+374
+00:22:05,410 --> 00:22:08,640
+They don't get applied in exactly the same
+way.
+
+375
+00:22:08,640 --> 00:22:11,168
+So for example, if you were implementing
+iterator in
+
+376
+00:22:11,168 --> 00:22:15,070
+C++ you would undoubtedly implement it in
+a different way
+
+377
+00:22:15,070 --> 00:22:17,320
+than if you were applying it in C or
+
+378
+00:22:17,320 --> 00:22:20,990
+even in Java where the abstractions tend
+to be different.
+
+379
+00:22:20,990 --> 00:22:23,279
+It's the same pattern but the realization
+is different.
+
+380
+00:22:24,460 --> 00:22:26,620
+This is not a showstopper, but it's
+something to keep
+
+381
+00:22:26,620 --> 00:22:30,260
+in mind that your patterns don't always
+apply blindly or directly.
+
+382
+00:22:32,010 --> 00:22:38,030
+So to summarize this section, the goal of
+patterns is not to restrict
+
+383
+00:22:38,030 --> 00:22:43,830
+developer creativity, it's not to have
+people applying things blindly and rotely.
+
+384
+00:22:43,830 --> 00:22:48,850
+In a rigid way by a set of design rules
+that are not possible to be changed.
+
+385
+00:22:50,150 --> 00:22:51,970
+Nor is the purpose of patterns to try to
+
+386
+00:22:51,970 --> 00:22:55,780
+automate humans, it's not trying to
+replace humans with tools.
+
+387
+00:22:57,080 --> 00:23:00,120
+Instead the real goal of patterns is to
+try
+
+388
+00:23:00,120 --> 00:23:05,260
+to codify important insights and
+experience that comes from humans.
+
+389
+00:23:05,260 --> 00:23:10,525
+Who have been there before, who have the
+experience, who built software and
+
+390
+00:23:10,525 --> 00:23:15,233
+have had the good fortune of being able to
+step back from their work.
+
+391
+00:23:15,233 --> 00:23:17,959
+Describe the key interactions, describe
+the key roles
+
+392
+00:23:17,959 --> 00:23:20,801
+and relationships, describe the key
+conventions in a way
+
+393
+00:23:20,801 --> 00:23:23,063
+that other people can learn from, as they
+come
+
+394
+00:23:23,063 --> 00:23:25,200
+up to speed in what they're trying to do.
+
+395
+00:23:26,690 --> 00:23:28,800
+Another key important thing to remember
+about this, is
+
+396
+00:23:28,800 --> 00:23:34,410
+that good patterns comes from
+generalizing, from real experience.
+
+397
+00:23:34,410 --> 00:23:38,070
+It's very hard to create patterns without
+that experience.
+
+398
+00:23:38,070 --> 00:23:39,670
+If you read a pattern written by
+
+399
+00:23:39,670 --> 00:23:42,620
+someone who doesn't really quite
+understand the domain.
+
+400
+00:23:42,620 --> 00:23:45,150
+It usually sticks out like a sore thumb.
+
+401
+00:23:45,150 --> 00:23:47,910
+That's why we use writer workshop methods
+when we help
+
+402
+00:23:47,910 --> 00:23:51,700
+people become better at communicating what
+it is that they know.
+
+403
+00:23:51,700 --> 00:23:53,880
+So they get other eyeballs to look, and
+
+404
+00:23:53,880 --> 00:23:56,590
+other brains to help consider ways to
+describe their
+
+405
+00:23:56,590 --> 00:23:59,670
+experience in a way that will be more
+digestible,
+
+406
+00:23:59,670 --> 00:24:03,429
+and understandable by other programmers,
+other developers, other architects.
+
+407
+00:24:04,810 --> 00:24:07,540
+Many of the software that I've developed,
+and the, the patterns that
+
+408
+00:24:07,540 --> 00:24:12,320
+I've documented have come out of building
+lots of real world systems.
+
+409
+00:24:12,320 --> 00:24:14,350
+Middleware, applications, and so on.
+
+410
+00:24:14,350 --> 00:24:17,720
+And if you take a look at this URL, you
+can learn about some
+
+411
+00:24:17,720 --> 00:24:20,210
+of the early experiences we had, where
+
+412
+00:24:20,210 --> 00:24:22,800
+we gained knowledge of the effective
+patterns.
+
+413
+00:24:22,800 --> 00:24:24,048
+That later led to the pattern
+
+414
+00:24:24,048 --> 00:24:26,670
+sequences and pattern languages we've been
+discussing.
+
+415
+00:24:28,580 --> 00:24:32,670
+The final point here, is that addressing
+these limitations
+
+416
+00:24:32,670 --> 00:24:38,560
+with patterns, often requires more than
+just reuse of design.
+
+417
+00:24:38,560 --> 00:24:40,940
+Patterns are fantastic at reusing design.
+
+418
+00:24:40,940 --> 00:24:43,145
+But in a real world system, you often need
+
+419
+00:24:43,145 --> 00:24:46,030
+more than just design reuse, you need
+reuse of code.
+

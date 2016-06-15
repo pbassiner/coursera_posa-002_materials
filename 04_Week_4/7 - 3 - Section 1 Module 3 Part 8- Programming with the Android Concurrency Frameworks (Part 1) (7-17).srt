@@ -1,0 +1,582 @@
+1
+00:00:00,000 --> 00:00:09,916
+[MUSIC].
+
+2
+00:00:09,916 --> 00:00:14,400
+Welcome to the next part of the module on
+Android concurrency frameworks.
+
+3
+00:00:14,400 --> 00:00:16,120
+Which analyzes a threaded downloads
+
+4
+00:00:16,120 --> 00:00:19,090
+application that implements several
+concurrency models.
+
+5
+00:00:19,090 --> 00:00:21,900
+Using the Android HaMeR and AsyncTask
+frameworks.
+
+6
+00:00:23,010 --> 00:00:25,010
+Earlier videos in this module examine key
+
+7
+00:00:25,010 --> 00:00:27,390
+classes in these frameworks and showed
+examples
+
+8
+00:00:27,390 --> 00:00:28,920
+of how these frameworks are applied to
+
+9
+00:00:28,920 --> 00:00:31,490
+portions of Android applications and its
+middleware.
+
+10
+00:00:32,610 --> 00:00:35,054
+While these examples illustrated
+industrial strength
+
+11
+00:00:35,054 --> 00:00:37,690
+usage of HaMeR and AsyncTask in practice.
+
+12
+00:00:37,690 --> 00:00:40,090
+They don't really lend themselves to
+comprehensive
+
+13
+00:00:40,090 --> 00:00:44,230
+dissection and experimentation in your
+Android development environment.
+
+14
+00:00:45,580 --> 00:00:49,230
+Therefore, this part of the module
+provides a detailed analysis
+
+15
+00:00:49,230 --> 00:00:52,970
+of the structure and functionality of the
+threaded downloads application.
+
+16
+00:00:54,160 --> 00:00:56,644
+Focusing on how it concurrently retrieves
+images from
+
+17
+00:00:56,644 --> 00:00:59,409
+remote servers, and displays them to the
+user's screen.
+
+18
+00:01:00,910 --> 00:01:02,920
+This application demonstrates three
+different
+
+19
+00:01:02,920 --> 00:01:05,390
+ways to download an image concurrently.
+
+20
+00:01:05,390 --> 00:01:10,920
+Posting and processing runnables, sending
+and handling messages, and executing
+
+21
+00:01:10,920 --> 00:01:13,350
+AsyncTasks using the concurrency idioms
+
+22
+00:01:13,350 --> 00:01:15,249
+supported by the Android concurrency
+frameworks.
+
+23
+00:01:16,610 --> 00:01:19,640
+The application prompts the user to enter
+the URL for the desired image.
+
+24
+00:01:20,730 --> 00:01:22,780
+After entering the URL, the user
+
+25
+00:01:22,780 --> 00:01:25,400
+can initiate the download concurrently by
+clicking
+
+26
+00:01:25,400 --> 00:01:29,660
+a button from the menu of buttons
+configured via an XML based resource file.
+
+27
+00:01:31,080 --> 00:01:34,410
+A progress dialog is displayed while the
+requested image is downloading.
+
+28
+00:01:35,790 --> 00:01:39,470
+After the download completes successfully,
+the image is displayed on the screen.
+
+29
+00:01:40,800 --> 00:01:44,099
+The user can return to the default image
+by selecting the reset image button.
+
+30
+00:01:45,780 --> 00:01:49,029
+The rest of this video and the next one
+explore the implementation of
+
+31
+00:01:49,029 --> 00:01:51,480
+this application, whose source code and
+metadata
+
+32
+00:01:51,480 --> 00:01:53,950
+is available on GitHub at this link.
+
+33
+00:01:53,950 --> 00:01:58,417
+So you might want to obtain it and follow
+along.
+
+34
+00:01:58,417 --> 00:02:03,102
+[MUSIC].
+
+35
+00:02:03,102 --> 00:02:05,667
+Before describing the concurrency models
+supported
+
+36
+00:02:05,667 --> 00:02:08,004
+by the Threaded Downloads application,
+we'll
+
+37
+00:02:08,004 --> 00:02:09,942
+first analyze the overall structure and
+
+38
+00:02:09,942 --> 00:02:12,589
+functionality of the Threaded Downloads
+project.
+
+39
+00:02:13,980 --> 00:02:16,780
+Each Android project contains three key
+elements.
+
+40
+00:02:16,780 --> 00:02:20,120
+First and foremost it contains the Java
+source code.
+
+41
+00:02:20,120 --> 00:02:22,199
+Second, it contains resources such as
+
+42
+00:02:22,199 --> 00:02:25,916
+bitmaps, user interface layout definitions
+and internationalized
+
+43
+00:02:25,916 --> 00:02:30,800
+strings that provide additional files and
+static content used by the Java code.
+
+44
+00:02:30,800 --> 00:02:32,590
+As described at this link.
+
+45
+00:02:32,590 --> 00:02:35,390
+And third, it contains an XML manifest
+file.
+
+46
+00:02:35,390 --> 00:02:37,610
+Containing information that Android needs
+to execute
+
+47
+00:02:37,610 --> 00:02:39,940
+the application, as described at this
+link.
+
+48
+00:02:41,060 --> 00:02:42,800
+The Android manifest file for the threaded
+
+49
+00:02:42,800 --> 00:02:46,820
+downloads application contains several
+pieces of essential information.
+
+50
+00:02:46,820 --> 00:02:50,870
+For example, it grants the application
+permission to use internet.
+
+51
+00:02:50,870 --> 00:02:54,300
+It also indicates the application's main
+activity, called
+
+52
+00:02:54,300 --> 00:02:58,390
+threaded downloads, and declares which
+intents it handles.
+
+53
+00:02:58,390 --> 00:03:02,579
+The layout of the application is specified
+by the contents of its main .xml resource
+
+54
+00:03:02,579 --> 00:03:04,644
+file, which dictates how the text view,
+
+55
+00:03:04,644 --> 00:03:07,820
+edit text, and buttons appear on the
+screen.
+
+56
+00:03:07,820 --> 00:03:10,360
+This file also specifies which methods in
+the
+
+57
+00:03:10,360 --> 00:03:13,450
+threaded downloads class are mapped to
+which button clicks.
+
+58
+00:03:14,450 --> 00:03:16,690
+There are four buttons with labels run
+
+59
+00:03:16,690 --> 00:03:20,120
+runnable, run messages, run Async, and
+reset image.
+
+60
+00:03:21,260 --> 00:03:24,430
+Clicking on these buttons triggers the
+corresponding hook methods.
+
+61
+00:03:24,430 --> 00:03:27,480
+In the threaded downloads class, which
+then downloads the
+
+62
+00:03:27,480 --> 00:03:31,140
+image requested by the user, via the
+associated concurrency model.
+
+63
+00:03:32,660 --> 00:03:36,804
+These button objects are connected to the
+corresponding threaded
+
+64
+00:03:36,804 --> 00:03:41,540
+download methods, by the Android on-click
+attributes, in the main.xml
+
+65
+00:03:41,540 --> 00:03:44,796
+file, which avoids hard coding the text
+view, edit
+
+66
+00:03:44,796 --> 00:03:49,132
+text, or button objects into the threaded
+downloads class itself.
+
+67
+00:03:49,132 --> 00:03:53,827
+[MUSIC].
+
+68
+00:03:53,827 --> 00:03:57,691
+The one and only activity in the Threaded
+Downloads application is
+
+69
+00:03:57,691 --> 00:04:03,780
+the ThreadedDownloads class, specified in
+the Android manifest file shown earlier.
+
+70
+00:04:03,780 --> 00:04:06,250
+This class extends the Android Activity
+base
+
+71
+00:04:06,250 --> 00:04:08,850
+class and contains several data members
+used by
+
+72
+00:04:08,850 --> 00:04:11,515
+the concurrency models to determine which
+URL to
+
+73
+00:04:11,515 --> 00:04:13,940
+download and how to interact with a user.
+
+74
+00:04:15,050 --> 00:04:18,500
+In particular, its data members indicate
+which URL to
+
+75
+00:04:18,500 --> 00:04:21,575
+use by default, where to store the URL
+requested
+
+76
+00:04:21,575 --> 00:04:24,650
+by the user, where to store the downloaded
+image
+
+77
+00:04:24,650 --> 00:04:27,770
+and how to display the progress of the
+download.
+
+78
+00:04:30,180 --> 00:04:33,216
+ThreadedDownloads on create hook method,
+sets the
+
+79
+00:04:33,216 --> 00:04:36,900
+content view specified in the main.xml
+file.
+
+80
+00:04:36,900 --> 00:04:40,060
+And then caches references to the edit
+text and
+
+81
+00:04:40,060 --> 00:04:43,580
+image view objects in data members to
+optimize subsequent access.
+
+82
+00:04:44,640 --> 00:04:46,785
+All the concurrency models share the
+download
+
+83
+00:04:46,785 --> 00:04:49,205
+image method, which runs in background
+threads and
+
+84
+00:04:49,205 --> 00:04:51,460
+can thus block without incurring an
+application
+
+85
+00:04:51,460 --> 00:04:54,300
+not responding dialogue from the user
+interface thread.
+
+86
+00:04:55,760 --> 00:04:58,909
+Download image connects to a remote
+server, downloads
+
+87
+00:04:58,909 --> 00:05:01,723
+the contents in the image, and provides
+access to
+
+88
+00:05:01,723 --> 00:05:04,068
+it by an input stream using the get
+content
+
+89
+00:05:04,068 --> 00:05:06,870
+method of the URL class described in this
+link.
+
+90
+00:05:08,460 --> 00:05:12,240
+The bitmap factory's decode stream method
+described at this link then
+
+91
+00:05:12,240 --> 00:05:16,089
+converts the image stream into a bitmap
+object described at this link.
+
+92
+00:05:17,980 --> 00:05:21,490
+Download image returns the bitmap object
+if decode stream succeeds.
+
+93
+00:05:22,670 --> 00:05:25,430
+If the download fails, however, a warning
+is
+
+94
+00:05:25,430 --> 00:05:27,590
+displayed to the user via a toast message.
+
+95
+00:05:28,610 --> 00:05:32,110
+Which automatically disappears after a
+short time out, as described at this link.
+
+96
+00:05:33,890 --> 00:05:36,790
+Although download failures occur in
+background threads.
+
+97
+00:05:36,790 --> 00:05:39,888
+The toast must be displayed in the user
+interface thread.
+
+98
+00:05:39,888 --> 00:05:43,038
+Download image, therefore creates a
+runnable command and
+
+99
+00:05:43,038 --> 00:05:45,548
+calls the activities run on UI thread
+method.
+
+100
+00:05:45,548 --> 00:05:48,928
+Which uses the HaMeR framework to post
+this command to the user
+
+101
+00:05:48,928 --> 00:05:53,150
+interface thread via an internal handler,
+as shown in this earlier video.
+
+102
+00:05:55,120 --> 00:05:59,494
+The runnables run hook method then uses a
+toast to inform the user
+
+103
+00:05:59,494 --> 00:06:04,523
+that something has gone wrong with the
+download, so they may try again.
+
+104
+00:06:04,523 --> 00:06:08,959
+[MUSIC].
+
+105
+00:06:08,959 --> 00:06:11,773
+In summary, the Threaded Downloads
+application
+
+106
+00:06:11,773 --> 00:06:15,200
+displays images retrieved from remote
+servers.
+
+107
+00:06:15,200 --> 00:06:17,780
+Using three different concurrency models
+based on
+
+108
+00:06:17,780 --> 00:06:20,820
+the Android HaMeR and AsyncTask
+concurrency frameworks.
+
+109
+00:06:22,260 --> 00:06:26,030
+This video analyzed the overall structure
+and functionality of the Threaded
+
+110
+00:06:26,030 --> 00:06:28,350
+Downloads project, outlining key elements
+in
+
+111
+00:06:28,350 --> 00:06:31,270
+its Android manifest and resource files.
+
+112
+00:06:31,270 --> 00:06:33,493
+As well as explaining several key data
+members
+
+113
+00:06:33,493 --> 00:06:36,060
+and methods in the Threaded Downloads
+class itself.
+
+114
+00:06:37,780 --> 00:06:39,770
+A simple use of the HaMeR framework was
+shown.
+
+115
+00:06:40,800 --> 00:06:43,780
+Which posted a runnable command containing
+a toast message
+
+116
+00:06:43,780 --> 00:06:46,550
+to display in the user interface thread
+when downloads fail.
+
+117
+00:06:48,340 --> 00:06:51,700
+Other methods in the class use additional
+Android
+
+118
+00:06:51,700 --> 00:06:55,780
+HaMeR and AsyncTask framework capabilities
+to download the
+
+119
+00:06:55,780 --> 00:06:59,860
+requested images via several concurrency
+models, which we
+
+120
+00:06:59,860 --> 00:07:02,738
+analyze in the next video in this module.
+
+121
+00:07:02,738 --> 00:07:10,459
+[MUSIC]
+

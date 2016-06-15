@@ -1,0 +1,881 @@
+1
+00:00:03,230 --> 00:00:04,900
+Welcome to the next part of the class.
+
+2
+00:00:06,010 --> 00:00:10,120
+In this module, we're going to be
+providing more information on patterns and
+
+3
+00:00:10,120 --> 00:00:15,260
+frameworks, to extend and augment material
+that we'll be covering in this course.
+
+4
+00:00:17,040 --> 00:00:20,033
+If we went back 20 years ago or so and
+taught this
+
+5
+00:00:20,033 --> 00:00:24,980
+class, we find that there was much less
+material back in those days.
+
+6
+00:00:24,980 --> 00:00:26,845
+There were some early papers on patterns.
+
+7
+00:00:26,845 --> 00:00:30,907
+Peter Coad had published a paper in 1992.
+
+8
+00:00:30,907 --> 00:00:33,987
+Ralph Johnson had published a paper about
+
+9
+00:00:33,987 --> 00:00:38,387
+documenting frameworks with patterns in
+1992, and of
+
+10
+00:00:38,387 --> 00:00:41,907
+course, the gang of four published their
+first
+
+11
+00:00:41,907 --> 00:00:45,810
+collected paper on patterns in ECOOP in
+1993.
+
+12
+00:00:45,810 --> 00:00:51,260
+Work on frameworks goes back a little
+further.
+
+13
+00:00:51,260 --> 00:00:54,972
+If you went back about 25 years ago or so,
+you'd see that there were
+
+14
+00:00:54,972 --> 00:00:57,340
+some papers by Ralph Johnson and Brian
+Foote
+
+15
+00:00:57,340 --> 00:01:00,550
+talking about frameworks from the 1988
+time frame.
+
+16
+00:01:00,550 --> 00:01:02,630
+And there was a lot of classic work done
+
+17
+00:01:02,630 --> 00:01:05,685
+by Taligent, which were some of the early
+promoters and
+
+18
+00:01:05,685 --> 00:01:09,065
+evangelists for frameworks, talking about
+the work they had
+
+19
+00:01:09,065 --> 00:01:13,770
+done developing frameworks for building
+operating systems and user interfaces.
+
+20
+00:01:15,330 --> 00:01:19,640
+This module provides a tour through some
+of the landscape
+
+21
+00:01:19,640 --> 00:01:23,399
+of literature that has appeared over the
+past two decades.
+
+22
+00:01:25,000 --> 00:01:27,850
+Of course, the classic works in the field
+we've covered in
+
+23
+00:01:27,850 --> 00:01:31,370
+depth, the Gang of Four book, and the POSA
+One book.
+
+24
+00:01:31,370 --> 00:01:35,260
+There are also four other volumes of the
+POSA series.
+
+25
+00:01:35,260 --> 00:01:37,730
+The Pattern Oriented Software Architecture
+series.
+
+26
+00:01:37,730 --> 00:01:41,030
+And these books talk about many other
+dimensions.
+
+27
+00:01:41,030 --> 00:01:44,450
+Many of which have a lot to do with
+concurrent and network software.
+
+28
+00:01:44,450 --> 00:01:47,134
+For example, the POSA 2 book, which I was
+the first
+
+29
+00:01:47,134 --> 00:01:51,310
+author on, talks about a patterned
+language for concurrent network software.
+
+30
+00:01:51,310 --> 00:01:56,260
+And we will be talking about many of these
+patterns throughout the course.
+
+31
+00:01:56,260 --> 00:01:58,780
+There's also a book called POSA 3, which
+
+32
+00:01:58,780 --> 00:02:02,179
+deals with a pattern language for resource
+management.
+
+33
+00:02:03,210 --> 00:02:05,370
+Patterns for dealing with resources,
+allocating
+
+34
+00:02:05,370 --> 00:02:07,408
+resources, deallocating resources, and so
+on.
+
+35
+00:02:07,408 --> 00:02:11,368
+POSA 4 combines over a hundred patterns to
+
+36
+00:02:11,368 --> 00:02:16,690
+focus on a pattern language for
+distributed computing.
+
+37
+00:02:16,690 --> 00:02:20,330
+And what makes this particularly
+interesting is that the real
+
+38
+00:02:20,330 --> 00:02:23,690
+emphasis of the book is not on the
+individual patterns and
+
+39
+00:02:23,690 --> 00:02:26,770
+isolation, which to some extent is the
+focus of POSA
+
+40
+00:02:26,770 --> 00:02:30,380
+1, POSA 2 and POSA 3, and again, a four
+book.
+
+41
+00:02:30,380 --> 00:02:35,090
+But, it really focuses more on the way in
+which those patterns work together.
+
+42
+00:02:35,090 --> 00:02:38,030
+So, well over half the book is talking
+about interactions
+
+43
+00:02:38,030 --> 00:02:42,820
+between patterns as opposed to talking
+about the patterns by themselves.
+
+44
+00:02:42,820 --> 00:02:48,345
+POSA 5 provides a tour through the concept
+space and the foundational themes
+
+45
+00:02:48,345 --> 00:02:54,160
+and ideas and abstractions underlying
+patterns and pattern languages.
+
+46
+00:02:54,160 --> 00:02:57,995
+And it talks about relationships between
+patterns, pattern complements,
+
+47
+00:02:57,995 --> 00:03:01,949
+pattern compounds, pattern sequences and,
+of course, pattern languages.
+
+48
+00:03:03,100 --> 00:03:06,634
+They are other books that are very
+important to get an architectural
+
+49
+00:03:06,634 --> 00:03:10,478
+view of patterns, and even though the
+books don't have the words pattern
+
+50
+00:03:10,478 --> 00:03:13,516
+in the title, they still deal with many of
+the same kinds of
+
+51
+00:03:13,516 --> 00:03:18,248
+abstractions that we've seen in other
+books in the pattern body of work.
+
+52
+00:03:18,248 --> 00:03:21,704
+One of the best examples of this
+particular type of book is
+
+53
+00:03:21,704 --> 00:03:24,800
+the book Software Architecture,
+perspectives on
+
+54
+00:03:24,800 --> 00:03:27,670
+an Emerging Discipline, by Shaw and
+Garlan.
+
+55
+00:03:27,670 --> 00:03:30,210
+And they talk about many of the
+fundamental patterns
+
+56
+00:03:30,210 --> 00:03:36,010
+and architectural styles that exist in
+build large-scale software systems.
+
+57
+00:03:36,010 --> 00:03:38,606
+There are also a number of other books
+that talk about
+
+58
+00:03:38,606 --> 00:03:41,785
+various aspect of patterns that are worth
+taking a look at.
+
+59
+00:03:41,785 --> 00:03:45,670
+The late John Vissides wrote an excellent
+book called Pattern Hatching.
+
+60
+00:03:45,670 --> 00:03:48,350
+Which grew out of some columns he'd
+written for
+
+61
+00:03:48,350 --> 00:03:52,050
+the C++ report magazine, while I was the
+editor.
+
+62
+00:03:52,050 --> 00:03:55,698
+And many of these patterns either were
+patterns that didn't make it
+
+63
+00:03:55,698 --> 00:03:58,962
+into the Gang of Four book because they
+were incomplete at the
+
+64
+00:03:58,962 --> 00:04:03,122
+time, but he completed, or there are
+additional patterns that he described
+
+65
+00:04:03,122 --> 00:04:08,070
+based on his experience applying the Gang
+of Four Patterns in different contexts.
+
+66
+00:04:08,070 --> 00:04:13,086
+For example, the discussion about
+destroying singletons was something that
+
+67
+00:04:13,086 --> 00:04:16,370
+came out after he wrote the Gang of Four
+Patterns.
+
+68
+00:04:17,640 --> 00:04:19,148
+There's also a number of patterns
+
+69
+00:04:19,148 --> 00:04:21,662
+and other domains pertaining distributive
+computing.
+
+70
+00:04:21,662 --> 00:04:27,268
+And Middleware is book on patterns for
+programming J2EE.
+
+71
+00:04:27,268 --> 00:04:30,090
+There's patterns for enterprise
+integration.
+
+72
+00:04:30,090 --> 00:04:34,270
+There's even patterns about component
+middleware and patterns for
+
+73
+00:04:34,270 --> 00:04:36,740
+brokers and patterns for remoting that are
+worth looking at.
+
+74
+00:04:37,740 --> 00:04:41,610
+There's also patterns for how to program
+parallel and distributed systems.
+
+75
+00:04:41,610 --> 00:04:45,290
+Trying to take advantage of multi-core and
+multi-processor hardware, effectively.
+
+76
+00:04:45,290 --> 00:04:47,670
+The pattern is that we're trying to build
+systems that
+
+77
+00:04:47,670 --> 00:04:52,060
+will be resilient in the face of failures
+and attacks.
+
+78
+00:04:53,070 --> 00:04:56,630
+And there's also patterns that deal with
+how to write code that will be secure.
+
+79
+00:04:56,630 --> 00:05:00,662
+That will be able to operate, even when
+you have adversaries that will try to
+
+80
+00:05:00,662 --> 00:05:04,640
+break in to your system and attack your
+network, steal your data and so on.
+
+81
+00:05:06,990 --> 00:05:09,510
+One of the things that happened when I
+first
+
+82
+00:05:09,510 --> 00:05:12,660
+got involved with patterns in the 1994
+time frame
+
+83
+00:05:12,660 --> 00:05:15,530
+was we had a series of conferences called
+pattern
+
+84
+00:05:15,530 --> 00:05:19,800
+languages of programming, and these
+conferences would bring together
+
+85
+00:05:19,800 --> 00:05:22,810
+both experts and novices for several days
+at Alcuin
+
+86
+00:05:22,810 --> 00:05:25,750
+Park in Illinois, where we would sit
+together and
+
+87
+00:05:25,750 --> 00:05:27,850
+work on how to improve the way we were
+
+88
+00:05:27,850 --> 00:05:33,260
+documenting our designs and our
+architectures and our software structures.
+
+89
+00:05:33,260 --> 00:05:36,960
+And from these conferences came a series
+of books that collected
+
+90
+00:05:36,960 --> 00:05:42,230
+together, revised, and it edited versions
+of the papers from these conferences.
+
+91
+00:05:42,230 --> 00:05:47,160
+That are now known as the Program Pattern
+Languages of Program Design, PLoP D books.
+
+92
+00:05:47,160 --> 00:05:48,980
+And there are five of these in all.
+
+93
+00:05:48,980 --> 00:05:51,646
+And they give kind of a nice, kind of,
+broad view of
+
+94
+00:05:51,646 --> 00:05:56,030
+the thinking of the pattern community from
+1994 to about 2000 time frame.
+
+95
+00:05:56,030 --> 00:05:59,362
+There are some excellent books for people
+who are trying to
+
+96
+00:05:59,362 --> 00:06:04,250
+build software that have to run in unusual
+or constrained environments.
+
+97
+00:06:04,250 --> 00:06:07,045
+So-called small memory software, which is
+often
+
+98
+00:06:07,045 --> 00:06:09,385
+the case for embedded systems which don't
+
+99
+00:06:09,385 --> 00:06:11,400
+have the luxury of gigabytes worth of
+
+100
+00:06:11,400 --> 00:06:15,440
+memory or high speed processors or
+unlimited power.
+
+101
+00:06:15,440 --> 00:06:18,368
+And of course, one of the other classic
+books in the field
+
+102
+00:06:18,368 --> 00:06:22,760
+of concurrency for patterns is Doug Lea's
+book for concurrent programming in Java,
+
+103
+00:06:22,760 --> 00:06:25,993
+which talks about many of the different
+ways of trying to devise
+
+104
+00:06:25,993 --> 00:06:30,070
+Java concurrent programs and many of the
+patterns for effective use of Java.
+
+105
+00:06:30,070 --> 00:06:32,266
+You'll find that many of the ideas that
+are
+
+106
+00:06:32,266 --> 00:06:35,316
+documented as patterns in Doug Lea's book
+have found their
+
+107
+00:06:35,316 --> 00:06:38,122
+way into the Java class libraries for
+concurrency, as
+
+108
+00:06:38,122 --> 00:06:41,370
+well as into frameworks we've talked about
+such as Android.
+
+109
+00:06:42,630 --> 00:06:44,909
+If you take a look at the Hillside
+website, which is
+
+110
+00:06:44,909 --> 00:06:48,036
+dedicated to all things patterns, you'll
+find a more extensive list
+
+111
+00:06:48,036 --> 00:06:50,792
+of many of the books related to the
+patterns, the community,
+
+112
+00:06:50,792 --> 00:06:54,290
+and, and work on patterns, and the body of
+knowledge of patterns.
+
+113
+00:06:54,290 --> 00:06:58,516
+There are also a number of books on
+frameworks.
+
+114
+00:06:58,516 --> 00:07:01,820
+One of the early contributions of
+frameworks as I mentioned before
+
+115
+00:07:01,820 --> 00:07:05,124
+was from the Taligent Group, which was a
+company that was building
+
+116
+00:07:05,124 --> 00:07:09,136
+frameworks to try to encapsulate low level
+operating system details and provide
+
+117
+00:07:09,136 --> 00:07:13,960
+a higher level programming abstractions to
+make it easier to build applications.
+
+118
+00:07:13,960 --> 00:07:17,836
+And there's a book called Inside Taligent,
+by Cotter and Patel, that has a nice
+
+119
+00:07:17,836 --> 00:07:20,629
+chapter that describes the philosophy of
+frameworks that
+
+120
+00:07:20,629 --> 00:07:22,900
+came with the approach that they were
+doing.
+
+121
+00:07:23,960 --> 00:07:27,438
+There's also a series of books that were
+published with
+
+122
+00:07:27,438 --> 00:07:32,396
+some colleagues of mine, relating to
+building patterns and applying patterns
+
+123
+00:07:32,396 --> 00:07:36,392
+in the form of frameworks, having
+frameworks applied in domain
+
+124
+00:07:36,392 --> 00:07:40,680
+specific ways, frameworks applied in more
+generic ways and so on.
+
+125
+00:07:40,680 --> 00:07:41,950
+And you might want to take a look.
+
+126
+00:07:41,950 --> 00:07:44,358
+These are collections of papers from
+people who had
+
+127
+00:07:44,358 --> 00:07:47,780
+experience either building or trying to
+apply frameworks in practice.
+
+128
+00:07:48,910 --> 00:07:51,575
+Speaking of applying patterns and
+frameworks in
+
+129
+00:07:51,575 --> 00:07:53,915
+practice, along the way over the past 20
+
+130
+00:07:53,915 --> 00:07:55,865
+years or so, I've also developed a
+
+131
+00:07:55,865 --> 00:07:59,860
+large number of frameworks, heavily driven
+by patterns.
+
+132
+00:07:59,860 --> 00:08:04,036
+Many of those patterns were documented in
+the POSA 2 book, but I've also published a
+
+133
+00:08:04,036 --> 00:08:06,356
+series of books that talk about the
+application
+
+134
+00:08:06,356 --> 00:08:09,090
+of these patterns in the ACE framework
+environment.
+
+135
+00:08:09,090 --> 00:08:10,580
+And so you might want to take a look at
+some
+
+136
+00:08:10,580 --> 00:08:13,090
+of the books that describe the frameworks
+that are used in ACE.
+
+137
+00:08:15,050 --> 00:08:17,529
+I mentioned before the pattern languages
+of
+
+138
+00:08:17,529 --> 00:08:21,160
+programming conference, PLoP, which
+started in 1994.
+
+139
+00:08:21,160 --> 00:08:24,794
+It's been ongoing for years, and, in fact,
+it is now
+
+140
+00:08:24,794 --> 00:08:28,823
+generalized and grown beyond its initial
+focus in the US, at
+
+141
+00:08:28,823 --> 00:08:33,405
+Alcuin Park to be an international
+sequence of conferences that take
+
+142
+00:08:33,405 --> 00:08:39,440
+place in Germany, South America,
+Scandinavia and other parts of the world.
+
+143
+00:08:39,440 --> 00:08:42,138
+The main benefit of going to a PLoP
+conference
+
+144
+00:08:42,138 --> 00:08:44,836
+is it gives a chance for pattern authors
+to get
+
+145
+00:08:44,836 --> 00:08:48,244
+feedback on the patterns that they're
+writing down from
+
+146
+00:08:48,244 --> 00:08:53,050
+experts, in the form of something called a
+writer's workshop.
+
+147
+00:08:53,050 --> 00:08:56,650
+A writer's workshop is a format derived
+from the
+
+148
+00:08:56,650 --> 00:08:59,900
+poetry and writing community where you
+have people sit around
+
+149
+00:08:59,900 --> 00:09:03,840
+in a circle, listen carefully to a
+description of
+
+150
+00:09:03,840 --> 00:09:07,140
+the, of the pattern or the work that's
+being discussed.
+
+151
+00:09:07,140 --> 00:09:11,390
+And then they take turns providing
+feedback to the author, things that
+
+152
+00:09:11,390 --> 00:09:14,260
+worked, things that didn't work, things
+they liked, things that could be improved.
+
+153
+00:09:14,260 --> 00:09:17,972
+And it could provides invaluable feedback
+to people who are trying to
+
+154
+00:09:17,972 --> 00:09:22,490
+codify their design expertise and write it
+down and disseminate in pattern form.
+
+155
+00:09:23,820 --> 00:09:26,460
+There's also a series of information about
+pattern
+
+156
+00:09:26,460 --> 00:09:29,460
+conferences that's also found on the
+Hillside website.
+
+157
+00:09:31,130 --> 00:09:34,140
+There's also a set of mailing lists if
+you'd like to learn more about patterns.
+
+158
+00:09:34,140 --> 00:09:36,444
+There's mailing lists that talk about the
+
+159
+00:09:36,444 --> 00:09:38,940
+Gang of Four Patterns, the various
+Siemens'
+
+160
+00:09:38,940 --> 00:09:42,780
+POSA patterns, patterns for interprocess
+communication, patterns
+
+161
+00:09:42,780 --> 00:09:44,960
+for business and other types of topics.
+
+162
+00:09:44,960 --> 00:09:47,600
+If you take a look at the Hillside
+website, you'll find a
+
+163
+00:09:47,600 --> 00:09:50,690
+way to subscribe to the mailing lists that
+are of interest to you.
+
+164
+00:09:52,110 --> 00:09:56,526
+And, finally, I have also produced quite
+an amount of information over the
+
+165
+00:09:56,526 --> 00:09:58,803
+years that I make available on patterns
+
+166
+00:09:58,803 --> 00:10:02,440
+and frameworks through my website at
+Vanderbilt.
+
+167
+00:10:02,440 --> 00:10:04,120
+I have some information here that talks
+
+168
+00:10:04,120 --> 00:10:07,880
+about the books I've written, on patterns
+and
+
+169
+00:10:07,880 --> 00:10:12,430
+frameworks, the presentations that I've
+recorded in either
+
+170
+00:10:12,430 --> 00:10:15,880
+podcast or video form on patterns and
+frameworks.
+
+171
+00:10:15,880 --> 00:10:19,420
+I've also taught many courses on patterns
+and frameworks,
+
+172
+00:10:19,420 --> 00:10:22,200
+at the various universities I've been a
+faculty member of.
+
+173
+00:10:22,200 --> 00:10:25,900
+All that material, the slides, the
+assignment descriptions, and
+
+174
+00:10:25,900 --> 00:10:28,910
+the syllabi and so on, are all available
+online.
+
+175
+00:10:28,910 --> 00:10:33,326
+And of course, I've not just talked about
+patterns and frameworks; I've
+
+176
+00:10:33,326 --> 00:10:37,742
+also built, and helped build, millions of
+lines of code, largely written
+
+177
+00:10:37,742 --> 00:10:41,882
+in C++, some written in Java, that
+implement many of these patterns
+
+178
+00:10:41,882 --> 00:10:46,630
+in frameworks that you can download and
+apply and use in your projects.
+
+179
+00:10:46,630 --> 00:10:50,660
+So take a look at my website, explore the
+links, and feel free to use
+
+180
+00:10:50,660 --> 00:10:54,130
+this material in a way that you see fit to
+make your projects more effective.
+

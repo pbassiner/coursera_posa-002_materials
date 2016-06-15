@@ -1,0 +1,690 @@
+1
+00:00:00,000 --> 00:00:09,775
+[MUSIC]
+
+2
+00:00:09,775 --> 00:00:12,097
+Welcome to the next part of the module on
+Android
+
+3
+00:00:12,097 --> 00:00:16,230
+Concurrency Frameworks which completes our
+coverage of the AsyncTask framework.
+
+4
+00:00:17,330 --> 00:00:19,380
+The previous video, discussed how Async
+
+5
+00:00:19,380 --> 00:00:22,570
+Task and bodies key characteristics of
+frameworks.
+
+6
+00:00:22,570 --> 00:00:25,120
+Such as their support for inversion of
+control.
+
+7
+00:00:25,120 --> 00:00:27,660
+The name specific structure of
+functionality.
+
+8
+00:00:27,660 --> 00:00:29,820
+And semi-complete portions of
+applications.
+
+9
+00:00:31,050 --> 00:00:35,340
+This part extends this earlier discussion,
+by examining two common types
+
+10
+00:00:35,340 --> 00:00:39,770
+of frameworks, black box and white box,
+described at this link.
+
+11
+00:00:40,960 --> 00:00:43,540
+It also demonstrates how AsyncTask
+contains elements
+
+12
+00:00:43,540 --> 00:00:45,790
+of both black box and white box
+frameworks.
+
+13
+00:00:47,010 --> 00:00:50,490
+The first type of framework, is the
+black-box framework, where application
+
+14
+00:00:50,490 --> 00:00:54,376
+developers only need to understand, the
+external interfaces of its classes.
+
+15
+00:00:54,376 --> 00:00:58,190
+Elements in black-box frameworks are
+typically reused,
+
+16
+00:00:58,190 --> 00:01:02,340
+by paramaterizing or assembling, instances
+of these classes.
+
+17
+00:01:02,340 --> 00:01:05,360
+The second type of framework is the
+white-box framework, where
+
+18
+00:01:05,360 --> 00:01:07,330
+application developers must also
+understand
+
+19
+00:01:07,330 --> 00:01:09,068
+some parts of the framework
+implementation.
+
+20
+00:01:09,068 --> 00:01:11,953
+Elements and white-box frameworks expend
+base
+
+21
+00:01:11,953 --> 00:01:14,638
+classes, and override their hook methods.
+
+22
+00:01:14,638 --> 00:01:19,126
+Black-box and white-box frameworks are
+based on different types of patterns.
+
+23
+00:01:19,126 --> 00:01:22,470
+For example, black-box frameworks are
+often developed
+
+24
+00:01:22,470 --> 00:01:26,970
+using patterns that emphasize
+extensibility, via object composition.
+
+25
+00:01:26,970 --> 00:01:31,050
+Examples of these types of patterns
+include strategy, or decorator.
+
+26
+00:01:31,050 --> 00:01:32,269
+Describe these lengths.
+
+27
+00:01:33,380 --> 00:01:36,960
+Likewise, white box frameworks are often
+developed using patterns
+
+28
+00:01:36,960 --> 00:01:39,650
+that emphasize extensibility via
+sub-classing,
+
+29
+00:01:39,650 --> 00:01:41,940
+and overriding of hook methods.
+
+30
+00:01:41,940 --> 00:01:45,810
+Examples of these types of patterns
+include template method, or state.
+
+31
+00:01:45,810 --> 00:01:47,000
+Described at these links.
+
+32
+00:01:48,310 --> 00:01:50,506
+To make the discussions of black box, and
+
+33
+00:01:50,506 --> 00:01:53,394
+white box frame works concrete, we'll show
+how Async
+
+34
+00:01:53,394 --> 00:01:56,534
+Task contains elements of both these types
+of frameworks,
+
+35
+00:01:56,534 --> 00:02:00,957
+which helps application developers, extend
+and customize it's capabilities.
+
+36
+00:02:00,957 --> 00:02:07,630
+[BLANK_AUDIO]
+
+37
+00:02:07,630 --> 00:02:11,174
+We first examine the white box elements of
+the Async Task framework, that
+
+38
+00:02:11,174 --> 00:02:13,348
+enable long duration operations to
+interact
+
+39
+00:02:13,348 --> 00:02:15,760
+and communicate with the user interface
+thread.
+
+40
+00:02:16,900 --> 00:02:20,130
+The Async Task base class, uses a template
+method pattern.
+
+41
+00:02:20,130 --> 00:02:21,710
+To define the program skeleton of an
+
+42
+00:02:21,710 --> 00:02:24,520
+algorithm in its execute method, which
+defers some
+
+43
+00:02:24,520 --> 00:02:26,925
+steps to sub-classes, in accordance with
+the
+
+44
+00:02:26,925 --> 00:02:30,200
+white-box framework design principles, as
+described this link.
+
+45
+00:02:31,540 --> 00:02:34,292
+After the execute template method is
+called, the
+
+46
+00:02:34,292 --> 00:02:38,159
+AsyncTask framework dictates the
+subsequently flow of control, and
+
+47
+00:02:38,159 --> 00:02:40,451
+evokes the on pre execute hook method, to
+
+48
+00:02:40,451 --> 00:02:44,206
+perform the initialization actions in the
+user interface thread.
+
+49
+00:02:44,206 --> 00:02:47,114
+When this hook method returns, the
+framework dispatches
+
+50
+00:02:47,114 --> 00:02:49,546
+the doInBackground hook method, which runs
+in a
+
+51
+00:02:49,546 --> 00:02:52,395
+background thread, and can thus block
+while performing
+
+52
+00:02:52,395 --> 00:02:56,220
+long duration operations, without
+affecting the user interface thread.
+
+53
+00:02:57,820 --> 00:02:59,800
+When doInBackground finishes,.
+
+54
+00:02:59,800 --> 00:03:02,270
+Its results are returned by the on post
+execute hook
+
+55
+00:03:02,270 --> 00:03:06,520
+method, which performs operations that
+must run, in these interface thread.
+
+56
+00:03:06,520 --> 00:03:08,200
+Such as displaying an image to the screen.
+
+57
+00:03:09,570 --> 00:03:12,182
+Although the variant, the template method
+pattern, used by the
+
+58
+00:03:12,182 --> 00:03:15,790
+Async Task framework, follows the
+[UNKNOWN] structure of the pattern.
+
+59
+00:03:15,790 --> 00:03:18,040
+Which involves overriding hook methods.
+
+60
+00:03:18,040 --> 00:03:20,114
+It extends the pattern, by allowing hook
+
+61
+00:03:20,114 --> 00:03:22,556
+methods to run in different threads of
+control.
+
+62
+00:03:22,556 --> 00:03:29,836
+[BLANK_AUDIO]
+
+63
+00:03:29,836 --> 00:03:34,360
+We now examine some black-box elements of
+the AsynTask framework.
+
+64
+00:03:34,360 --> 00:03:37,190
+Which enable application developers, to
+configure the number
+
+65
+00:03:37,190 --> 00:03:39,520
+and behaviour of threads that run in the
+background.
+
+66
+00:03:39,520 --> 00:03:41,400
+And perform Async Tasks concurrently.
+
+67
+00:03:42,690 --> 00:03:44,960
+Async Task uses the strategy pattern, to
+
+68
+00:03:44,960 --> 00:03:47,070
+select its internal concurrency model at
+runtime.
+
+69
+00:03:48,210 --> 00:03:51,950
+The default concurrency model, used by
+Async Task, has changed over time.
+
+70
+00:03:53,050 --> 00:03:56,559
+As described in the discussion on, order
+of execution, at this link.
+
+71
+00:03:57,860 --> 00:04:01,980
+In recent releases of Android, the default
+behavior of Async Task is to use a
+
+72
+00:04:01,980 --> 00:04:04,340
+single background thread in each process,
+to
+
+73
+00:04:04,340 --> 00:04:07,350
+run all due in background methods of
+tasks.
+
+74
+00:04:07,350 --> 00:04:10,970
+Thereby avoiding common application
+errors, caused by concurrent execution.
+
+75
+00:04:12,360 --> 00:04:14,300
+Async Task concurrency model, can be
+
+76
+00:04:14,300 --> 00:04:16,990
+configured by a several different executor
+strategies.
+
+77
+00:04:18,100 --> 00:04:21,640
+The default behavior is implemented by a
+serial executor strategy.
+
+78
+00:04:21,640 --> 00:04:25,550
+Which executes task, one at a time, in
+sequential order, within a process.
+
+79
+00:04:26,890 --> 00:04:29,580
+Some applications however, benefit from
+the ability to
+
+80
+00:04:29,580 --> 00:04:33,270
+run multiple AsyncTasks, within a process
+and parallel.
+
+81
+00:04:33,270 --> 00:04:36,280
+For example, to take advantage of multi
+core chipsets.
+
+82
+00:04:37,500 --> 00:04:41,760
+To support this use case, AsyncTask
+incidents can be configured.
+
+83
+00:04:41,760 --> 00:04:44,990
+With a thread pool executor strategy,
+which executes
+
+84
+00:04:44,990 --> 00:04:48,040
+multiple long duration tasks in parallel
+within a process.
+
+85
+00:04:50,120 --> 00:04:52,140
+The AsyncTask framework, also supports
+
+86
+00:04:52,140 --> 00:04:55,460
+custom executors, which application
+developers create,
+
+87
+00:04:55,460 --> 00:04:59,299
+by implementing the executor interface, to
+define their own concurrency models.
+
+88
+00:05:00,640 --> 00:05:02,830
+The executor interface defines a strategy.
+
+89
+00:05:02,830 --> 00:05:04,500
+That enables runtime configuration of
+
+90
+00:05:04,500 --> 00:05:06,750
+concurrency models, that implement,
+executor.
+
+91
+00:05:07,950 --> 00:05:09,480
+These strategies can be passed to an
+
+92
+00:05:09,480 --> 00:05:12,996
+AsyncTask, by its executor on executor
+method.
+
+93
+00:05:12,996 --> 00:05:15,980
+Or, by calling its undocumented set
+default executor method.
+
+94
+00:05:17,330 --> 00:05:18,992
+These executor strategies are treated as
+
+95
+00:05:18,992 --> 00:05:22,240
+black-box plug-ins by the AsyncTask
+framework,
+
+96
+00:05:22,240 --> 00:05:26,720
+so there's no need to subclass AsyncTask,
+to configure different concurrency models.
+
+97
+00:05:27,790 --> 00:05:31,080
+Regardless of which concurrency model is
+configured,
+
+98
+00:05:31,080 --> 00:05:34,300
+the AsyncTask framework ensures that all
+hook methods
+
+99
+00:05:34,300 --> 00:05:37,100
+are synchronized, in such a way, that
+certain
+
+100
+00:05:37,100 --> 00:05:41,456
+operations are safe, without making
+explicit synchronization calls.
+
+101
+00:05:41,456 --> 00:05:45,582
+In particular, member fields, can be set
+in the constructor, or the on
+
+102
+00:05:45,582 --> 00:05:47,680
+pre execute hook method, and safely
+
+103
+00:05:47,680 --> 00:05:50,480
+referred to by the doInBackground hook
+method.
+
+104
+00:05:50,480 --> 00:05:55,309
+Likewise, member fields set in
+doInBackground, can be safely referred to,
+
+105
+00:05:55,309 --> 00:05:58,984
+by the on progress update and on post
+execute hook methods.
+
+106
+00:05:58,984 --> 00:06:05,406
+[BLANK_AUDIO]
+
+107
+00:06:05,406 --> 00:06:07,930
+In summary, the Async Task framework
+combines
+
+108
+00:06:07,930 --> 00:06:11,270
+black box and white box techniques and
+patterns.
+
+109
+00:06:11,270 --> 00:06:13,551
+Which enables application developers to
+
+110
+00:06:13,551 --> 00:06:16,361
+easily extend and customize it's
+capabilities.
+
+111
+00:06:16,361 --> 00:06:17,050
+In general.
+
+112
+00:06:17,050 --> 00:06:20,420
+White-box frameworks are easier to
+develop, because their
+
+113
+00:06:20,420 --> 00:06:22,970
+design needn't anticipate a wide range of
+use
+
+114
+00:06:22,970 --> 00:06:26,800
+cases, since that's the responsibility of
+application developers,
+
+115
+00:06:26,800 --> 00:06:29,600
+that extend and customize their base
+classes or interfaces.
+
+116
+00:06:30,610 --> 00:06:31,530
+They're also harder to use
+
+117
+00:06:31,530 --> 00:06:34,560
+however, because application developers
+must understand
+
+118
+00:06:34,560 --> 00:06:38,519
+more framework implementation details,
+such as which hook methods to override.
+
+119
+00:06:40,096 --> 00:06:45,140
+Conversely, black box frameworks are
+harder to build, because their interfaces
+
+120
+00:06:45,140 --> 00:06:48,200
+and control flow, must anticipate a wider
+range of use cases.
+
+121
+00:06:49,250 --> 00:06:52,310
+However, they're easier to configure and
+use,
+
+122
+00:06:52,310 --> 00:06:55,350
+since they're customized by a self
+contained plug-ins.
+
+123
+00:06:55,350 --> 00:06:58,299
+Which enable dynamic variation of
+framework behavior.
+
+124
+00:06:58,299 --> 00:07:02,661
+Without extending or changing framework
+code, as described at this link.
+
+125
+00:07:02,661 --> 00:07:04,695
+[BLANK_AUDIO]
+
+126
+00:07:04,695 --> 00:07:08,130
+The AsyncTask framework applies several
+Gang of Four patterns.
+
+127
+00:07:08,130 --> 00:07:09,940
+For example, it applies the template
+
+128
+00:07:09,940 --> 00:07:13,020
+method pattern, to implement its white-box
+capabilities.
+
+129
+00:07:13,020 --> 00:07:17,005
+So users must subclass it, and then decide
+which of is on pre execute,
+
+130
+00:07:17,005 --> 00:07:21,360
+doInBackground, on progress update, on
+post execute,
+
+131
+00:07:21,360 --> 00:07:23,150
+and on cancel hook methods to override.
+
+132
+00:07:24,280 --> 00:07:26,890
+After an application running in the user
+interface thread,
+
+133
+00:07:26,890 --> 00:07:30,830
+calls an Async Task execute template
+method, the framework invokes
+
+134
+00:07:30,830 --> 00:07:33,260
+these hook methods at different points of
+time, and
+
+135
+00:07:33,260 --> 00:07:36,630
+at different context, such as in the user
+interface thread.
+
+136
+00:07:36,630 --> 00:07:37,920
+Or one or more background threats.
+
+137
+00:07:39,098 --> 00:07:42,320
+Likewise, Async Tasks applies the strategy
+pattern to
+
+138
+00:07:42,320 --> 00:07:44,780
+implements black-box capabilities, which
+
+139
+00:07:44,780 --> 00:07:47,320
+enable applications to dynamically
+configure,
+
+140
+00:07:47,320 --> 00:07:51,400
+predefined or custom executors, which
+designates which concurrency model
+
+141
+00:07:51,400 --> 00:07:54,420
+to use when running Async Tasks within a
+process.
+
+142
+00:07:55,770 --> 00:07:58,696
+It also applies the POSA2 Half-Sync
+Half-Async pattern.
+
+143
+00:07:58,696 --> 00:08:02,566
+To guide the design of it's internal
+concurrency structure and functionality.
+
+144
+00:08:02,566 --> 00:08:05,866
+[BLANK_AUDIO]
+
+145
+00:08:05,866 --> 00:08:13,799
+[MUSIC]
+
