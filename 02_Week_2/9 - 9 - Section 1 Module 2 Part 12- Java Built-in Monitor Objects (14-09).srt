@@ -1,0 +1,1214 @@
+1
+00:00:00,000 --> 00:00:05,020
+[MUSIC].
+
+2
+00:00:05,020 --> 00:00:05,700
+Welcome
+
+3
+00:00:08,570 --> 00:00:13,250
+to the next part of the module, which
+covers Java built-in monitor objects.
+
+4
+00:00:13,250 --> 00:00:15,650
+These mechanisms can be used to
+synchronize and schedule
+
+5
+00:00:15,650 --> 00:00:18,470
+the interaction of multiple threads, in a
+concurrent program.
+
+6
+00:00:19,580 --> 00:00:22,580
+This part motivates the need for built-in
+monitor objects, by fixing the
+
+7
+00:00:22,580 --> 00:00:26,470
+simple, but Buggy concurrent program,
+shown in the earlier part of the module.
+
+8
+00:00:27,780 --> 00:00:29,660
+This program contained two threads.
+
+9
+00:00:29,660 --> 00:00:33,220
+A producer and a consumer, that incurred
+race conditions,
+
+10
+00:00:33,220 --> 00:00:36,190
+when calling the put and take methods of
+Buggy Queue.
+
+11
+00:00:37,610 --> 00:00:39,880
+To fix the problems with the Buggy Queue.
+
+12
+00:00:39,880 --> 00:00:43,010
+We use a Java built-in monitor object,
+that enables the threads
+
+13
+00:00:43,010 --> 00:00:44,760
+to communicate, by passing messages,
+
+14
+00:00:44,760 --> 00:00:47,660
+via a properly synchronized SimpleBlocking
+Queue.
+
+15
+00:00:49,040 --> 00:00:51,660
+A monitor is a classic concurrency control
+mechanism,
+
+16
+00:00:51,660 --> 00:00:54,860
+that can be used to coordinate
+synchronization scheduling.
+
+17
+00:00:54,860 --> 00:00:58,060
+Of multiple threads, that access and
+interact in
+
+18
+00:00:58,060 --> 00:01:00,560
+a critical section, as described at this
+link.
+
+19
+00:01:01,600 --> 00:01:06,370
+In particular, a monitor allows threads to
+have both mutual exclusion, and,
+
+20
+00:01:06,370 --> 00:01:09,400
+the ability to block, while waiting for
+certain conditions to become true.
+
+21
+00:01:10,950 --> 00:01:12,460
+Monitors also have a mechanism for
+
+22
+00:01:12,460 --> 00:01:14,620
+notifying other threads, the conditions
+they're
+
+23
+00:01:14,620 --> 00:01:18,480
+waiting on have been met, so the other
+threads can continue their processing
+
+24
+00:01:21,800 --> 00:01:23,010
+accordingly.
+
+25
+00:01:23,010 --> 00:01:23,559
+[MUSIC].
+
+26
+00:01:26,620 --> 00:01:30,400
+Before we show the complete Java built-in
+monitor object solution, we outline
+
+27
+00:01:30,400 --> 00:01:34,630
+a partial solution to the race condition
+problems with the original Buggy Queue.
+
+28
+00:01:34,630 --> 00:01:37,630
+This solution, called Buggy Synchronized
+Queue,
+
+29
+00:01:37,630 --> 00:01:40,130
+uses Java synchronized methods, to specify
+sections
+
+30
+00:01:40,130 --> 00:01:44,718
+of the code in an object, that can't be
+accessed concurrently by multiple threads.
+
+31
+00:01:44,718 --> 00:01:47,850
+In particular, allow the Java synchronized
+keyword,
+
+32
+00:01:47,850 --> 00:01:50,360
+to the Buggy Queue's put and take methods.
+
+33
+00:01:50,360 --> 00:01:52,370
+Which has two effects.
+
+34
+00:01:52,370 --> 00:01:55,370
+First, it's not possible for two
+indications of
+
+35
+00:01:55,370 --> 00:01:57,530
+put and take on the same object to
+interleave.
+
+36
+00:01:58,580 --> 00:02:01,250
+When one thread is executing a
+synchronized put method on an
+
+37
+00:02:01,250 --> 00:02:05,000
+object, all other threads that invoke
+synchronized methods for the same object.
+
+38
+00:02:05,000 --> 00:02:08,620
+Will block, until the first thread is done
+with the object.
+
+39
+00:02:08,620 --> 00:02:11,590
+Second, when a synchronized method exits,
+
+40
+00:02:11,590 --> 00:02:15,020
+it automatically establishes a
+happens-before relationship,
+
+41
+00:02:15,020 --> 00:02:19,830
+with any subsequent invocation, of a
+synchronized method for the same object.
+
+42
+00:02:19,830 --> 00:02:23,190
+Which insures that changes to the state of
+the object, are visible to all threats.
+
+43
+00:02:24,620 --> 00:02:26,740
+This link provides more information on the
+
+44
+00:02:26,740 --> 00:02:29,560
+syntax and semantics of Java synchronized
+methods.
+
+45
+00:02:30,950 --> 00:02:33,490
+Although using synchronized insures that
+put and take
+
+46
+00:02:33,490 --> 00:02:37,250
+critical sections can't be access
+concurrently by multiple threads.
+
+47
+00:02:37,250 --> 00:02:39,800
+There are still some problems with this
+solution.
+
+48
+00:02:39,800 --> 00:02:42,510
+For example, the take method will waste
+CPU
+
+49
+00:02:42,510 --> 00:02:45,340
+cycles by spinning in a busy way, throwing
+
+50
+00:02:45,340 --> 00:02:47,710
+the index out of bounds exception,
+whenever the
+
+51
+00:02:47,710 --> 00:02:51,060
+remove method is called in an empty array
+list.
+
+52
+00:02:51,060 --> 00:02:55,210
+Likewise, the put method, could continue
+adding new messages
+
+53
+00:02:55,210 --> 00:02:57,720
+to the array list, until heat memory is
+exhausted.
+
+54
+00:02:59,020 --> 00:03:00,790
+This link provides more information on
+busy
+
+55
+00:03:00,790 --> 00:03:04,030
+waiting, and outlines some solutions to
+the problem.
+
+56
+00:03:04,030 --> 00:03:07,510
+One of which is addressed by Java built-in
+monitor objects, which we'll cover next.
+
+57
+00:03:07,510 --> 00:03:12,540
+[MUSIC]
+
+58
+00:03:12,540 --> 00:03:14,970
+All objects in Java can be used as
+built-in monitor
+
+59
+00:03:14,970 --> 00:03:18,640
+objects, which support two types of thread
+synchronization and scheduling.
+
+60
+00:03:18,640 --> 00:03:22,490
+Mutual exclusion, and cooperation, as
+described at this link.
+
+61
+00:03:22,490 --> 00:03:25,170
+Mutual exclusion enables multiple threads
+to access
+
+62
+00:03:25,170 --> 00:03:27,710
+and update shared data without race
+conditions.
+
+63
+00:03:27,710 --> 00:03:29,760
+It's supported in the Java Virtual
+Machine,
+
+64
+00:03:29,760 --> 00:03:33,170
+by an object's entrance cue and
+synchronized methods.
+
+65
+00:03:33,170 --> 00:03:35,955
+Cooperation enables threads to coordinate
+and schedule interactions.
+
+66
+00:03:37,010 --> 00:03:38,560
+It's supported in the Java Virtual
+Machine,
+
+67
+00:03:38,560 --> 00:03:42,580
+via an object's wait queue, and
+notification mechanisms.
+
+68
+00:03:42,580 --> 00:03:45,150
+These mechanisms implement a variant of
+the monitor object
+
+69
+00:03:45,150 --> 00:03:48,679
+pattern, described at this link, and
+covered in upcoming videos.
+
+70
+00:03:49,760 --> 00:03:53,340
+This pattern ensures that only one method
+runs within an object,
+
+71
+00:03:53,340 --> 00:03:54,590
+and allows an objects methods
+
+72
+00:03:54,590 --> 00:03:56,910
+to cooperatively schedule their execution
+sequences.
+
+73
+00:03:58,466 --> 00:04:00,920
+Well applied Java's built-in monitor
+objects to implement a
+
+74
+00:04:00,920 --> 00:04:04,680
+better solution, to the Buggy synchronized
+queue shown earlier.
+
+75
+00:04:04,680 --> 00:04:07,190
+In particular, this solution, which is
+called
+
+76
+00:04:07,190 --> 00:04:10,560
+Simple Blocking Queue, improves upon buggy
+queue.
+
+77
+00:04:10,560 --> 00:04:13,560
+By preventing erase conditions from
+occurring, when put
+
+78
+00:04:13,560 --> 00:04:16,220
+and take methods are called concurrently
+by multiple threads.
+
+79
+00:04:17,650 --> 00:04:20,540
+It also improves upon Buggy synchronized
+queue,
+
+80
+00:04:20,540 --> 00:04:23,680
+by preventing busy waiting from wasting
+CPU cycles.
+
+81
+00:04:23,680 --> 00:04:27,860
+[BLANK_AUDIO]
+
+82
+00:04:27,860 --> 00:04:30,920
+[MUSIC].
+
+83
+00:04:30,920 --> 00:04:34,470
+To make simple blocking queue a monitor
+object, we'll first add the synchronized
+
+84
+00:04:34,470 --> 00:04:36,980
+keyword to its put and take methods,
+
+85
+00:04:36,980 --> 00:04:38,950
+following the approach described in this
+link.
+
+86
+00:04:40,420 --> 00:04:43,560
+Although this is not the complete
+solution, it's the starting point
+
+87
+00:04:43,560 --> 00:04:46,809
+to ensure access to the queue's put and
+take methods is serialized.
+
+88
+00:04:47,920 --> 00:04:49,750
+Similar to the axis protocol, for an
+
+89
+00:04:49,750 --> 00:04:52,530
+airplane restroom, discussed in an earlier
+video.
+
+90
+00:04:54,210 --> 00:04:56,520
+Java also supports synchronized
+statements,
+
+91
+00:04:56,520 --> 00:04:58,490
+often called synchronized blocks, which
+
+92
+00:04:58,490 --> 00:05:01,410
+acquire and release a lock, within the
+scope of a statement.
+
+93
+00:05:02,550 --> 00:05:05,090
+In the synchronized statement example on
+this slide, the
+
+94
+00:05:05,090 --> 00:05:08,110
+lock is a simple block and queue object
+itself.
+
+95
+00:05:08,110 --> 00:05:11,500
+Which is the intrinsic lock, that's
+associated with every Java object.
+
+96
+00:05:12,800 --> 00:05:15,270
+Although programming synchronized blocks
+requires more effort
+
+97
+00:05:15,270 --> 00:05:18,320
+than programming synchronized methods,
+they can enhance
+
+98
+00:05:18,320 --> 00:05:21,870
+concurrency by enabling fine grain
+serialization, that
+
+99
+00:05:21,870 --> 00:05:25,290
+minimizes the scope over which locks are
+held.
+
+100
+00:05:25,290 --> 00:05:27,610
+For example, in this implementation of
+
+101
+00:05:27,610 --> 00:05:30,720
+put, the entire synchronized method is
+serialized.
+
+102
+00:05:30,720 --> 00:05:33,320
+Whereas in this implementation, only the
+synchronized
+
+103
+00:05:33,320 --> 00:05:36,180
+statement is serialized using the
+intrinsic lock.
+
+104
+00:05:36,180 --> 00:05:40,540
+Likewise, it's possible for a synchronized
+statement to use an explicit lock object.
+
+105
+00:05:40,540 --> 00:05:43,050
+That's different from an object's
+intrinsic lock.
+
+106
+00:05:43,050 --> 00:05:45,930
+Which provides further opportunities for
+fine grain serialization.
+
+107
+00:05:47,050 --> 00:05:49,490
+This link has more information on
+intrinsic locks,
+
+108
+00:05:49,490 --> 00:05:53,448
+explicit locks, synchronized methods, and
+synchronized statements in Java.
+
+109
+00:05:53,448 --> 00:05:54,236
+[MUSIC]
+
+110
+00:05:54,236 --> 00:05:59,486
+As discussed earlier, synchronized methods
+and
+
+111
+00:05:59,486 --> 00:06:03,936
+statements are only a partial solution.
+
+112
+00:06:03,936 --> 00:06:08,300
+Therefore, Java's built-in monitor
+objects, also provide waiting and
+
+113
+00:06:08,300 --> 00:06:12,089
+notification mechanisms, that help threads
+cooperatively schedule their interactions.
+
+114
+00:06:13,582 --> 00:06:16,590
+Each built-in monitor object inherits the
+weight, notify and
+
+115
+00:06:16,590 --> 00:06:19,380
+notify all methods from the Java Object
+Class, which are
+
+116
+00:06:19,380 --> 00:06:22,060
+similar to the weight, signal and signal
+all methods,
+
+117
+00:06:22,060 --> 00:06:25,190
+defined by Java Condition Objects,
+described in this earlier video.
+
+118
+00:06:26,510 --> 00:06:30,130
+Each Java monitor object has one wait
+queue and one entrance queue.
+
+119
+00:06:31,240 --> 00:06:33,770
+All calls to wait are done in a wait
+queue, and
+
+120
+00:06:33,770 --> 00:06:36,660
+all notify and notify all calls, also
+apply to this queue.
+
+121
+00:06:38,110 --> 00:06:39,720
+Having only one wait queue in a built-in
+
+122
+00:06:39,720 --> 00:06:42,620
+monitor object, is more restrictive than
+programming the Java
+
+123
+00:06:42,620 --> 00:06:44,970
+condition objects, which allow an object
+to have
+
+124
+00:06:44,970 --> 00:06:47,930
+multiple wait queues, as shown in this
+earlier video.
+
+125
+00:06:49,470 --> 00:06:53,469
+Some consequences of this restriction,
+will be discussed in this video's summary.
+
+126
+00:06:55,190 --> 00:06:57,560
+Android's Java virtual machine implements
+built-in
+
+127
+00:06:57,560 --> 00:07:01,050
+monitor object synchronizers, via POSIX
+mechanisms.
+
+128
+00:07:01,050 --> 00:07:03,050
+For example, an entrance queue is
+implemented as
+
+129
+00:07:03,050 --> 00:07:06,400
+a POSIX mutual exclusion, or mutex lock,
+augmented
+
+130
+00:07:06,400 --> 00:07:09,490
+to support recursive locking semantics,
+which protect shared
+
+131
+00:07:09,490 --> 00:07:12,420
+data from race conditions, as described at
+this link.
+
+132
+00:07:13,620 --> 00:07:16,900
+A wait queue is implemented as a POSIX
+condition variable.
+
+133
+00:07:16,900 --> 00:07:19,780
+Which allows one or more threads, to block
+on the wait queue of
+
+134
+00:07:19,780 --> 00:07:24,330
+an monitor object, until some conditions
+become true, as described at this link.
+
+135
+00:07:26,180 --> 00:07:28,480
+POSIX condition variables are conceptually
+similar
+
+136
+00:07:28,480 --> 00:07:30,710
+to Java condition objects, discussed in
+our
+
+137
+00:07:30,710 --> 00:07:33,790
+earlier video, though their
+implementations differ,
+
+138
+00:07:33,790 --> 00:07:35,589
+since they're written in different
+programming languages.
+
+139
+00:07:36,598 --> 00:07:40,930
+For example, condition objects are written
+largely in Java, and POXIS
+
+140
+00:07:40,930 --> 00:07:44,030
+condition variables are written in C, as
+shown in these path
+
+141
+00:07:47,100 --> 00:07:47,810
+notes.
+
+142
+00:07:47,810 --> 00:07:52,010
+[MUSIC].
+
+143
+00:07:52,010 --> 00:07:55,695
+Now that we've provided an overview of
+Java built-in monitor objects.
+
+144
+00:07:55,695 --> 00:07:57,520
+We've visually analyzed their behavior, in
+the
+
+145
+00:07:57,520 --> 00:07:59,980
+context of our simple block and queue
+example.
+
+146
+00:07:59,980 --> 00:08:04,680
+As shown in this diagram, each Java
+monitor object
+
+147
+00:08:04,680 --> 00:08:08,360
+has one entrance queue, associated with
+its monitor lock.
+
+148
+00:08:08,360 --> 00:08:10,820
+And one wait queue, associated with its
+
+149
+00:08:10,820 --> 00:08:14,160
+implicit monitor condition, as described
+at this link.
+
+150
+00:08:15,880 --> 00:08:18,650
+When thread T1 calls take on an empty
+
+151
+00:08:18,650 --> 00:08:21,120
+simple blocking queue, it enters the
+monitor object.
+
+152
+00:08:22,240 --> 00:08:24,930
+Assuming though the thread is active
+inside the monitor object.
+
+153
+00:08:24,930 --> 00:08:26,890
+Key one acquires a monitor lock.
+
+154
+00:08:26,890 --> 00:08:30,260
+And starts to run the code in Buggy
+synchronized queues critical section.
+
+155
+00:08:31,440 --> 00:08:35,060
+Where it will determined that the
+underline array list mQ is empty.
+
+156
+00:08:36,090 --> 00:08:40,380
+As long the mQ list is empty, key one will
+wait, on the monitor condition.
+
+157
+00:08:41,570 --> 00:08:45,300
+Calling wait on the monitor condition
+atomicaly releases the monitor lock.
+
+158
+00:08:45,300 --> 00:08:47,480
+And blocks the current thread, until a
+call to
+
+159
+00:08:47,480 --> 00:08:50,140
+notify or notify all is made on the same
+object.
+
+160
+00:08:51,410 --> 00:08:54,542
+In the context of our concurrent
+producer-consumer example,
+
+161
+00:08:54,542 --> 00:08:57,036
+assume that thread T2 calls put on simple
+blocking
+
+162
+00:08:57,036 --> 00:08:59,472
+queue, while thread T1 is blocked on its
+monitor
+
+163
+00:08:59,472 --> 00:09:03,000
+condition, causing T2 to end with the
+monitor object.
+
+164
+00:09:03,000 --> 00:09:05,400
+Acquire the monitor lock, add the message
+to the
+
+165
+00:09:05,400 --> 00:09:08,095
+mQ list [INAUDIBLE] notify all to wake up
+any
+
+166
+00:09:08,095 --> 00:09:10,610
+null threads waiting on the monitor
+condition, and then
+
+167
+00:09:10,610 --> 00:09:14,470
+release the monitor lock, and exit the
+monitor object.
+
+168
+00:09:14,470 --> 00:09:18,370
+At this point, thread T1 will be unblocked
+from the monitor condition.
+
+169
+00:09:18,370 --> 00:09:22,955
+We acquire the monitor lock, and remove
+and return the first item in the mQ
+
+170
+00:09:22,955 --> 00:09:26,050
+array list, which will cause T1 to release
+
+171
+00:09:26,050 --> 00:09:28,575
+the monitor lock, and leave the monitor
+object.
+
+172
+00:09:28,575 --> 00:09:29,315
+[MUSIC]
+
+173
+00:09:29,315 --> 00:09:35,075
+Now that we've examined the behavior of a
+monitor object
+
+174
+00:09:35,075 --> 00:09:41,080
+visually, we'll show some simple blocking
+Q Java code.
+
+175
+00:09:41,080 --> 00:09:43,610
+And discuss several implementation
+considerations.
+
+176
+00:09:44,870 --> 00:09:47,500
+Within a synchronized method, a thread can
+wait for a
+
+177
+00:09:47,500 --> 00:09:51,760
+condition to become true, using the
+guarded suspension pattern, described at
+
+178
+00:09:51,760 --> 00:09:55,920
+this link, which requires both a lock to
+be acquired, and
+
+179
+00:09:55,920 --> 00:09:59,250
+a condition to be satisfied before an
+operation can be executed.
+
+180
+00:10:00,290 --> 00:10:04,460
+For example, the synchronized take method
+implicitly acquires the monitor lock.
+
+181
+00:10:04,460 --> 00:10:08,840
+Checks the array list mQ size, and blocks
+if it's empty.
+
+182
+00:10:08,840 --> 00:10:11,050
+A call to wait should almost always be
+invoked inside
+
+183
+00:10:11,050 --> 00:10:13,540
+of a loop, that tests for the condition
+being waited on.
+
+184
+00:10:13,540 --> 00:10:15,960
+A loop is needed since a waiting
+
+185
+00:10:15,960 --> 00:10:19,240
+thread can't assume that a notification it
+received.
+
+186
+00:10:19,240 --> 00:10:22,080
+Was for the particular condition it's
+waiting on.
+
+187
+00:10:22,080 --> 00:10:27,010
+It also can't assume the condition is even
+still true, due to the non-deterministic
+
+188
+00:10:27,010 --> 00:10:29,390
+operations of other threads, accessing the
+monitor
+
+189
+00:10:29,390 --> 00:10:31,850
+object concurrently, as described at this
+link.
+
+190
+00:10:33,280 --> 00:10:36,410
+A thread blocking on wait, won't continue,
+until another
+
+191
+00:10:36,410 --> 00:10:39,620
+thread notifies it, that the condition may
+be true.
+
+192
+00:10:39,620 --> 00:10:44,020
+For example, I take call block because the
+array list mQ is empty.
+
+193
+00:10:44,020 --> 00:10:47,930
+Won't wake up, until put notifies it that
+there's a message to process.
+
+194
+00:10:49,230 --> 00:10:52,440
+When a thread blocked on wait is notified,
+it wakes up, obtains
+
+195
+00:10:52,440 --> 00:10:56,390
+the monitor lock, and checks to see if the
+condition has been satisfied.
+
+196
+00:10:56,390 --> 00:11:01,360
+If so, it exits the loop, and continues
+processing the code and the method.
+
+197
+00:11:01,360 --> 00:11:03,700
+When it's done, it releases the monitor
+lock.
+
+198
+00:11:03,700 --> 00:11:06,736
+And leaves the monitored object, for
+example, when a
+
+199
+00:11:06,736 --> 00:11:10,280
+block take call is awaken after put calls
+notify all.
+
+200
+00:11:10,280 --> 00:11:13,750
+It checkes to make sure that mQ array list
+is no longer empty, and then
+
+201
+00:11:13,750 --> 00:11:18,530
+removes and returns the first item in the
+list; as it leaves the monitor's critical
+
+202
+00:11:20,740 --> 00:11:21,530
+section.
+
+203
+00:11:21,530 --> 00:11:22,119
+[MUSIC].
+
+204
+00:11:25,620 --> 00:11:28,670
+In summary, any Java object may be used as
+
+205
+00:11:28,670 --> 00:11:31,285
+a built-in monitor object, by marking its
+methods with
+
+206
+00:11:31,285 --> 00:11:33,930
+the synchronized key word, or marking
+portions of its
+
+207
+00:11:33,930 --> 00:11:36,964
+code as synchronized statements as
+described at this link.
+
+208
+00:11:38,580 --> 00:11:42,510
+Although these synchronized methods can
+help, they're only a partial solution.
+
+209
+00:11:42,510 --> 00:11:44,490
+Since they don't address problems with
+busy waiting.
+
+210
+00:11:45,920 --> 00:11:48,124
+Therefore, Java built-in monitor objects
+
+211
+00:11:48,124 --> 00:11:50,796
+also provide waiting and notification
+mechanisms.
+
+212
+00:11:50,796 --> 00:11:55,340
+Although Java built-in monitor objects are
+relatively simple, they have some
+
+213
+00:11:55,340 --> 00:12:00,180
+subtleties and limitations, such as nested
+monitor lockout, which occurs when
+
+214
+00:12:00,180 --> 00:12:04,670
+a first thread, acquires a nested object's
+monitor lock, without relinquishing
+
+215
+00:12:04,670 --> 00:12:09,110
+the monitor lock, already held by the
+object containing the nested object.
+
+216
+00:12:09,110 --> 00:12:11,480
+Thereby preventing a second thread, from
+
+217
+00:12:11,480 --> 00:12:13,541
+acquiring the containing object's monitor
+lock.
+
+218
+00:12:15,010 --> 00:12:17,830
+This link describes the nested monitor
+lockout problem, and
+
+219
+00:12:17,830 --> 00:12:20,110
+outlines problems, that can be applied to
+remedy it.
+
+220
+00:12:21,460 --> 00:12:23,500
+There are also some subtleties, related to
+the
+
+221
+00:12:23,500 --> 00:12:27,040
+wait queue, associated with the Java
+built-in monitor object.
+
+222
+00:12:27,040 --> 00:12:29,860
+Which supports both notify, and notify all
+methods.
+
+223
+00:12:31,270 --> 00:12:34,410
+Notify wakes up a single thread waiting on
+the monitor condition.
+
+224
+00:12:34,410 --> 00:12:37,080
+Whereas notify all, wakes up all threads
+waiting on the condition.
+
+225
+00:12:38,440 --> 00:12:41,370
+This link describes how to choose which
+method to use.
+
+226
+00:12:43,000 --> 00:12:46,310
+There are situations where a program, may
+need to tightly control
+
+227
+00:12:46,310 --> 00:12:50,360
+the order in which threads are unblocked,
+when a condition changes.
+
+228
+00:12:50,360 --> 00:12:52,780
+Rather than relying on the arbitrary
+built-in
+
+229
+00:12:52,780 --> 00:12:56,080
+semantics, of Java's built-in monitor
+notification mechanism.
+
+230
+00:12:57,720 --> 00:12:59,200
+This link describes a pattern for
+
+231
+00:12:59,200 --> 00:13:02,190
+explicitly designating which thread should
+proceed.
+
+232
+00:13:03,690 --> 00:13:06,720
+Yet another limitation with Java built-in
+monitor objects, is
+
+233
+00:13:06,720 --> 00:13:10,670
+that they lack certain useful features,
+provided by reentrant locks.
+
+234
+00:13:10,670 --> 00:13:13,810
+For example, there's no equivalent to
+tryLock.
+
+235
+00:13:13,810 --> 00:13:16,900
+Or lock interuptedly on a built-in monitor
+object.
+
+236
+00:13:16,900 --> 00:13:20,940
+Which is one reason why Android and the
+java.util.concurrent package, often use
+
+237
+00:13:20,940 --> 00:13:22,920
+reentrant locks, instead of built-in Java
+
+238
+00:13:22,920 --> 00:13:24,880
+monitor objects, for their synchronization
+needs.
+
+239
+00:13:26,320 --> 00:13:27,880
+Although Java monitor objects are
+relatively
+
+240
+00:13:27,880 --> 00:13:30,340
+easy to use for simple concurrent
+programs.
+
+241
+00:13:30,340 --> 00:13:32,630
+It's often the case that production
+software
+
+242
+00:13:32,630 --> 00:13:35,870
+may need more than Java's built-in monitor
+objects.
+
+243
+00:13:35,870 --> 00:13:38,700
+This link provides more information on the
+broader range of
+
+244
+00:13:38,700 --> 00:13:40,930
+synchronization and scheduling mechanisms,
+in
+
+245
+00:13:40,930 --> 00:13:45,840
+the java.util.concurrent and
+java.util.concurrent.locks package.
+
+246
+00:13:45,840 --> 00:13:48,090
+It's also common for Android applications
+to use its
+
+247
+00:13:48,090 --> 00:13:52,320
+concurrency frameworks, than to use Java
+built-in monitors objects directly.
+
+248
+00:13:52,320 --> 00:13:59,061
+These frameworks implement a broader range
+of concurrency, patterns and
+
+249
+00:13:59,061 --> 00:14:06,400
+mechanisms, as summarized at this link,
+and described later in this section.
+
+250
+00:14:06,400 --> 00:14:07,198
+[MUSIC]
+
+251
+00:14:07,198 --> 00:14:08,679
+[BLANK_AUDIO]
+

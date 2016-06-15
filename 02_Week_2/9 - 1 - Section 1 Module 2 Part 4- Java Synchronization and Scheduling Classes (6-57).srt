@@ -1,0 +1,597 @@
+1
+00:00:00,000 --> 00:00:05,020
+[MUSIC]
+
+2
+00:00:05,020 --> 00:00:05,700
+Welcome
+
+3
+00:00:08,610 --> 00:00:11,320
+to the next part of the module, which
+presents
+
+4
+00:00:11,320 --> 00:00:14,629
+an overview of key Java synchronization
+and scheduling classes.
+
+5
+00:00:15,830 --> 00:00:19,270
+The concurrent Java program examples
+presented in the previous part
+
+6
+00:00:19,270 --> 00:00:21,540
+produced incorrect results, since they
+
+7
+00:00:21,540 --> 00:00:23,700
+lacked proper synchronization and
+scheduling.
+
+8
+00:00:24,800 --> 00:00:30,070
+Therefore, this part summarizes the key
+Java classes provided by Android to
+
+9
+00:00:30,070 --> 00:00:32,350
+synchronize access to critical sections
+and
+
+10
+00:00:32,350 --> 00:00:35,190
+schedule interactions among threads and
+concurrent programs.
+
+11
+00:00:36,700 --> 00:00:38,980
+We don't show any Java code in this part.
+
+12
+00:00:38,980 --> 00:00:42,620
+We just outlined it's key synchronization
+and scheduling classes,
+
+13
+00:00:42,620 --> 00:00:44,980
+and compare and contrast them at a
+conceptual level.
+
+14
+00:00:46,580 --> 00:00:49,830
+Subsequent parts of the module will show
+how to program these mechanisms in Java.
+
+15
+00:00:51,430 --> 00:00:53,690
+Java defines many synchronization and
+scheduling
+
+16
+00:00:53,690 --> 00:00:56,430
+classes, in its Java util concurrent
+
+17
+00:00:56,430 --> 00:00:59,690
+and Java util concurrent locks packages,
+which are described at this link.
+
+18
+00:01:01,030 --> 00:01:04,420
+We'll cover a subset of these classes,
+including a reentrant lock, which
+
+19
+00:01:04,420 --> 00:01:06,060
+is a mutual exclusion mechanism, that
+
+20
+00:01:06,060 --> 00:01:09,540
+extend Java's built in monitor lock
+capabilities.
+
+21
+00:01:09,540 --> 00:01:12,410
+Reentrant read write lock, which improves
+performance when resources
+
+22
+00:01:12,410 --> 00:01:14,406
+are read much more often than they're
+written to.
+
+23
+00:01:15,435 --> 00:01:19,590
+Semaphore, which is conceptually a non
+negative integer used to control
+
+24
+00:01:19,590 --> 00:01:24,075
+the access of multiple threads to a
+limited number of shared resources.
+
+25
+00:01:24,075 --> 00:01:27,610
+ConditionObject, which allows threads to
+block themselves until some
+
+26
+00:01:27,610 --> 00:01:32,610
+conditions involving shared state become
+true and count down latches,
+
+27
+00:01:32,610 --> 00:01:34,470
+which allow one or more threads to wait
+until
+
+28
+00:01:34,470 --> 00:01:37,460
+a set of operations being performed in
+other threads complete.
+
+29
+00:01:38,958 --> 00:01:41,360
+Although these 5 classes allow Java
+threads
+
+30
+00:01:41,360 --> 00:01:43,279
+to serialize and coordinate their inner
+actions.
+
+31
+00:01:44,320 --> 00:01:46,980
+They are distinct from the synchronized
+keyword and
+
+32
+00:01:46,980 --> 00:01:50,580
+the wait, notify, and notify all methods
+provided
+
+33
+00:01:50,580 --> 00:01:53,380
+by the built-in monitor object mechanisms
+available to
+
+34
+00:01:53,380 --> 00:01:55,800
+all Java objects, which are described at
+this link.
+
+35
+00:01:57,240 --> 00:02:00,210
+These 5 classes are more fundamental and
+flexible, than the
+
+36
+00:02:00,210 --> 00:02:03,830
+monitor lock and monitor condition
+provided by built-in monitor objects.
+
+37
+00:02:03,830 --> 00:02:07,590
+So we present them first, which has the
+added benefit of making it
+
+38
+00:02:07,590 --> 00:02:11,130
+easier to understand Java's built in
+monitor objects, when we cover them later.
+
+39
+00:02:11,130 --> 00:02:14,203
+[MUSIC]
+
+40
+00:02:14,203 --> 00:02:16,609
+[BLANK_AUDIO]
+
+41
+00:02:16,609 --> 00:02:23,050
+The performance in behavior of the Java
+synchronization and scheduling classes
+
+42
+00:02:23,050 --> 00:02:27,290
+we'll cover in the remainder of this
+module, depend on a number of factors.
+
+43
+00:02:27,290 --> 00:02:30,270
+Such as the implementation of the Java
+virtual machine, operating
+
+44
+00:02:30,270 --> 00:02:33,009
+system, hardware, and the use cases in
+which they're applied.
+
+45
+00:02:34,270 --> 00:02:36,000
+There are various ways of implementing
+these classes.
+
+46
+00:02:37,050 --> 00:02:40,605
+One alternative involves so-called spin
+locks, described at this link.
+
+47
+00:02:40,605 --> 00:02:44,470
+That busy wait, without sleeping, until
+the lock is acquired.
+
+48
+00:02:44,470 --> 00:02:46,540
+Spin locks often use low level hardware
+
+49
+00:02:46,540 --> 00:02:49,640
+test and set operations to implement
+mutual exclusion.
+
+50
+00:02:49,640 --> 00:02:51,950
+These hardware operations are fast, but
+can incur
+
+51
+00:02:51,950 --> 00:02:55,450
+the overhead of busy waiting, described at
+this link.
+
+52
+00:02:55,450 --> 00:02:58,060
+An alternative is sleep locks, where the
+system
+
+53
+00:02:58,060 --> 00:03:00,430
+puts a thread to sleep, until it may be
+
+54
+00:03:00,430 --> 00:03:03,480
+able to make progress again, which is
+often used
+
+55
+00:03:03,480 --> 00:03:06,730
+for semaphores and ConditionObjects as
+described at this link.
+
+56
+00:03:08,220 --> 00:03:09,900
+Although this approach doesn't incur busy
+
+57
+00:03:09,900 --> 00:03:12,550
+waiting overhead, it incurs contact
+switching
+
+58
+00:03:12,550 --> 00:03:15,960
+overhead to put a thread to sleep and wake
+it up later on.
+
+59
+00:03:17,530 --> 00:03:21,820
+Some implementations provide adaptive
+locks that spin for a short time, and
+
+60
+00:03:21,820 --> 00:03:24,860
+then put the thread to sleep, if they
+can't acquire the resource quickly.
+
+61
+00:03:26,115 --> 00:03:28,880
+An excellent presentation on the design
+and implementation of
+
+62
+00:03:28,880 --> 00:03:31,440
+the Java Util concurrent package appears
+at this link.
+
+63
+00:03:33,010 --> 00:03:35,460
+There are other issues to consider when
+choosing between
+
+64
+00:03:35,460 --> 00:03:38,950
+the Java synchronization and scheduling
+classes provided by Android.
+
+65
+00:03:40,580 --> 00:03:43,560
+ReentrantLocks have lower overhead than
+ReentrantReadWrite locks.
+
+66
+00:03:43,560 --> 00:03:48,470
+Since the latter has more complicated
+semantics and implementation complexity.
+
+67
+00:03:48,470 --> 00:03:51,066
+On the other hand, reentrant read-write
+locks can
+
+68
+00:03:51,066 --> 00:03:55,200
+able more parallelism on multicore, or
+multiprocessor hardware.
+
+69
+00:03:55,200 --> 00:03:59,210
+Especially if an object's data is read
+much more often than it's written to.
+
+70
+00:04:00,435 --> 00:04:02,450
+ConditionalObjects and semaphores
+generally have more
+
+71
+00:04:02,450 --> 00:04:04,600
+overhead than reentrant locks and
+reentrant read-write
+
+72
+00:04:04,600 --> 00:04:07,240
+locks because the former [UNKNOWN] sleep
+locks
+
+73
+00:04:07,240 --> 00:04:09,370
+whereas the latter can do spin locks.
+
+74
+00:04:09,370 --> 00:04:11,920
+On the other hand, ConditionObjects in
+semaphores are
+
+75
+00:04:11,920 --> 00:04:15,510
+much more expressive, since they provide
+greater capability.
+
+76
+00:04:15,510 --> 00:04:18,000
+For example, ReentrantLocks and Reentrant
+ReadWriteLocks must
+
+77
+00:04:18,000 --> 00:04:20,050
+be used in a fully bracketed manner,
+
+78
+00:04:20,050 --> 00:04:23,438
+where the thread that acquires a lock must
+be the one to release it.
+
+79
+00:04:23,438 --> 00:04:27,000
+In contrast, ConditionObjects and
+semaphores allow threads to
+
+80
+00:04:27,000 --> 00:04:31,220
+coordinate their processing via more
+flexible interaction patterns.
+
+81
+00:04:31,220 --> 00:04:33,540
+For example, threads can use a semaphore
+
+82
+00:04:33,540 --> 00:04:36,522
+to take turns communicating via a shared
+object.
+
+83
+00:04:36,522 --> 00:04:40,510
+Moreover, ConditionObjects allow threads
+to coordinate their interactions via
+
+84
+00:04:40,510 --> 00:04:45,650
+arbitrarily complex conditions involving
+state that's shared by multiple threads.
+
+85
+00:04:46,760 --> 00:04:48,410
+ConditionObjects have a fundamentally
+different
+
+86
+00:04:48,410 --> 00:04:51,870
+purpose, than ReentrantLocks and
+ReentrantReadWriteLocks.
+
+87
+00:04:51,870 --> 00:04:54,260
+A thread can use these latter two locks to
+keep
+
+88
+00:04:54,260 --> 00:04:58,600
+other threads out of a critical section,
+while performing its computations.
+
+89
+00:04:58,600 --> 00:05:01,330
+Conversely, a thread uses a
+ConditionObject
+
+90
+00:05:01,330 --> 00:05:02,830
+to keep itself out of the critical
+
+91
+00:05:02,830 --> 00:05:04,760
+section, until it can make forward
+
+92
+00:05:04,760 --> 00:05:07,223
+progress, when changes to shared state
+occur.
+
+93
+00:05:07,223 --> 00:05:09,822
+[BLANK_AUDIO]
+
+94
+00:05:09,822 --> 00:05:14,641
+[MUSIC].
+
+95
+00:05:14,641 --> 00:05:18,733
+In summary, all the Java synchronization
+and scheduling classes outlined in
+
+96
+00:05:18,733 --> 00:05:20,469
+this video appear throughout the
+
+97
+00:05:20,469 --> 00:05:24,520
+Android infrastructure, framework and
+application software.
+
+98
+00:05:24,520 --> 00:05:27,220
+Including many examples we cover in this
+MOOC.
+
+99
+00:05:27,220 --> 00:05:29,150
+So it helps to know something about them
+when you examine
+
+100
+00:05:29,150 --> 00:05:32,650
+the Android open source code base, which
+is available at this link.
+
+101
+00:05:34,000 --> 00:05:37,120
+There's several reasons why concurrent
+programs use these classes.
+
+102
+00:05:38,600 --> 00:05:43,600
+One reason is to protect the objects and
+resources shared by multiple threads from
+
+103
+00:05:43,600 --> 00:05:45,840
+race conditions that would otherwise
+corrupt them,
+
+104
+00:05:45,840 --> 00:05:48,650
+if they were accessed and updated
+simultaneously.
+
+105
+00:05:50,020 --> 00:05:53,147
+Another reason is to schedule and control
+the order in which threads execute.
+
+106
+00:05:53,147 --> 00:05:53,647
+[BLANK_AUDIO].
+
+107
+00:05:55,430 --> 00:05:57,660
+The importance of these mechanisms is
+reflected in the
+
+108
+00:05:57,660 --> 00:06:00,580
+amount of time we devote to them in this
+module.
+
+109
+00:06:00,580 --> 00:06:02,720
+Which is roughly an order of magnitude
+longer
+
+110
+00:06:02,720 --> 00:06:05,320
+than we devoted to Java threading
+mechanisms themselves.
+
+111
+00:06:07,370 --> 00:06:10,420
+The reason for this additional focus, is
+that complexity
+
+112
+00:06:10,420 --> 00:06:14,510
+in concurrent programs, as in life, often
+stems from
+
+113
+00:06:14,510 --> 00:06:16,180
+trying to coordinate multiple
+
+114
+00:06:16,180 --> 00:06:19,112
+interdependent entities working together,
+rather
+
+115
+00:06:19,112 --> 00:06:22,789
+than the behavior of individual entities
+working in isolation.
+
+116
+00:06:24,350 --> 00:06:27,930
+For each class covering the next 5 videos,
+we'll first summarize
+
+117
+00:06:27,930 --> 00:06:32,790
+the general concept, outline an analogous
+humanoid use of the concept
+
+118
+00:06:32,790 --> 00:06:35,560
+to make it easier to remember what it
+does, and then
+
+119
+00:06:35,560 --> 00:06:38,014
+share how the class is implemented and
+applied in the Android.
+
+120
+00:06:39,060 --> 00:06:41,769
+Therefore, even if you're already familiar
+with
+
+121
+00:06:41,769 --> 00:06:44,730
+the Java synchronization and scheduling
+classes, you
+
+122
+00:06:44,730 --> 00:06:46,998
+may learn something new about how they're
+
+123
+00:06:46,998 --> 00:06:49,794
+implemented and used in the Android
+environment.
+
+124
+00:06:49,794 --> 00:06:57,819
+[MUSIC]
+

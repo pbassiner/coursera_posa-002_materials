@@ -1,0 +1,620 @@
+1
+00:00:00,000 --> 00:00:08,510
+[MUSIC].
+
+2
+00:00:08,510 --> 00:00:11,230
+Welcome to the next part of the module,
+which
+
+3
+00:00:11,230 --> 00:00:14,664
+covers the Java CountDownLatch class that
+implements barrier synchronization.
+
+4
+00:00:16,240 --> 00:00:21,064
+This part provides a conceptual overview
+of barrier synchronization, explains how
+
+5
+00:00:21,064 --> 00:00:25,218
+the Java CountDownLatch class implements
+these concepts to enable one or
+
+6
+00:00:25,218 --> 00:00:28,702
+more threads to wait until a set of
+operations being performed
+
+7
+00:00:28,702 --> 00:00:33,794
+in other threads completes, and shows how
+CountDownLatches are applied in Android.
+
+8
+00:00:33,794 --> 00:00:36,802
+A barrier is a synchronization technique
+that halts the
+
+9
+00:00:36,802 --> 00:00:39,780
+progress of one or more threads at a
+particular point.
+
+10
+00:00:39,780 --> 00:00:42,478
+No thread can proceed until all other
+threads
+
+11
+00:00:42,478 --> 00:00:45,400
+reach this barrier, as described at this
+link.
+
+12
+00:00:46,600 --> 00:00:49,390
+Barriers are commonly used in several
+ways.
+
+13
+00:00:49,390 --> 00:00:50,960
+One way is to defer the start of
+
+14
+00:00:50,960 --> 00:00:54,976
+current computations until after an object
+has been initialized.
+
+15
+00:00:54,976 --> 00:00:57,450
+For example, the main thread of an
+application
+
+16
+00:00:57,450 --> 00:01:00,320
+that coverts a video from ABC HD format
+into
+
+17
+00:01:00,320 --> 00:01:03,140
+MP4 format might spawn four threads to run
+
+18
+00:01:03,140 --> 00:01:06,050
+different parts of the conversion
+computations on different cores.
+
+19
+00:01:07,245 --> 00:01:11,390
+An initialization done barrier, created
+with a count of one, can be used to defer
+
+20
+00:01:11,390 --> 00:01:13,320
+the start of these threads until the main
+
+21
+00:01:13,320 --> 00:01:16,110
+thread has finished initializing its
+internal data structures.
+
+22
+00:01:18,020 --> 00:01:21,430
+When initialization is finished, the main
+thread decrements the count
+
+23
+00:01:21,430 --> 00:01:25,300
+to zero and all the threads can begin
+their conversions concurrently.
+
+24
+00:01:27,130 --> 00:01:30,590
+Another common use is to allow one thread
+to wait until a group
+
+25
+00:01:30,590 --> 00:01:35,270
+of other concurrent threads are done with
+their processing before it can continue.
+
+26
+00:01:35,270 --> 00:01:38,060
+For example, the main thread in our video
+format
+
+27
+00:01:38,060 --> 00:01:42,210
+conversion application can use a
+conversion done barrier, created with
+
+28
+00:01:42,210 --> 00:01:44,480
+a count of four, to wait until all the
+
+29
+00:01:44,480 --> 00:01:47,940
+threads finish their conversions before
+continuing with its other work.
+
+30
+00:01:49,660 --> 00:01:54,336
+As each thread finishes, the barrier count
+is decremented by one.
+
+31
+00:01:54,336 --> 00:01:58,221
+When the count reaches zero, the main
+thread can continue.
+
+32
+00:01:58,221 --> 00:02:01,755
+A human known use of barrier
+synchronization is the protocol used by
+
+33
+00:02:01,755 --> 00:02:04,979
+a tour guide, described at this link, who
+waits until all the
+
+34
+00:02:04,979 --> 00:02:08,947
+tourists have arrived before starting
+their tour, and who also waits until
+
+35
+00:02:08,947 --> 00:02:13,302
+all the tourists have finished the tour
+before continuing with their other work.
+
+36
+00:02:13,302 --> 00:02:19,961
+[MUSIC].
+
+37
+00:02:19,961 --> 00:02:23,743
+Java provides barrier synchronization via
+its CountDownLatch class,
+
+38
+00:02:23,743 --> 00:02:25,789
+which allows one or more threads to wait
+
+39
+00:02:25,789 --> 00:02:28,083
+until a set of operations being performed
+in
+
+40
+00:02:28,083 --> 00:02:31,310
+other threads have completed, as described
+at this link.
+
+41
+00:02:32,800 --> 00:02:37,936
+Most of its implementation is written in
+Java, as shown at this pathname.
+
+42
+00:02:37,936 --> 00:02:41,596
+CountDownLatch uses the gang of four
+bridge pattern, described at this
+
+43
+00:02:41,596 --> 00:02:43,036
+link, to inherit the bulk of
+
+44
+00:02:43,036 --> 00:02:46,574
+it's functionality from the
+AbstractQueuedSynchronizer class.
+
+45
+00:02:46,574 --> 00:02:49,044
+Which provides a framework for
+implementing
+
+46
+00:02:49,044 --> 00:02:51,579
+blocking locks and synchronizers that rely
+on
+
+47
+00:02:51,579 --> 00:02:55,510
+first in, first out, or FIFO wait queues,
+as described at this link.
+
+48
+00:02:56,960 --> 00:03:01,050
+The constructor initializes CountDownLatch
+with a given count.
+
+49
+00:03:01,050 --> 00:03:02,870
+Once this count is set, it can't
+
+50
+00:03:02,870 --> 00:03:06,153
+be reset without creating a new
+CountDownLatch instance.
+
+51
+00:03:06,153 --> 00:03:10,053
+An alternative is to use a Java
+CyclicBarrier, which is cyclic because
+
+52
+00:03:10,053 --> 00:03:14,261
+it can be reused by resetting the count
+after waiting threads are released.
+
+53
+00:03:14,261 --> 00:03:18,213
+CyclicBarrier is useful for programs with
+a fixed size number
+
+54
+00:03:18,213 --> 00:03:22,184
+of threads that wait for each other, as
+described this link.
+
+55
+00:03:22,184 --> 00:03:25,570
+The key methods in CountDownLatch are
+await and countdown.
+
+56
+00:03:26,570 --> 00:03:31,262
+Await causes the calling thread to wait
+until the latch's count reaches zero.
+
+57
+00:03:31,262 --> 00:03:34,382
+CountDown decrements the count of the
+latch, releasing
+
+58
+00:03:34,382 --> 00:03:37,229
+all the waiting threads if the count
+reaches zero.
+
+59
+00:03:37,229 --> 00:03:40,877
+A CountDownLatch doesn't require that
+threads calling countDown
+
+60
+00:03:40,877 --> 00:03:42,925
+wait for the count to reach zero before
+
+61
+00:03:42,925 --> 00:03:46,189
+proceeding, it simply prevents any thread
+from proceeding
+
+62
+00:03:46,189 --> 00:03:48,734
+past an await call until all threads can
+pass.
+
+63
+00:03:48,734 --> 00:03:54,972
+[MUSIC].
+
+64
+00:03:54,972 --> 00:03:57,312
+To show how Java CountDownLatches are used
+
+65
+00:03:57,312 --> 00:04:00,237
+in Android, we'll analyze its Contacts
+Provider,
+
+66
+00:04:00,237 --> 00:04:04,930
+which is a source of data for a device's
+contacts application, shown at this link.
+
+67
+00:04:06,150 --> 00:04:11,848
+The Contacts Provider is implemented by
+the ContactsProvider2 class, which extends
+
+68
+00:04:11,848 --> 00:04:15,852
+AbstractContactsProvider that, in turn,
+extends Content
+
+69
+00:04:15,852 --> 00:04:18,428
+Provider, as shown at this pathname.
+
+70
+00:04:18,428 --> 00:04:21,746
+We don't analyze every detail of this
+code, just
+
+71
+00:04:21,746 --> 00:04:25,849
+the parts we need to explain how the
+CountDownLatches work.
+
+72
+00:04:25,849 --> 00:04:30,497
+A Content Provider is a core Android
+component that manages access
+
+73
+00:04:30,497 --> 00:04:35,598
+to a central repository of structured
+data, as described at this link.
+
+74
+00:04:35,598 --> 00:04:38,550
+The Contacts Provider presents its data to
+
+75
+00:04:38,550 --> 00:04:42,404
+applications by a standard Content
+Provider methods,
+
+76
+00:04:42,404 --> 00:04:45,684
+such as insert, query, update, and delete,
+
+77
+00:04:45,684 --> 00:04:50,142
+which internally accesses multiple SQLite
+database tables.
+
+78
+00:04:50,142 --> 00:04:52,848
+A pair of CountDownLatches are used to
+defer read
+
+79
+00:04:52,848 --> 00:04:57,150
+and write operations until the Contacts
+Provider is properly initialized.
+
+80
+00:04:57,150 --> 00:04:59,407
+The Contacts Provider onCreate entry point
+
+81
+00:04:59,407 --> 00:05:02,720
+method calls its internal initialize
+method.
+
+82
+00:05:02,720 --> 00:05:05,270
+Initialize starts a background thread.
+
+83
+00:05:05,270 --> 00:05:08,750
+It initializes the SQLite database by
+importing the legacy
+
+84
+00:05:08,750 --> 00:05:12,680
+contacts, updating accounts, locale, and
+search information, et cetera.
+
+85
+00:05:13,780 --> 00:05:16,100
+These time consuming tasks continue to run
+
+86
+00:05:16,100 --> 00:05:19,310
+concurrently, even after initialize and
+onCreate have returned.
+
+87
+00:05:20,440 --> 00:05:23,278
+So, Contacts Provider methods, such as
+query and
+
+88
+00:05:23,278 --> 00:05:25,522
+insert, must not be allowed to read from
+
+89
+00:05:25,522 --> 00:05:27,964
+or write to the database, since it's state
+
+90
+00:05:27,964 --> 00:05:32,205
+will be inconsistent until the background
+initialization tasks finish.
+
+91
+00:05:32,205 --> 00:05:34,155
+To ensure consistency and optimize
+
+92
+00:05:34,155 --> 00:05:37,340
+performance, two CountDownLatches, each
+initialized
+
+93
+00:05:37,340 --> 00:05:41,307
+with a count of one, prevent database
+access during initialization.
+
+94
+00:05:41,307 --> 00:05:43,859
+Splitting the CountDownLatches into read
+and write
+
+95
+00:05:43,859 --> 00:05:47,049
+access optimizes performance, since
+read-only methods on the
+
+96
+00:05:47,049 --> 00:05:49,137
+Contacts Provider can be processed as soon
+
+97
+00:05:49,137 --> 00:05:51,521
+as that portion of the database is
+initialized.
+
+98
+00:05:51,521 --> 00:05:54,071
+For example, any calls to query, block
+
+99
+00:05:54,071 --> 00:05:57,104
+until the Read Access Latch count equals
+zero.
+
+100
+00:05:57,104 --> 00:06:01,690
+Likewise, any calls to insert, block until
+the Write Access Latch count equals zero.
+
+101
+00:06:02,840 --> 00:06:04,960
+All these Contacts Provider methods call
+the
+
+102
+00:06:04,960 --> 00:06:08,700
+private waitForAccess method, which calls
+a wait
+
+103
+00:06:08,700 --> 00:06:11,294
+on its CountDownLatch parameter to block
+the
+
+104
+00:06:11,294 --> 00:06:13,950
+caller until the designated initialization
+is complete.
+
+105
+00:06:15,330 --> 00:06:17,360
+As initialization tasks running
+concurrently
+
+106
+00:06:17,360 --> 00:06:19,126
+in the background thread complete, the
+
+107
+00:06:19,126 --> 00:06:23,200
+performBackgroundTask method calls
+countDown on the
+
+108
+00:06:23,200 --> 00:06:26,310
+appropriate Read and Write Access Latches.
+
+109
+00:06:26,310 --> 00:06:30,468
+Which unblock any methods that read from
+or write to the Contacts
+
+110
+00:06:30,468 --> 00:06:35,938
+Provider, so they can proceed and compete
+for the database transaction monitor.
+
+111
+00:06:35,938 --> 00:06:42,682
+[MUSIC].
+
+112
+00:06:42,682 --> 00:06:46,257
+In summary, a Java CountDownLatch provides
+a versatile barrier
+
+113
+00:06:46,257 --> 00:06:49,707
+synchronization tool that can be used for
+several purposes.
+
+114
+00:06:49,707 --> 00:06:54,540
+If it's initialized with a count of one,
+it serves as a simple on-off latch.
+
+115
+00:06:54,540 --> 00:06:56,540
+For example, in our earlier video
+
+116
+00:06:56,540 --> 00:06:59,365
+conversion example, all four threads that
+evoke
+
+117
+00:06:59,365 --> 00:07:01,460
+await, block on the initialization done
+
+118
+00:07:01,460 --> 00:07:04,090
+latch until the main thread invokes
+countDown.
+
+119
+00:07:05,160 --> 00:07:08,850
+If it's initialized to N, it can make one
+thread wait until N
+
+120
+00:07:08,850 --> 00:07:13,760
+threads have completed some action or some
+action has been completed N times.
+
+121
+00:07:13,760 --> 00:07:16,415
+For example, the main thread in the video
+conversion
+
+122
+00:07:16,415 --> 00:07:19,311
+example waits until all the worker threads
+are finished.
+
+123
+00:07:19,311 --> 00:07:22,272
+At which point, it returns to it's caller.
+
+124
+00:07:22,272 --> 00:07:25,728
+ACountDownLatch supports several types of
+await operations,
+
+125
+00:07:25,728 --> 00:07:28,416
+including an await that causes the current
+thread
+
+126
+00:07:28,416 --> 00:07:33,085
+to wait until the latch is counted is down
+to zero, unless the thread is interrupted.
+
+127
+00:07:33,085 --> 00:07:38,629
+Or, a time to wait that blocks until the
+specified waiting time elapses.
+
+128
+00:07:38,629 --> 00:07:42,085
+CountDownLatch is used throughout Android,
+both in its
+
+129
+00:07:42,085 --> 00:07:45,763
+frameworks and in its common applications
+and providers.
+
+130
+00:07:45,763 --> 00:07:54,609
+[MUSIC]
+

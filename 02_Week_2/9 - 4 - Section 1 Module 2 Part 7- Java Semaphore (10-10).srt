@@ -1,0 +1,832 @@
+1
+00:00:00,000 --> 00:00:05,020
+[MUSIC].
+
+2
+00:00:05,020 --> 00:00:05,700
+Welcome
+
+3
+00:00:08,620 --> 00:00:12,940
+to the next part of the module, which
+covers the Java Semaphore class.
+
+4
+00:00:12,940 --> 00:00:16,420
+This part provides a conceptual overview
+of semaphores, explains
+
+5
+00:00:16,420 --> 00:00:20,070
+how the Java Semaphore implements these
+concepts, to enable multiple
+
+6
+00:00:20,070 --> 00:00:22,230
+threads to control access to a limited
+number of
+
+7
+00:00:22,230 --> 00:00:25,970
+shared resources and shows how semaphores
+are applied in Android.
+
+8
+00:00:27,450 --> 00:00:30,920
+A semaphore is conceptually a non-negative
+integer that can be
+
+9
+00:00:30,920 --> 00:00:35,840
+incremented and decremented atomically to
+control access to a shared resource.
+
+10
+00:00:35,840 --> 00:00:37,520
+An early use of semaphores was to provide
+
+11
+00:00:37,520 --> 00:00:41,030
+train operators with simple stop and
+proceed indications
+
+12
+00:00:41,030 --> 00:00:42,760
+to ensure they shared a single train track
+
+13
+00:00:42,760 --> 00:00:45,350
+safely and efficiently, as described at
+this link.
+
+14
+00:00:46,600 --> 00:00:49,950
+In concurrent programs, they're used to
+synchronize schedule, the
+
+15
+00:00:49,950 --> 00:00:53,560
+interaction between multiple concurrent
+threads as described in this link.
+
+16
+00:00:54,590 --> 00:00:59,060
+For example, to ensure overall system
+responsiveness, it may be necessary
+
+17
+00:00:59,060 --> 00:01:02,189
+to eliminate the number of resources
+devoted to a particular task.
+
+18
+00:01:03,730 --> 00:01:05,700
+Consider a pool of threads performing
+image
+
+19
+00:01:05,700 --> 00:01:08,460
+rendering, which is computationally
+intensive that use
+
+20
+00:01:08,460 --> 00:01:13,340
+a semaphore to restrict access to a fixed
+number of cores on a multi-core processor.
+
+21
+00:01:13,340 --> 00:01:16,050
+Such as two out of four cores on a quad
+core system.
+
+22
+00:01:17,180 --> 00:01:19,540
+Before threading the pool can render an
+image,
+
+23
+00:01:19,540 --> 00:01:22,420
+it must first acquire a permit from the
+semaphore.
+
+24
+00:01:22,420 --> 00:01:26,519
+Decrementic by one, thereby ensuring that
+a core is available for use.
+
+25
+00:01:28,090 --> 00:01:30,020
+If two threads each acquire a permit from
+
+26
+00:01:30,020 --> 00:01:33,170
+the semaphore, it's permit count drops to
+zero.
+
+27
+00:01:33,170 --> 00:01:35,750
+At this point, only these two threads can
+perform
+
+28
+00:01:35,750 --> 00:01:39,390
+rendering, the others must wait, blocking
+for an available permit.
+
+29
+00:01:40,680 --> 00:01:44,000
+When a thread is done rendering the image,
+it's placed back in the pool, and a
+
+30
+00:01:44,000 --> 00:01:46,810
+permit is returned to the semaphore,
+allowing another
+
+31
+00:01:46,810 --> 00:01:49,620
+thread to access the core and process
+another image.
+
+32
+00:01:51,070 --> 00:01:54,830
+The acquisition and release protocol in
+this example is fully bracketed.
+
+33
+00:01:54,830 --> 00:01:58,070
+Similar to a reentrant lock or a reentrant
+read write lock, since the
+
+34
+00:01:58,070 --> 00:02:02,410
+thread that acquires a permit is the same
+thread that releases the permit.
+
+35
+00:02:02,410 --> 00:02:04,190
+But that's just one of several use cases
+
+36
+00:02:04,190 --> 00:02:06,440
+for semaphores that we'll examine in this
+video.
+
+37
+00:02:08,270 --> 00:02:10,570
+There are two general types of semaphores.
+
+38
+00:02:10,570 --> 00:02:13,710
+Counting semaphores allow an arbitrary
+resource count.
+
+39
+00:02:13,710 --> 00:02:16,488
+For example, our image rendering example
+used a
+
+40
+00:02:16,488 --> 00:02:19,380
+counting semaphore with an initial count
+of two.
+
+41
+00:02:19,380 --> 00:02:23,590
+Conversely, binary semaphores restrict the
+count to either zero or one,
+
+42
+00:02:23,590 --> 00:02:27,460
+which corresponds to locked or unlocked,
+available or unavailable, et cetera.
+
+43
+00:02:28,800 --> 00:02:32,320
+Later in this module, we'll show how a
+pair of binary semaphores can
+
+44
+00:02:32,320 --> 00:02:36,120
+be apply to fix the buggy ping-pong
+program covered earlier in this module.
+
+45
+00:02:36,120 --> 00:02:39,170
+[MUSIC].
+
+46
+00:02:39,170 --> 00:02:39,670
+We'll
+
+47
+00:02:43,500 --> 00:02:46,870
+now examine a human known use of
+semaphores that I learned
+
+48
+00:02:46,870 --> 00:02:50,740
+when I was a graduate student at the
+University of California Irvine.
+
+49
+00:02:50,740 --> 00:02:52,870
+Irvine is located close to the beach.
+
+50
+00:02:52,870 --> 00:02:55,730
+So we played lots of beach volleyball on
+the weekends.
+
+51
+00:02:55,730 --> 00:02:58,300
+For example, the Corona del Mar Beach
+described at
+
+52
+00:02:58,300 --> 00:03:01,100
+this link had a half dozen or so
+volleyball courts.
+
+53
+00:03:02,160 --> 00:03:05,040
+On a nice day, however, there were always
+more teams
+
+54
+00:03:05,040 --> 00:03:08,360
+that wanted to play volleyball than there
+were courts available.
+
+55
+00:03:08,360 --> 00:03:09,910
+So courts were a limited resource.
+
+56
+00:03:11,110 --> 00:03:14,720
+To schedule access to the courts, a
+counting semaphore protocol was used
+
+57
+00:03:14,720 --> 00:03:18,220
+that involved placing a bag full of beach
+volley balls in the sand.
+
+58
+00:03:18,220 --> 00:03:20,020
+One ball for every available court.
+
+59
+00:03:21,340 --> 00:03:22,580
+Each pair of teams that wanted to play
+
+60
+00:03:22,580 --> 00:03:25,800
+volleyball would send a representative
+over to the bag.
+
+61
+00:03:25,800 --> 00:03:28,140
+If there was a ball in the bag, that
+representative
+
+62
+00:03:28,140 --> 00:03:30,340
+could take the ball, and the teams could
+play volleyball.
+
+63
+00:03:30,340 --> 00:03:33,950
+As long as the bag was empty, however,
+teams that
+
+64
+00:03:33,950 --> 00:03:36,060
+wanted to play volleyball would have to
+wait for other
+
+65
+00:03:36,060 --> 00:03:38,520
+teams to finish their games and return a
+ball to
+
+66
+00:03:38,520 --> 00:03:41,360
+the bag, so they can claim it and start
+their game.
+
+67
+00:03:42,740 --> 00:03:46,330
+Semaphore protocol used in this example is
+fully bracketed.
+
+68
+00:03:46,330 --> 00:03:50,060
+Similar to the image rendering example we
+discussed earlier that granted
+
+69
+00:03:50,060 --> 00:03:53,130
+the pull of threads access to a limited
+number of processor cores.
+
+70
+00:03:53,130 --> 00:04:00,120
+[MUSIC].
+
+71
+00:04:00,120 --> 00:04:03,630
+Java provides semaphores by its semaphore
+class, which
+
+72
+00:04:03,630 --> 00:04:06,370
+implements counting semaphores as
+described through this link.
+
+73
+00:04:07,820 --> 00:04:10,140
+Implementing a binary semaphore is easy.
+
+74
+00:04:10,140 --> 00:04:12,170
+Simply create a Java semaphore with a
+count of one.
+
+75
+00:04:13,508 --> 00:04:16,680
+Most of its implementation is written in
+JAVA, as shown in this path name.
+
+76
+00:04:18,120 --> 00:04:19,770
+Semaphore using the gang of four bridge
+
+77
+00:04:19,770 --> 00:04:23,380
+pattern, described in this link, for
+several purposes.
+
+78
+00:04:23,380 --> 00:04:26,130
+First, it inherits the bulk of its
+functionality from
+
+79
+00:04:26,130 --> 00:04:30,020
+the abstract cube synchronizer class,
+described at this link, which
+
+80
+00:04:30,020 --> 00:04:33,440
+provides a framework for implementing
+building blocks and synchronizers that
+
+81
+00:04:33,440 --> 00:04:37,560
+rely on first in, first out or FIFO weight
+cues.
+
+82
+00:04:37,560 --> 00:04:42,230
+Second, it implements several lock
+acquisition model via a common interface.
+
+83
+00:04:42,230 --> 00:04:44,650
+If the fair parameter to the sum of our
+constructor is
+
+84
+00:04:44,650 --> 00:04:48,200
+true, then access is always granted to the
+longest waiting thread.
+
+85
+00:04:49,330 --> 00:04:52,070
+However, if it's false, or if the default
+constructor is
+
+86
+00:04:52,070 --> 00:04:55,340
+used, a lock does not guarantee any
+particular access order.
+
+87
+00:04:56,780 --> 00:05:00,870
+Both constructors create a semaphore with
+a designated number of permits, which set
+
+88
+00:05:00,870 --> 00:05:02,290
+the number of resources that can be
+
+89
+00:05:02,290 --> 00:05:04,410
+acquired before threads block on the
+semaphore.
+
+90
+00:05:05,750 --> 00:05:10,930
+The key methods in semaphore are acquire,
+try acquire and release, which
+
+91
+00:05:10,930 --> 00:05:12,390
+forward to the fair or not
+
+92
+00:05:12,390 --> 00:05:15,000
+fair implementations, selected in the
+constructors.
+
+93
+00:05:16,430 --> 00:05:19,588
+Acquire obtains permit from the semaphore,
+blocking til
+
+94
+00:05:19,588 --> 00:05:21,840
+one is available or the thread is
+interrupted.
+
+95
+00:05:22,970 --> 00:05:26,400
+If a permit is available, acquire returns
+immediately,
+
+96
+00:05:26,400 --> 00:05:28,990
+reducing the number of available permits
+by one.
+
+97
+00:05:28,990 --> 00:05:31,550
+Try acquire obtains a permit from the
+semaphore
+
+98
+00:05:31,550 --> 00:05:34,610
+if one becomes available within the given
+waiting time.
+
+99
+00:05:34,610 --> 00:05:36,790
+And the current thread has not been
+interrupted.
+
+100
+00:05:38,120 --> 00:05:40,700
+Release returns a permit to the semaphore,
+
+101
+00:05:40,700 --> 00:05:43,750
+increasing the number of available permits
+by one.
+
+102
+00:05:43,750 --> 00:05:46,310
+If any threads are trying to acquire a
+permit, then
+
+103
+00:05:46,310 --> 00:05:49,090
+one is selected and given the permit that
+was just released.
+
+104
+00:05:50,320 --> 00:05:52,960
+Unlike reentrant locks and reentrant read
+write locks,
+
+105
+00:05:52,960 --> 00:05:56,140
+there's no requirement that semaphores
+must be fully bracketed.
+
+106
+00:05:56,140 --> 00:05:59,416
+For example, a thread that releases a
+permit need
+
+107
+00:05:59,416 --> 00:06:02,694
+not have acquired that permit in the first
+place.
+
+108
+00:06:02,694 --> 00:06:08,070
+[MUSIC].
+
+109
+00:06:08,070 --> 00:06:11,310
+To show how a Java semaphore is used in
+Android,
+
+110
+00:06:11,310 --> 00:06:15,370
+we'll analyze an example that implements
+the VideoEditor interface, which
+
+111
+00:06:15,370 --> 00:06:18,820
+provides editing and preview functionality
+for audio and video media
+
+112
+00:06:18,820 --> 00:06:21,730
+items in a project timeline, as shown at
+this link.
+
+113
+00:06:23,165 --> 00:06:26,640
+VideoEditor is part of an internal package
+used by the Android VideoEditor
+
+114
+00:06:26,640 --> 00:06:30,159
+application, found in the packages apps
+folder, shown at this path name.
+
+115
+00:06:31,740 --> 00:06:37,770
+VideoEditorImpl implements the VideoEditor
+interface shown at this path name.
+
+116
+00:06:37,770 --> 00:06:40,100
+We don't analyze every detail of this
+code, just
+
+117
+00:06:40,100 --> 00:06:42,319
+the parts we need to explain how
+semaphores work.
+
+118
+00:06:43,890 --> 00:06:48,250
+VideoEditorImpl creates a binary semaphore
+that uses the fair acquisition model to
+
+119
+00:06:48,250 --> 00:06:52,480
+insure FIFO ordering of videos previews
+run in a background worker thread.
+
+120
+00:06:53,680 --> 00:06:56,640
+It also defines lock and unlock wrapper
+methods.
+
+121
+00:06:56,640 --> 00:07:00,020
+They call tryAcquire and release on the
+semaphore to
+
+122
+00:07:00,020 --> 00:07:02,440
+the control the order in which videos are
+previewed.
+
+123
+00:07:04,100 --> 00:07:08,120
+If the start preview method acquires a
+semaphore within a designated time
+
+124
+00:07:08,120 --> 00:07:11,960
+out ,it previews all the audio and video
+items in a timeline.
+
+125
+00:07:13,190 --> 00:07:17,682
+Conversely, stop preview stops the preview
+and releases the semaphore.
+
+126
+00:07:17,682 --> 00:07:22,830
+The VideoEditorActivity is the main
+activity of the VideoEditor.
+
+127
+00:07:22,830 --> 00:07:26,250
+It handles user requests on a project
+timeline, as shown at this path name.
+
+128
+00:07:28,150 --> 00:07:31,490
+It contains a private class called Preview
+Thread, that
+
+129
+00:07:31,490 --> 00:07:35,320
+extends thread and starts preview
+playbacks in the background.
+
+130
+00:07:36,750 --> 00:07:38,360
+When a preview playback runs, it
+
+131
+00:07:38,360 --> 00:07:41,630
+calls the VideoEditorImpl start preview
+method, which
+
+132
+00:07:41,630 --> 00:07:45,530
+acquires a semaphore lock to ensure only
+one preview runs at a time.
+
+133
+00:07:47,360 --> 00:07:50,450
+If the user wants to stop watching the
+current preview, the
+
+134
+00:07:50,450 --> 00:07:53,980
+preview stop method is called from the
+user interface thread, which
+
+135
+00:07:53,980 --> 00:07:58,850
+in turn, calls the VideoEditorImpl stop
+preview method that releases a
+
+136
+00:07:58,850 --> 00:08:01,810
+semaphore, so the next video can run in
+the background thread.
+
+137
+00:08:03,650 --> 00:08:07,360
+Unlike our previous example that used a
+semaphore to schedule access of image
+
+138
+00:08:07,360 --> 00:08:11,490
+rendering threads to processor cores, the
+VideoEditorActivity
+
+139
+00:08:11,490 --> 00:08:14,510
+does not use a fully bracketed model.
+
+140
+00:08:14,510 --> 00:08:17,590
+Since the background thread that acquires
+a semaphore is not
+
+141
+00:08:17,590 --> 00:08:20,390
+the same as a user interface thread, it
+releases it.
+
+142
+00:08:21,720 --> 00:08:22,500
+[MUSIC].
+
+143
+00:08:22,500 --> 00:08:23,280
+In
+
+144
+00:08:27,550 --> 00:08:29,820
+summary, a Java semaphore provides a
+
+145
+00:08:29,820 --> 00:08:32,510
+flexible synchronization and scheduling
+mechanism that
+
+146
+00:08:32,510 --> 00:08:36,680
+enables multiple threads to control access
+to a limited number of shared resources.
+
+147
+00:08:36,680 --> 00:08:41,170
+A key part of its flexibility stems from
+the fact that its acquire and release
+
+148
+00:08:41,170 --> 00:08:43,960
+methods need not be full bracketed unlike
+
+149
+00:08:43,960 --> 00:08:46,990
+Java reentrant blocks and reentrant read
+write blocks.
+
+150
+00:08:46,990 --> 00:08:49,340
+In particular, there's no requirement that
+a thread
+
+151
+00:08:49,340 --> 00:08:51,779
+that releases semaphore must have acquired
+it earlier.
+
+152
+00:08:52,830 --> 00:08:56,540
+A semaphore supports several types of
+acquire and release operations,
+
+153
+00:08:56,540 --> 00:08:59,586
+including blocking, non-blocking, timed,
+and
+
+154
+00:08:59,586 --> 00:09:02,820
+multi-permit acquire and release
+operations.
+
+155
+00:09:02,820 --> 00:09:04,940
+The blocking operations of a semaphore are
+implemented
+
+156
+00:09:04,940 --> 00:09:07,630
+by asleep blocks, which trigger a context
+switch.
+
+157
+00:09:07,630 --> 00:09:11,560
+So the overhead of waiting to acquire an
+unavailable semaphore may be
+
+158
+00:09:11,560 --> 00:09:15,730
+higher than mechanisms that use spin locks
+as discussed at this link.
+
+159
+00:09:17,140 --> 00:09:20,820
+When used to coordinate access to a pool
+of resources, a semaphore
+
+160
+00:09:20,820 --> 00:09:26,100
+tracks how many resources are free, but
+not which particular resources are free.
+
+161
+00:09:26,100 --> 00:09:29,940
+Therefore, some other mechanisms, possibly
+involving conditional objects or more
+
+162
+00:09:29,940 --> 00:09:34,059
+semiphores, may be required to select a
+particular free resource.
+
+163
+00:09:35,280 --> 00:09:37,150
+Semaphores can be tedious and error-prone
+to
+
+164
+00:09:37,150 --> 00:09:39,550
+program, due to the following common
+mistakes.
+
+165
+00:09:40,670 --> 00:09:43,320
+Requesting a permit and forgetting to
+release it.
+
+166
+00:09:43,320 --> 00:09:46,100
+Releasing a permit that was never
+requested.
+
+167
+00:09:46,100 --> 00:09:49,070
+Holding permit for a long time without
+needing it.
+
+168
+00:09:49,070 --> 00:09:51,886
+And accessing a shared resource without
+requesting
+
+169
+00:09:51,886 --> 00:09:53,994
+a permit for it or after releasing it.
+
+170
+00:09:53,994 --> 00:09:59,186
+For these reasons, Java semaphores are
+rarely seen
+
+171
+00:09:59,186 --> 00:10:04,570
+in Android, being limited primarily to
+unit tests.
+
+172
+00:10:04,570 --> 00:10:09,979
+[MUSIC]
+

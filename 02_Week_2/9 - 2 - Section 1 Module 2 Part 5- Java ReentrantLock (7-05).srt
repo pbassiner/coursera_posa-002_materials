@@ -1,0 +1,563 @@
+1
+00:00:05,032 --> 00:00:07,105
+[MUSIC]
+
+2
+00:00:07,105 --> 00:00:12,790
+Welcome to the next part of the module,
+which covers the Java ReentrantLock class.
+
+3
+00:00:12,790 --> 00:00:15,040
+This part provides a conceptual overview
+of mutual
+
+4
+00:00:15,040 --> 00:00:18,250
+exclusion, explains how the ReentrantLock
+class implements these
+
+5
+00:00:18,250 --> 00:00:20,710
+concepts to provide mutual exclusion to
+concurrent Java
+
+6
+00:00:20,710 --> 00:00:23,969
+programs, and shows how ReentrantLocks are
+applied in Android.
+
+7
+00:00:25,420 --> 00:00:26,920
+Mutual exclusion is one of the most
+
+8
+00:00:26,920 --> 00:00:30,440
+fundamental synchronization concepts,
+which defines a critical
+
+9
+00:00:30,440 --> 00:00:34,980
+section where only one thread at a time
+can execute, as described at this link.
+
+10
+00:00:36,000 --> 00:00:40,390
+A human known use of mutual exclusion is
+the protocol used in an airplane
+
+11
+00:00:40,390 --> 00:00:45,359
+restroom, which is a critical section
+where only one person at a time should be.
+
+12
+00:00:46,680 --> 00:00:50,080
+If the sign says vacant, one person can
+enter.
+
+13
+00:00:50,080 --> 00:00:52,340
+When they lock the door, the sign then
+says occupied.
+
+14
+00:00:52,340 --> 00:00:56,190
+As long as the restroom is occupied, other
+people must
+
+15
+00:00:56,190 --> 00:00:58,440
+queue up outside and wait for their turn
+to enter.
+
+16
+00:00:59,650 --> 00:01:02,000
+When the person in the restroom exits,
+they set the
+
+17
+00:01:02,000 --> 00:01:05,290
+lock back to vacant allowing a waiting
+person to enter.
+
+18
+00:01:06,720 --> 00:01:09,020
+Note how this protocol is fully bracketed.
+
+19
+00:01:09,020 --> 00:01:12,880
+In other words, the person who enters the
+restroom and locks the door must
+
+20
+00:01:12,880 --> 00:01:16,540
+be the same person who unlocks the door
+and exits the restroom when they're
+
+21
+00:01:18,610 --> 00:01:19,740
+done.
+
+22
+00:01:19,740 --> 00:01:23,120
+[MUSIC].
+
+23
+00:01:23,120 --> 00:01:26,800
+Java provides mutual exclusion via its
+ReentrantLock class, which
+
+24
+00:01:26,800 --> 00:01:29,330
+implements the lock interface, as
+described at this link.
+
+25
+00:01:30,560 --> 00:01:33,840
+Most of its implementation is written in
+Java, as shown at this path name.
+
+26
+00:01:34,885 --> 00:01:37,000
+ReentrantLock uses the Ganga four bridge
+pattern
+
+27
+00:01:37,000 --> 00:01:40,170
+described at this link for several
+purposes.
+
+28
+00:01:40,170 --> 00:01:42,800
+First, it inherits the bulk of its
+functionality from
+
+29
+00:01:42,800 --> 00:01:46,910
+the abstract queued synchronizer class
+described at this link; which
+
+30
+00:01:46,910 --> 00:01:50,100
+provides a framework for implementing
+blocking locks and synchronizers that
+
+31
+00:01:50,100 --> 00:01:54,560
+rely on First In, First Out or F.I.F.O.
+wait queues.
+
+32
+00:01:54,560 --> 00:01:56,290
+Second, it implements several lock
+
+33
+00:01:56,290 --> 00:01:58,370
+acquisition models via its common
+interface,
+
+34
+00:01:59,410 --> 00:02:02,960
+if the fair parameter pass, so the
+ReentrantLock instructor is true.
+
+35
+00:02:02,960 --> 00:02:05,640
+Then access is always granted to the
+longest waiting thread.
+
+36
+00:02:06,700 --> 00:02:09,550
+However, if it's false or if the default
+constructor is
+
+37
+00:02:09,550 --> 00:02:12,980
+used, a lock does not guarantee any
+particular access order.
+
+38
+00:02:14,450 --> 00:02:19,270
+The key methods in ReentrantLock are lock,
+lock interruptibly, and unlock.
+
+39
+00:02:20,310 --> 00:02:22,500
+Lock acquires a lock if it's available.
+
+40
+00:02:22,500 --> 00:02:26,420
+Otherwise, it spins or blocks until the
+lock become available.
+
+41
+00:02:26,420 --> 00:02:29,410
+Lock interuptibly acquire a lock unless
+the thread is
+
+42
+00:02:29,410 --> 00:02:32,800
+interrupted, in which case it throws an
+interrupted exception.
+
+43
+00:02:34,090 --> 00:02:37,030
+Unlock attempts to release the lock if
+it's the holder.
+
+44
+00:02:38,650 --> 00:02:40,680
+These methods simply forward to the fair
+
+45
+00:02:40,680 --> 00:02:43,970
+or non-fair implementations selected in
+the ReentrantLock instructors.
+
+46
+00:02:44,980 --> 00:02:47,030
+The non-fair implementations of these
+methods are
+
+47
+00:02:47,030 --> 00:02:49,940
+optimized to use faster mutual exclusion
+mechanisms.
+
+48
+00:02:49,940 --> 00:02:52,280
+Such as spin locks as describe in this
+link.
+
+49
+00:02:52,280 --> 00:02:57,513
+[MUSIC].
+
+50
+00:02:57,513 --> 00:03:03,020
+To show how a Java ReentrantLock is used
+in Android, we'll analysis
+
+51
+00:03:03,020 --> 00:03:06,750
+a portion of the take method from the
+array blocking queue class.
+
+52
+00:03:06,750 --> 00:03:09,410
+Which is a bounded blocking queue that
+stores its elements in
+
+53
+00:03:09,410 --> 00:03:13,660
+First In, First Out or FIFA order, as
+described at this link.
+
+54
+00:03:14,820 --> 00:03:18,033
+Array Blocking Queue extends Abstract
+Queue and implements
+
+55
+00:03:18,033 --> 00:03:20,350
+Blocking Queue as shown at this path name.
+
+56
+00:03:21,520 --> 00:03:24,620
+We don't analyze every detail of this
+code, just
+
+57
+00:03:24,620 --> 00:03:26,925
+the parts we need to explain how
+ReentrantLocks work.
+
+58
+00:03:26,925 --> 00:03:30,409
+Array blocking queue uses a ReentrantLock
+to protect against
+
+59
+00:03:30,409 --> 00:03:35,630
+race conditions when threads concurrently
+access its internal data members.
+
+60
+00:03:35,630 --> 00:03:38,620
+Such as the array of queued items, indices
+for the next
+
+61
+00:03:38,620 --> 00:03:41,610
+take or put calls, and the number of
+elements in the queue.
+
+62
+00:03:43,050 --> 00:03:46,228
+These data members need not be defined as
+volatile.
+
+63
+00:03:46,228 --> 00:03:49,000
+Since a ReentrantLock implementation
+enforces the same memory
+
+64
+00:03:49,000 --> 00:03:53,150
+synchronization semantics, provided by
+built in Java monitor locks.
+
+65
+00:03:53,150 --> 00:03:55,480
+Which ensure that reads and writes the
+data members
+
+66
+00:03:55,480 --> 00:03:59,680
+by different threads are properly
+propagated through memory caches.
+
+67
+00:03:59,680 --> 00:04:01,029
+As described at this link.
+
+68
+00:04:02,355 --> 00:04:05,690
+Assume thread T1 calls take to remove the
+first element in a new
+
+69
+00:04:05,690 --> 00:04:09,810
+instance of an array blocking queue, which
+will block since the queue is empty.
+
+70
+00:04:11,150 --> 00:04:14,900
+If another thread doesn't already hold the
+array blocking queue ReentrantLock,
+
+71
+00:04:14,900 --> 00:04:18,370
+thread T1 will acquire it, sending the
+lock's hold count to one.
+
+72
+00:04:19,602 --> 00:04:23,450
+The ReentrantLock's data member is copied
+into a final local variable.
+
+73
+00:04:23,450 --> 00:04:25,840
+Which is an optimization idiom that
+produces the
+
+74
+00:04:25,840 --> 00:04:28,590
+smallest byte codes, as described at this
+link.
+
+75
+00:04:29,740 --> 00:04:34,568
+If thread T2 tries to acquire the lock
+held by T1, T2 becomes dormant until T1
+
+76
+00:04:34,568 --> 00:04:37,621
+calls unlock, which will decrement the
+hold count
+
+77
+00:04:37,621 --> 00:04:40,700
+and release the lock when the count
+reaches zero.
+
+78
+00:04:40,700 --> 00:04:44,490
+Unlock is typically called [INAUDIBLE]
+block to ensure the lock is
+
+79
+00:04:44,490 --> 00:04:48,370
+released no matter how the method exits as
+described at this link.
+
+80
+00:04:49,570 --> 00:04:54,468
+After T1 releases a lock, T2 can acquire
+it and enter the critical section.
+
+81
+00:04:54,468 --> 00:04:57,580
+We'll examine the broader aspects of
+synchronizing and scheduling array
+
+82
+00:04:57,580 --> 00:05:01,050
+blocking queue methods in our upcoming
+video on Java condition objects.
+
+83
+00:05:01,050 --> 00:05:04,460
+Where we use both a ReentrantLock and a
+pair of condition objects to
+
+84
+00:05:04,460 --> 00:05:06,870
+implement the monitor object pattern,
+described at
+
+85
+00:05:06,870 --> 00:05:09,200
+this link and covered in upcoming videos.
+
+86
+00:05:09,200 --> 00:05:13,659
+[MUSIC].
+
+87
+00:05:16,680 --> 00:05:19,330
+In summary, a Java ReentrantLock provides
+
+88
+00:05:19,330 --> 00:05:21,410
+a lightweight mutual exclusion mechanism
+that
+
+89
+00:05:21,410 --> 00:05:25,680
+defines a critical section where only one
+thread at a time can execute.
+
+90
+00:05:25,680 --> 00:05:29,570
+It provides the same basic behavior and
+semantics as the implicit monitor
+
+91
+00:05:29,570 --> 00:05:32,440
+lock accessed using Java's built-in
+synchronized
+
+92
+00:05:32,440 --> 00:05:36,060
+methods and statements, but with extended
+capabilities.
+
+93
+00:05:36,060 --> 00:05:38,630
+Such as methods that perform non-blocking,
+
+94
+00:05:38,630 --> 00:05:41,970
+interruptible, and time lock acquisition
+operations.
+
+95
+00:05:43,272 --> 00:05:46,970
+A ReentrantLock must be used by a fully
+bracketed protocol, since a
+
+96
+00:05:46,970 --> 00:05:50,510
+thread that acquires a lock, must be the
+one to release it.
+
+97
+00:05:50,510 --> 00:05:53,500
+Another example of a fully bracketed
+protocol, is documented
+
+98
+00:05:53,500 --> 00:05:56,258
+by the scoped locking pattern described at
+this link.
+
+99
+00:05:56,258 --> 00:06:01,830
+Likewise the C++ resource acquisition is
+initialization idiom, uses its
+
+100
+00:06:01,830 --> 00:06:05,270
+protocol to ensure exception safety, as
+described at this link.
+
+101
+00:06:06,440 --> 00:06:08,650
+A thread owning a ReentrantLock can
+reacquire
+
+102
+00:06:08,650 --> 00:06:12,140
+it without deadlocking, since the
+underlying ReentrantLock implementation
+
+103
+00:06:12,140 --> 00:06:14,740
+simply increments its hold count in
+accordance with
+
+104
+00:06:14,740 --> 00:06:17,095
+the recursive lock semantics described at
+this link.
+
+105
+00:06:18,560 --> 00:06:22,020
+Although ReentrantLocks are a fundamental
+mutual exclusion mechanism.
+
+106
+00:06:22,020 --> 00:06:24,184
+They can be tedious and error-prone to
+
+107
+00:06:24,184 --> 00:06:26,990
+program, due to the following common
+mistakes.
+
+108
+00:06:26,990 --> 00:06:30,180
+Acquiring a lock and forgetting to release
+it, releasing a
+
+109
+00:06:30,180 --> 00:06:33,750
+lock that was never acquired, holding a
+lock for a
+
+110
+00:06:33,750 --> 00:06:37,870
+long time without needing it, and
+accessing a shared resource
+
+111
+00:06:37,870 --> 00:06:42,452
+without acquiring a lock for it first or
+after releasing it.
+
+112
+00:06:42,452 --> 00:06:45,700
+Java built-in monitor objects address some
+of these limitations.
+
+113
+00:06:45,700 --> 00:06:47,280
+As we'll discuss later in this module.
+
+114
+00:06:48,540 --> 00:06:54,190
+ReentrantLock is used throughout Android,
+particularly
+
+115
+00:06:54,190 --> 00:06:59,162
+in its Java token current package
+implementation,
+
+116
+00:06:59,162 --> 00:07:03,540
+as shown by the source code at this path
+name.
+

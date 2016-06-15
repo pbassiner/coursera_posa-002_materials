@@ -1,0 +1,971 @@
+1
+00:00:00,000 --> 00:00:08,510
+[MUSIC].
+
+2
+00:00:08,510 --> 00:00:11,320
+Welcome to the next part of the module
+which
+
+3
+00:00:11,320 --> 00:00:14,180
+continues the analysis of an example that
+shows how
+
+4
+00:00:14,180 --> 00:00:17,170
+Java concurrency mechanisms can be used to
+synchronize and
+
+5
+00:00:17,170 --> 00:00:20,310
+schedule the behavior of threads in a
+concurrent program.
+
+6
+00:00:21,680 --> 00:00:25,080
+This part focuses on the ping pong program
+implementation,
+
+7
+00:00:25,080 --> 00:00:28,210
+building upon the design of review in the
+previous part.
+
+8
+00:00:28,210 --> 00:00:31,090
+In particular, we conduct a detailed
+walk-through of the
+
+9
+00:00:31,090 --> 00:00:34,780
+pattern oriented framework source code,
+and show how it's customized
+
+10
+00:00:34,780 --> 00:00:37,940
+to create and start 2 Java threads whose
+run hook
+
+11
+00:00:37,940 --> 00:00:41,430
+methods alternate printing ping and pong
+on the computer console.
+
+12
+00:00:42,930 --> 00:00:44,950
+In addition to showing how to program with
+Java
+
+13
+00:00:44,950 --> 00:00:49,840
+semaphores, condition objects and
+countdown latches, we demonstrate by
+
+14
+00:00:49,840 --> 00:00:53,080
+example how the application of gangoffour
+patterns, such as
+
+15
+00:00:53,080 --> 00:00:58,206
+template method, strategy, and [INAUDIBLE]
+method provide several benefits.
+
+16
+00:00:58,206 --> 00:01:01,570
+For example, we show how this pattern
+related framework makes
+
+17
+00:01:01,570 --> 00:01:04,000
+it easy to replace the use of Java
+semaphores with
+
+18
+00:01:04,000 --> 00:01:08,310
+Java condition objects to support more
+sophisticated behavior without changing
+
+19
+00:01:08,310 --> 00:01:11,290
+the core ping pong algorithm, or the
+framework software itself.
+
+20
+00:01:12,800 --> 00:01:16,690
+We examine a lot of design and programming
+concepts and source code in this video.
+
+21
+00:01:16,690 --> 00:01:18,710
+And even though it's clean and concise,
+
+22
+00:01:18,710 --> 00:01:22,030
+it's also heavily refactored, and pattern
+oriented.
+
+23
+00:01:22,030 --> 00:01:26,100
+So it's important to read and run the
+code, available at this link.
+
+24
+00:01:26,100 --> 00:01:28,880
+Carefully watch this video and the
+previous one,
+
+25
+00:01:28,880 --> 00:01:31,730
+perhaps multiple times and learn how the
+various
+
+26
+00:01:31,730 --> 00:01:34,470
+patterns described at the provided links
+work to
+
+27
+00:01:34,470 --> 00:01:37,045
+fully understand how all the pieces fit
+together.
+
+28
+00:01:37,045 --> 00:01:44,680
+[MUSIC]
+
+29
+00:01:44,680 --> 00:01:46,410
+Now that we've covered the design of the
+pattern
+
+30
+00:01:46,410 --> 00:01:50,230
+oriented Ping-Pong program, we'll analyze
+its implementation in detail.
+
+31
+00:01:51,480 --> 00:01:53,880
+The bulk of the Ping-Pong program code is
+defined
+
+32
+00:01:53,880 --> 00:01:56,620
+in the play Ping Pong class which
+implements the runnable
+
+33
+00:01:56,620 --> 00:02:00,450
+interface and provides a pattern oriented
+framework for varying
+
+34
+00:02:00,450 --> 00:02:03,659
+certain aspects of the Ping-Pong
+algorithm, and its concurrent behavior.
+
+35
+00:02:05,400 --> 00:02:07,540
+The play ping pong class contains several
+static
+
+36
+00:02:07,540 --> 00:02:10,090
+data members shared by the threads it
+creates internally.
+
+37
+00:02:11,520 --> 00:02:14,450
+These data members keep track of the
+number of iterations to play ping
+
+38
+00:02:14,450 --> 00:02:18,720
+pong, the number of times to print either
+ping or pong during each turn.
+
+39
+00:02:19,970 --> 00:02:23,950
+A strategy object used to portably to
+print the ping and pong output and
+
+40
+00:02:23,950 --> 00:02:27,360
+synchronize completion of the internal
+threads and
+
+41
+00:02:27,360 --> 00:02:30,030
+the type of synchronization mechanism to
+use.
+
+42
+00:02:30,030 --> 00:02:32,090
+For example, Java semaphores are condition
+objects.
+
+43
+00:02:33,610 --> 00:02:35,730
+The play ping pong constructor initializes
+these
+
+44
+00:02:35,730 --> 00:02:37,670
+data members using the parameters passed
+to it.
+
+45
+00:02:38,870 --> 00:02:42,760
+A static method ping pong thread class
+extends thread and plays
+
+46
+00:02:42,760 --> 00:02:46,440
+the role of abstract class in the temporal
+method pattern described earlier.
+
+47
+00:02:48,030 --> 00:02:50,430
+The acquire and release abstract methods
+are
+
+48
+00:02:50,430 --> 00:02:52,840
+over written by sub classes to schedule
+the
+
+49
+00:02:52,840 --> 00:02:57,380
+order of printing the ping or pong string
+set by the ping pong thread constructor.
+
+50
+00:02:59,290 --> 00:03:02,650
+The ping pong thread run hook method
+executes in a separate thread
+
+51
+00:03:02,650 --> 00:03:06,040
+and plays the role of the template method
+in the template method pattern.
+
+52
+00:03:06,040 --> 00:03:07,420
+It loops with a designated number of
+
+53
+00:03:07,420 --> 00:03:10,640
+iterations, and performs the protocol that
+uses the
+
+54
+00:03:10,640 --> 00:03:13,590
+acquire and release hook methods to
+alternate printing
+
+55
+00:03:13,590 --> 00:03:15,780
+the ping and pong strings to the output.
+
+56
+00:03:18,030 --> 00:03:20,980
+Several pattern oriented aspects are shown
+in this run template method.
+
+57
+00:03:21,980 --> 00:03:24,450
+First, the platform strategy print method
+
+58
+00:03:24,450 --> 00:03:26,370
+uses the strategy pattern discussed
+earlier
+
+59
+00:03:26,370 --> 00:03:30,550
+to provide a platform independent means
+for writing text to the output display.
+
+60
+00:03:31,910 --> 00:03:34,850
+Second, the acquire and release hook
+methods play
+
+61
+00:03:34,850 --> 00:03:36,780
+the role of primitive operations in the
+template
+
+62
+00:03:36,780 --> 00:03:40,320
+method pattern but aferring the specifics
+of synchronization
+
+63
+00:03:40,320 --> 00:03:43,120
+and scheduling to the ping pong thread
+subclasses.
+
+64
+00:03:44,680 --> 00:03:48,880
+When the loop exits, the platform strategy
+done method is called to indicate
+
+65
+00:03:48,880 --> 00:03:50,920
+the thread has finished its processing
+
+66
+00:03:50,920 --> 00:03:52,810
+which decrements the countdown watch by
+one.
+
+67
+00:03:54,030 --> 00:03:55,580
+When all running ping pong threads have
+
+68
+00:03:55,580 --> 00:03:59,090
+returned, the countdown latch drops to 0,
+which
+
+69
+00:03:59,090 --> 00:04:01,430
+informs the play ping pong objects thread
+to
+
+70
+00:04:01,430 --> 00:04:03,890
+shut down, as shown later in this video.
+
+71
+00:04:03,890 --> 00:04:06,819
+[MUSIC].
+
+72
+00:04:10,640 --> 00:04:14,070
+The pattern oriented ping pong framework
+can be transparently
+
+73
+00:04:14,070 --> 00:04:18,490
+configured to support different
+synchronisers either semaphore based or
+
+74
+00:04:18,490 --> 00:04:21,550
+condition object based using the make ping
+pong threads
+
+75
+00:04:21,550 --> 00:04:25,750
+factory method covered both earlier and
+later in this video.
+
+76
+00:04:25,750 --> 00:04:27,410
+We first analyzed the semaphore based
+
+77
+00:04:27,410 --> 00:04:30,120
+synchroniser configuration which enables
+the ping and
+
+78
+00:04:30,120 --> 00:04:34,269
+pong threads to alternate printing the
+ping and pong strings to the console.
+
+79
+00:04:35,490 --> 00:04:37,450
+In this implementation, the pingpong
+
+80
+00:04:37,450 --> 00:04:40,680
+threadsema class extends pingpongthread
+and plays
+
+81
+00:04:40,680 --> 00:04:43,380
+the role of the concrete class in a
+template method pattern.
+
+82
+00:04:44,600 --> 00:04:47,080
+It defines a [INAUDIBLE] array of Java
+semaphores
+
+83
+00:04:47,080 --> 00:04:49,250
+that schedule the order in which its
+acquire
+
+84
+00:04:49,250 --> 00:04:52,010
+and release hook methods alternate the
+printing of
+
+85
+00:04:52,010 --> 00:04:55,120
+ping and pong in its superclasses run
+template method.
+
+86
+00:04:56,730 --> 00:04:59,410
+The pingpong thread sema constructor
+initializes this
+
+87
+00:04:59,410 --> 00:05:01,850
+array with the semaphore parameters it
+receives.
+
+88
+00:05:02,850 --> 00:05:05,280
+The PingPong ThreadSema acquire and
+release hook
+
+89
+00:05:05,280 --> 00:05:07,990
+methods simply forward to the acquire and
+
+90
+00:05:07,990 --> 00:05:10,500
+release methods of the first or second
+
+91
+00:05:10,500 --> 00:05:13,293
+semaphore stored in the semaphore array
+data member.
+
+92
+00:05:13,293 --> 00:05:16,240
+[SOUND] These 2 members play the role
+
+93
+00:05:16,240 --> 00:05:18,410
+of primitive operations in the template
+method pattern.
+
+94
+00:05:19,450 --> 00:05:22,760
+They're used to decouple the core
+Ping-Pong algorithm in the Ping-Pong
+
+95
+00:05:22,760 --> 00:05:24,630
+thread run hook method from the
+
+96
+00:05:24,630 --> 00:05:27,435
+actual mechanisms that perform the
+synchronization.
+
+97
+00:05:27,435 --> 00:05:35,580
+[MUSIC].
+
+98
+00:05:35,580 --> 00:05:38,720
+The ConditionObject base configuration of
+the ping pong program
+
+99
+00:05:38,720 --> 00:05:42,040
+supports more flexible behavior than the
+semaphore based configuration.
+
+100
+00:05:43,230 --> 00:05:46,430
+In particular, it uses condition objects
+to enable each thread
+
+101
+00:05:46,430 --> 00:05:49,860
+to print multiple ping or pong strings
+consecutively during it's term.
+
+102
+00:05:51,140 --> 00:05:54,800
+The PingPongThreadCond class extends
+PingPongThread, and
+
+103
+00:05:54,800 --> 00:05:55,830
+also plays the role of the
+
+104
+00:05:55,830 --> 00:05:57,390
+concrete class in the template method
+
+105
+00:05:57,390 --> 00:06:01,090
+pattern just like the PingPongThreadSema
+class.
+
+106
+00:06:01,090 --> 00:06:03,910
+However, it defines more data members
+since
+
+107
+00:06:03,910 --> 00:06:06,320
+its synchronization mechanism and behavior
+are different.
+
+108
+00:06:07,740 --> 00:06:11,000
+These data members include a 2 element
+array of Java conditions
+
+109
+00:06:11,000 --> 00:06:14,790
+that are used together with a re-entrant
+lock, to schedule the order
+
+110
+00:06:14,790 --> 00:06:19,430
+in which its acquire, and release hook
+methods consecutively print ping
+
+111
+00:06:19,430 --> 00:06:23,290
+or pong in the super classes run template
+method during a turn.
+
+112
+00:06:25,235 --> 00:06:28,100
+2 other data members keep track of the
+threat identifiers, that
+
+113
+00:06:28,100 --> 00:06:31,440
+coordinate the passing of control between
+the ping and pong threads.
+
+114
+00:06:33,070 --> 00:06:36,000
+The constructor of PingPongThreadCond
+initializes all these
+
+115
+00:06:36,000 --> 00:06:37,720
+data members with the parameters passed to
+it.
+
+116
+00:06:38,970 --> 00:06:40,970
+The acquire hook method of ping pong
+thread
+
+117
+00:06:40,970 --> 00:06:44,220
+cond is more complex than ping pong thread
+sema.
+
+118
+00:06:45,500 --> 00:06:47,510
+In particular, it first acquires the
+
+119
+00:06:47,510 --> 00:06:49,970
+ReentrantLock to enter the critical
+section
+
+120
+00:06:49,970 --> 00:06:52,720
+and then check to see if it's the owner of
+the turn.
+
+121
+00:06:52,720 --> 00:06:57,500
+Since the thread can only print ping or
+pong when it's the turn owner.
+
+122
+00:06:57,500 --> 00:06:59,670
+If it's not the turn owner, it waits
+
+123
+00:06:59,670 --> 00:07:02,280
+on the condition object which atomically
+releases a
+
+124
+00:07:02,280 --> 00:07:04,510
+lock and goes to sleep until the other
+
+125
+00:07:04,510 --> 00:07:07,130
+threads signals it after making it the
+turn owner.
+
+126
+00:07:08,820 --> 00:07:12,210
+The release method works collaboratively
+with acquire.
+
+127
+00:07:12,210 --> 00:07:14,500
+When it's called by a thread, it acquires
+the
+
+128
+00:07:14,500 --> 00:07:17,960
+reentrantLock to enter the critical
+section and then decrements
+
+129
+00:07:17,960 --> 00:07:21,220
+the turn countdown data member by 1 which
+keeps
+
+130
+00:07:21,220 --> 00:07:23,680
+track of the number of consecutive
+iterations per turn.
+
+131
+00:07:25,280 --> 00:07:27,240
+This threads turn is over when the value
+of
+
+132
+00:07:27,240 --> 00:07:30,280
+turn count down drops to 0 in which case,
+
+133
+00:07:30,280 --> 00:07:32,390
+it makes the other thread, the turn owner
+and
+
+134
+00:07:32,390 --> 00:07:36,270
+it resets the iterations per turn to max
+turns.
+
+135
+00:07:36,270 --> 00:07:40,850
+Finally, this thread signals the other
+thread that its turn can begin and then
+
+136
+00:07:40,850 --> 00:07:48,921
+releases the ReentrantLock before
+returning from the critical section.
+
+137
+00:07:48,921 --> 00:07:51,900
+[MUSIC].
+
+138
+00:07:51,900 --> 00:07:53,760
+Now that we've examined the pieces of the
+ping
+
+139
+00:07:53,760 --> 00:07:56,380
+pong program, we'll show how they all fit
+together.
+
+140
+00:07:57,860 --> 00:07:59,720
+The run hook method of the play ping pong
+
+141
+00:07:59,720 --> 00:08:03,000
+class is the entry point into the ping
+pong algorithm.
+
+142
+00:08:04,170 --> 00:08:06,490
+It executes into a separate thread and
+informs
+
+143
+00:08:06,490 --> 00:08:08,650
+the platform strategy that a new game is
+beginning.
+
+144
+00:08:09,930 --> 00:08:13,290
+It then creates an array of ping pong
+thread objects that
+
+145
+00:08:13,290 --> 00:08:16,710
+are initialized by the make ping pong
+threads which uses the
+
+146
+00:08:16,710 --> 00:08:21,220
+factory method pattern described earlier
+to configure either Java semaphores or
+
+147
+00:08:21,220 --> 00:08:25,220
+Java condition objects, control how the
+threads alternate between Ping and Pong.
+
+148
+00:08:26,820 --> 00:08:30,540
+After this factory method returns, the
+Ping and Pong threads are started
+
+149
+00:08:30,540 --> 00:08:33,480
+which causes the Java virtual machine to
+execute their run template methods.
+
+150
+00:08:34,640 --> 00:08:36,780
+Play Ping-Pong run uses a countdown latch
+
+151
+00:08:36,780 --> 00:08:39,460
+defined by the platform strategy await
+done method,
+
+152
+00:08:39,460 --> 00:08:40,850
+to block until both of these threads
+
+153
+00:08:40,850 --> 00:08:43,446
+finish their processing and exit, before
+it returns.
+
+154
+00:08:43,446 --> 00:08:48,390
+The make Ping-Pong threads factory method
+isolates the creation of the requested
+
+155
+00:08:48,390 --> 00:08:50,900
+synchronization and scheduling mechanisms
+which in
+
+156
+00:08:50,900 --> 00:08:53,820
+this case, are implemented using
+semaphores.
+
+157
+00:08:53,820 --> 00:08:58,450
+In particular, we create a pair of binary
+semaphores, one for the ping thread, and
+
+158
+00:08:58,450 --> 00:09:00,430
+the other for the pong thread and
+
+159
+00:09:00,430 --> 00:09:02,700
+initialize the ping semaphore to start out
+unlocked.
+
+160
+00:09:03,930 --> 00:09:08,169
+We next create 2 ping pong thread Sema
+objects, passing in the parameters.
+
+161
+00:09:09,400 --> 00:09:12,950
+These semaphores are passed to these
+object constructors in opposite
+
+162
+00:09:12,950 --> 00:09:17,010
+order to ensure the threads correctly
+alternate printing ping and pong.
+
+163
+00:09:18,020 --> 00:09:22,370
+For example, the ping thread is passed the
+ping semaphore, followed by the pong
+
+164
+00:09:22,370 --> 00:09:24,910
+semaphore whereas the pong thread is
+passed
+
+165
+00:09:24,910 --> 00:09:27,540
+the pong semaphore, followed by the ping
+semaphore.
+
+166
+00:09:29,500 --> 00:09:33,660
+The main entry point method in the main
+class sets all the pieces in motion.
+
+167
+00:09:34,780 --> 00:09:38,890
+It uses the factory method pattern to
+initialize the platform strategy object
+
+168
+00:09:38,890 --> 00:09:42,590
+which in this case is the console platform
+strategy, which then initializes the
+
+169
+00:09:42,590 --> 00:09:45,810
+command line options, which can be used to
+control the number of
+
+170
+00:09:45,810 --> 00:09:49,340
+ping pong iterations and finally,
+initializes
+
+171
+00:09:49,340 --> 00:09:51,920
+the PlayPingPong object, with the
+requested parameters.
+
+172
+00:09:53,100 --> 00:09:56,010
+When all this initialization completes, an
+anonymous
+
+173
+00:09:56,010 --> 00:09:57,940
+thread is created and started to run
+
+174
+00:09:57,940 --> 00:10:00,870
+the PlayPingPong object, which triggers
+all the
+
+175
+00:10:00,870 --> 00:10:03,810
+concurrent ping pong algorithm processing,
+discussed earlier.
+
+176
+00:10:03,810 --> 00:10:08,554
+[MUSIC].
+
+177
+00:10:08,554 --> 00:10:15,970
+In summary, this video analyzed the
+implementation of a pattern
+
+178
+00:10:15,970 --> 00:10:21,150
+oriented framework, that supports a family
+of related concurrent ping pong programs.
+
+179
+00:10:21,150 --> 00:10:23,950
+Unlike the buggy implementation we
+examined in an earlier
+
+180
+00:10:23,950 --> 00:10:27,620
+video, this framework was customized and
+configured with Java's
+
+181
+00:10:27,620 --> 00:10:31,390
+semaphores, condition objects, and count
+down latches to correct
+
+182
+00:10:31,390 --> 00:10:34,470
+the alternate printing ping and pong on
+the computer console.
+
+183
+00:10:34,470 --> 00:10:38,030
+The use of the gangoffour template method,
+and factor
+
+184
+00:10:38,030 --> 00:10:42,110
+method patterns, enhance systematic reuse
+and flexibility by making
+
+185
+00:10:42,110 --> 00:10:44,570
+it easy to switch between Java semaphores
+and condition
+
+186
+00:10:44,570 --> 00:10:47,160
+object synchronization mechanisms, without
+changing
+
+187
+00:10:47,160 --> 00:10:48,900
+the framework or application software.
+
+188
+00:10:50,220 --> 00:10:52,320
+These patterns also extended the program
+to
+
+189
+00:10:52,320 --> 00:10:55,850
+transparently support more sophisticated
+ping-pong behavior such
+
+190
+00:10:55,850 --> 00:10:57,760
+as allowing each thread to print multiple
+
+191
+00:10:57,760 --> 00:11:00,680
+ping or pong strings consecutively, during
+its turn.
+
+192
+00:11:00,680 --> 00:11:03,450
+The use of the gangoffour strategy
+
+193
+00:11:03,450 --> 00:11:06,390
+pattern, enhanced portability, by defining
+a
+
+194
+00:11:06,390 --> 00:11:10,840
+platform strategy class hierarchy, that
+factors at different ways of printing ping
+
+195
+00:11:10,840 --> 00:11:15,820
+and pong and coordinating the completion
+of printing operations on different run
+
+196
+00:11:15,820 --> 00:11:20,700
+time platforms, such as a Java console
+application versus an Android application.
+
+197
+00:11:21,930 --> 00:11:25,280
+Although there are many classes in this
+framework based solution,
+
+198
+00:11:25,280 --> 00:11:28,360
+knowledge of the patterns that motivate
+and guide its design
+
+199
+00:11:28,360 --> 00:11:33,300
+and implementation greatly simplify both
+understanding how it works, and how to
+
+200
+00:11:33,300 --> 00:11:39,040
+extend it, to support new requirements and
+environments.
+
+201
+00:11:39,040 --> 00:11:46,609
+[BLANK_AUDIO]
+

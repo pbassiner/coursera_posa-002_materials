@@ -1,0 +1,528 @@
+1
+00:00:00,000 --> 00:00:08,580
+[MUSIC]
+
+2
+00:00:08,580 --> 00:00:09,760
+Welcome to the next part of the
+
+3
+00:00:09,760 --> 00:00:14,200
+module, which covers the Java
+ReentrantReadWriteLock class.
+
+4
+00:00:14,200 --> 00:00:17,694
+This part provides a conceptual overview
+of readers-writer
+
+5
+00:00:17,694 --> 00:00:20,750
+locks, explains how the Reentrant
+read-write class implements these
+
+6
+00:00:20,750 --> 00:00:23,940
+concepts to provide readers-writer lock
+semantics to concurrent Java
+
+7
+00:00:23,940 --> 00:00:25,895
+programs, and shows how
+
+8
+00:00:25,895 --> 00:00:28,160
+ReentrantReadWriteLocks are applied in
+Android.
+
+9
+00:00:28,160 --> 00:00:34,040
+A readers-writer lock is a synchronization
+mechanism often used in situations
+
+10
+00:00:34,040 --> 00:00:38,470
+where many threads concurrently access the
+same shared resource at one time.
+
+11
+00:00:38,470 --> 00:00:40,820
+Some reading, and some writing, with a
+
+12
+00:00:40,820 --> 00:00:43,080
+constraint that no thread may access the
+resource
+
+13
+00:00:43,080 --> 00:00:47,110
+for reading or writing while another
+thread is in the act of writing to it.
+
+14
+00:00:47,110 --> 00:00:48,189
+As described at this link.
+
+15
+00:00:50,060 --> 00:00:53,810
+It allows access to a shared resource
+either by multiple threads
+
+16
+00:00:53,810 --> 00:00:57,820
+that have read only access or one thread
+that has write access.
+
+17
+00:00:57,820 --> 00:01:02,800
+Readers-writer locks may help improve
+performance when resources
+
+18
+00:01:02,800 --> 00:01:05,596
+are read much more often than written,
+especially
+
+19
+00:01:05,596 --> 00:01:09,360
+on multi-core and multiprocessor platforms
+that can perform
+
+20
+00:01:09,360 --> 00:01:12,548
+many computations in parallel, as
+described at this link.
+
+21
+00:01:12,548 --> 00:01:16,405
+A loosely analogous human known use of
+
+22
+00:01:16,405 --> 00:01:19,380
+readers-writer locking is the protocol
+followed in
+
+23
+00:01:19,380 --> 00:01:22,270
+formal political debates, such as the
+United
+
+24
+00:01:22,270 --> 00:01:25,330
+States presidential debates described at
+this link.
+
+25
+00:01:25,330 --> 00:01:28,190
+Where only one person, the writer, is
+allowed
+
+26
+00:01:28,190 --> 00:01:31,100
+to speak at a time, at least in theory.
+
+27
+00:01:31,100 --> 00:01:34,210
+However, everyone in the audience, the
+readers,
+
+28
+00:01:34,210 --> 00:01:36,550
+can listen to what the speaker is saying.
+
+29
+00:01:36,550 --> 00:01:39,950
+Likewise, audience members can ask
+questions, thus
+
+30
+00:01:39,950 --> 00:01:42,340
+becoming writers for the duration of their
+questions.
+
+31
+00:01:42,340 --> 00:01:46,659
+[MUSIC].
+
+32
+00:01:49,710 --> 00:01:55,100
+Java provides readers-writer locks, via
+it's ReentrantReadWriteLock class.
+
+33
+00:01:55,100 --> 00:01:59,000
+Which implements the ReadWriteLock
+interface, as described at this link.
+
+34
+00:02:00,270 --> 00:02:03,340
+Most of it's implementation is written in
+Java.
+
+35
+00:02:03,340 --> 00:02:06,780
+As shown at this path name, reentrant
+reader writeer lock,
+
+36
+00:02:06,780 --> 00:02:11,280
+contains two instances of inner classes,
+reader lock, and writer lock.
+
+37
+00:02:11,280 --> 00:02:13,950
+That implement the read and write lock
+behaviors respectively.
+
+38
+00:02:15,400 --> 00:02:17,590
+This diagram shows how multiple reader
+threads
+
+39
+00:02:17,590 --> 00:02:20,730
+can acquire the reader lock and execute
+concurrently.
+
+40
+00:02:20,730 --> 00:02:23,231
+Where as this diagram, shows how just one
+writer
+
+41
+00:02:23,231 --> 00:02:25,540
+can acquire the WriteLock and one at a
+time.
+
+42
+00:02:27,300 --> 00:02:29,440
+ReentrantReadWriteLock uses the
+Gang-of-Four Bridge
+
+43
+00:02:29,440 --> 00:02:31,120
+pattern, described at this link.
+
+44
+00:02:31,120 --> 00:02:32,820
+For several purposes.
+
+45
+00:02:32,820 --> 00:02:35,760
+First, inherits the bulk of its
+functionality
+
+46
+00:02:35,760 --> 00:02:39,800
+from the AbstractQueuedSynchronizer class
+described at this link.
+
+47
+00:02:39,800 --> 00:02:43,160
+Which provides a framework for
+implementing, blocking locks and
+
+48
+00:02:43,160 --> 00:02:47,890
+synchronizers that rely on first-in,
+first-out, or FIFO wait queues.
+
+49
+00:02:47,890 --> 00:02:50,450
+Second, it implements a fair or non-fair
+
+50
+00:02:50,450 --> 00:02:54,095
+lock acquisition order model via a common
+interface.
+
+51
+00:02:54,095 --> 00:02:57,110
+Its constructor selects the designated
+model based on the fair
+
+52
+00:02:57,110 --> 00:03:00,500
+parameter, similar to the ReentrantLock
+presented earlier in this video.
+
+53
+00:03:01,550 --> 00:03:04,105
+Its constructor also initializes the
+readerLock and
+
+54
+00:03:04,105 --> 00:03:06,190
+writerLock data members that implement the
+lock
+
+55
+00:03:06,190 --> 00:03:09,030
+interface, and thus support the standard
+lock
+
+56
+00:03:09,030 --> 00:03:11,542
+and unlock methods covered in the
+ReentrantLock video.
+
+57
+00:03:13,140 --> 00:03:17,235
+The key methods in reentrant reader writer
+lock or the readLock and writeLock
+
+58
+00:03:17,235 --> 00:03:20,259
+accessor methods that return the
+underlined readerLock
+
+59
+00:03:20,259 --> 00:03:23,400
+and writerLock objects initialized in its
+constructor.
+
+60
+00:03:24,510 --> 00:03:28,110
+Which are used to acquire the lock for
+reading and writing respectively.
+
+61
+00:03:28,110 --> 00:03:34,653
+[MUSIC].
+
+62
+00:03:34,653 --> 00:03:37,199
+To show how a Java ReentrantReadWriteLock
+is
+
+63
+00:03:37,199 --> 00:03:39,946
+used in Android, we'll analyze an example
+from
+
+64
+00:03:39,946 --> 00:03:43,296
+the BluetoothSocket class, which manages a
+connection to
+
+65
+00:03:43,296 --> 00:03:46,190
+a Bluetooth device, as described at this
+link.
+
+66
+00:03:47,560 --> 00:03:51,170
+BluetoothSocket implements the closable
+interface, as shown at this path name.
+
+67
+00:03:52,390 --> 00:03:54,930
+We don't analyze every detail of this
+code, just
+
+68
+00:03:54,930 --> 00:03:57,610
+the parts we need to explain how
+ReentrantReadWriteLock's work.
+
+69
+00:03:59,015 --> 00:04:02,910
+BluetoothSockets constructor creates a
+ReentrantReadWriteLock and
+
+70
+00:04:02,910 --> 00:04:04,580
+stores it in the nLock data member.
+
+71
+00:04:06,140 --> 00:04:10,200
+The BluetoothSocket close method releases
+any system resources it holds.
+
+72
+00:04:11,340 --> 00:04:14,710
+Although only the first call to close has
+any effect, it's
+
+73
+00:04:14,710 --> 00:04:17,790
+safe to call close multiple times
+concurrently on the same object.
+
+74
+00:04:18,870 --> 00:04:23,170
+When close runs, it first acquires a
+readLock on nLock,.
+
+75
+00:04:23,170 --> 00:04:25,140
+Execute some operations that examine the
+state of
+
+76
+00:04:25,140 --> 00:04:28,700
+the socket and returns if it's already
+closed.
+
+77
+00:04:28,700 --> 00:04:30,300
+Unlocking the readLock as it returns.
+
+78
+00:04:31,880 --> 00:04:34,010
+If the sockets not already closed,
+
+79
+00:04:34,010 --> 00:04:37,347
+close acquires a writeLock, sets the
+BluetoothSocket
+
+80
+00:04:37,347 --> 00:04:42,560
+state to closed, releases the resources,
+and unlocks the writeLock as it returns.
+
+81
+00:04:43,680 --> 00:04:46,740
+Multiple threads can acquire mLock for
+reading at the same time.
+
+82
+00:04:46,740 --> 00:04:48,670
+But only one thread at a time can acquire
+
+83
+00:04:48,670 --> 00:04:52,690
+mLock for writing, thereby ensuring
+readers writers lock semantics.
+
+84
+00:04:52,690 --> 00:04:56,786
+[MUSIC].
+
+85
+00:04:56,786 --> 00:05:03,830
+In summary, a Java ReentrantReadWriteLock
+allows greater concurrency
+
+86
+00:05:03,830 --> 00:05:08,670
+when accessing shared data than a
+ReentrantLock, as discussed at this link.
+
+87
+00:05:08,670 --> 00:05:11,590
+ReentrantReadWriteLock exploits the fact
+that while only a single
+
+88
+00:05:11,590 --> 00:05:14,650
+writer thread can modify the shared data
+at a time.
+
+89
+00:05:14,650 --> 00:05:17,770
+Often any number of reader threads can
+concurrently examine the data.
+
+90
+00:05:18,970 --> 00:05:22,390
+However, speedups from
+ReentrantReadWriteLock will only be
+
+91
+00:05:22,390 --> 00:05:26,020
+fully realized on a multi-core or
+multi-processor system.
+
+92
+00:05:26,020 --> 00:05:28,860
+And then only if the access patterns for
+shared data are suitable.
+
+93
+00:05:30,520 --> 00:05:33,020
+Profiling and measurement can be used to
+determine if
+
+94
+00:05:33,020 --> 00:05:36,740
+a ReentrantReadWriteLock is suitable for a
+particular use case.
+
+95
+00:05:38,728 --> 00:05:40,690
+This link presents a pattern language for
+
+96
+00:05:40,690 --> 00:05:43,760
+selecting among various locking primitives
+for concurrent programs.
+
+97
+00:05:45,530 --> 00:05:48,104
+In addition to the acquisition order
+fairness
+
+98
+00:05:48,104 --> 00:05:50,810
+policy, discussed earlier in this video,
+Java
+
+99
+00:05:50,810 --> 00:05:55,034
+ReentrantReadWriteLock's also support
+recursive lock semantics, lock
+
+100
+00:05:55,034 --> 00:05:58,440
+downgrading from a writeLock to a
+readLock.
+
+101
+00:05:58,440 --> 00:06:00,520
+An interruption of lock acquisition.
+
+102
+00:06:01,930 --> 00:06:04,290
+Finding a compelling use case for
+ReentrantReadWriteLock
+
+103
+00:06:04,290 --> 00:06:07,410
+is hard in Android, where they're used
+sparingly.
+
+104
+00:06:07,410 --> 00:06:10,620
+Clearly, optimizing the performance of the
+BluetoothSocket
+
+105
+00:06:10,620 --> 00:06:14,620
+closed method doesn't do justice to a
+ReentrandReadWriteLock.
+
+106
+00:06:14,620 --> 00:06:15,692
+And it's power as a
+
+107
+00:06:15,692 --> 00:06:19,415
+scalable synchronization mechanism for
+parallel processing.
+
+108
+00:06:19,415 --> 00:06:22,431
+Further discussion of
+ReentrantReadWriteLock's and their
+
+109
+00:06:22,431 --> 00:06:24,696
+broader applicability appears at this
+link.
+
+110
+00:06:24,696 --> 00:06:33,189
+[MUSIC]
+
