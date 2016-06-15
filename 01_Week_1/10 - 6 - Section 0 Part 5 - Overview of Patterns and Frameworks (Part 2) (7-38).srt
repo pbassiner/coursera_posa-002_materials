@@ -1,0 +1,636 @@
+1
+00:00:00,337 --> 00:00:08,924
+[MUSIC].
+
+2
+00:00:08,924 --> 00:00:11,167
+Welcome to the next part of the
+introduction section.
+
+3
+00:00:11,167 --> 00:00:13,540
+In this part we will continue our
+discussion of
+
+4
+00:00:13,540 --> 00:00:16,570
+patterns and frameworks outlining how they
+are used through our
+
+5
+00:00:16,570 --> 00:00:20,293
+Android to improve the structure and
+functionality of the concurrency
+
+6
+00:00:20,293 --> 00:00:23,290
+and communication in middleware used by
+its applications and services.
+
+7
+00:00:24,650 --> 00:00:27,128
+Androids concurrency and communications
+frameworks.
+
+8
+00:00:27,128 --> 00:00:31,550
+An applications to these frameworks are
+designed, implemented, and integrated
+
+9
+00:00:31,550 --> 00:00:34,790
+in accordance with many Gang of Four and
+POSA patterns.
+
+10
+00:00:34,790 --> 00:00:37,950
+The most essential patterns used in
+Android's frameworks appear in the POSA
+
+11
+00:00:37,950 --> 00:00:40,520
+books, which isn't surprising, since these
+
+12
+00:00:40,520 --> 00:00:43,280
+books document fundamental concurrency and
+communication patterns.
+
+13
+00:00:44,490 --> 00:00:45,760
+For example, the monitor object
+
+14
+00:00:45,760 --> 00:00:48,330
+pattern synchronizes concurrent method
+execution to
+
+15
+00:00:48,330 --> 00:00:51,790
+ensure that only one method at a time runs
+within an object.
+
+16
+00:00:51,790 --> 00:00:53,940
+It also allows an object's methods to
+cooperatively
+
+17
+00:00:53,940 --> 00:00:57,140
+schedule their execution sequences, as
+described at this link.
+
+18
+00:00:58,240 --> 00:00:59,680
+Android applies this pattern to implement
+
+19
+00:00:59,680 --> 00:01:03,720
+the LinkedBlockingQueue class in the
+java.util.concurrent package.
+
+20
+00:01:03,720 --> 00:01:07,165
+Which provides a synchronized list of link
+nodes that enqueues
+
+21
+00:01:07,165 --> 00:01:10,380
+and dequeues elements in first in first
+out or FIFO order.
+
+22
+00:01:11,425 --> 00:01:15,070
+The thread specific storage pattern allows
+multiple threads to use one logically
+
+23
+00:01:15,070 --> 00:01:19,150
+global access point to retrieve an object
+that's local to a thread.
+
+24
+00:01:19,150 --> 00:01:23,610
+Without incurring locking overhead on each
+object access, as described at this link.
+
+25
+00:01:24,960 --> 00:01:27,130
+The Android looper class applies this
+pattern
+
+26
+00:01:27,130 --> 00:01:29,290
+by using a Java ThreadLocal object, to
+
+27
+00:01:29,290 --> 00:01:31,240
+ensure only one looper is created per
+
+28
+00:01:31,240 --> 00:01:34,120
+thread, as described in these upcoming
+videos.
+
+29
+00:01:35,370 --> 00:01:39,830
+The command processor pattern packages a
+piece of application functionality as
+
+30
+00:01:39,830 --> 00:01:43,190
+well as its parameterization in an object
+to execute it in another
+
+31
+00:01:43,190 --> 00:01:46,270
+context, such as a later point in time, in
+a different
+
+32
+00:01:46,270 --> 00:01:49,860
+process, in a different thread, et cetera,
+as described at this link.
+
+33
+00:01:50,920 --> 00:01:53,665
+The Android hammer framework applies this
+pattern to
+
+34
+00:01:53,665 --> 00:01:55,983
+enable code in a background thread, to
+post a
+
+35
+00:01:55,983 --> 00:01:59,155
+runnable command that's enqueued and
+processed later in the
+
+36
+00:01:59,155 --> 00:02:02,603
+user interface thread, as described in
+these upcoming videos.
+
+37
+00:02:02,603 --> 00:02:08,303
+Android also applies this pattern to it's
+intent service, which handles asynchronous
+
+38
+00:02:08,303 --> 00:02:13,407
+requests, expressed as intents on demand
+in a background thread of a service.
+
+39
+00:02:13,407 --> 00:02:14,772
+[MUSIC].
+
+40
+00:02:18,530 --> 00:02:20,650
+The active object pattern defines the
+units of
+
+41
+00:02:20,650 --> 00:02:24,260
+concurrency on a component to be request
+for service.
+
+42
+00:02:24,260 --> 00:02:27,090
+These service requests are processed in a
+different thread then the
+
+43
+00:02:27,090 --> 00:02:30,389
+client thread that invoked the request, as
+described at this link.
+
+44
+00:02:31,520 --> 00:02:33,910
+The Android hammer framework applies a
+variant to
+
+45
+00:02:33,910 --> 00:02:36,100
+this pattern to enable a client in one
+
+46
+00:02:36,100 --> 00:02:38,440
+thread to send messages to a handler
+running
+
+47
+00:02:38,440 --> 00:02:41,680
+in another thread, as covered in these
+upcoming videos.
+
+48
+00:02:43,200 --> 00:02:47,280
+Android also applies this pattern by its
+binder communication framework,
+
+49
+00:02:47,280 --> 00:02:50,722
+which uses messengers to enable message
+based interactions across processes.
+
+50
+00:02:50,722 --> 00:02:54,830
+The Half-Sync, Half-Async pattern
+decouples asynchronous and synchronous
+
+51
+00:02:54,830 --> 00:02:59,200
+service processing in concurrent systems
+by introducing two layers.
+
+52
+00:02:59,200 --> 00:03:00,770
+One for asynchronous service processing
+
+53
+00:03:00,770 --> 00:03:02,930
+and one for synchronous service
+processing.
+
+54
+00:03:04,060 --> 00:03:08,170
+These layers communicate via one or more
+synchronized queues and simplify
+
+55
+00:03:08,170 --> 00:03:10,950
+concurrent programming without unduly
+reducing
+
+56
+00:03:10,950 --> 00:03:13,250
+performance, as described at this link.
+
+57
+00:03:14,448 --> 00:03:17,480
+The Android AsyncTask framework applies
+this pattern to allow one or
+
+58
+00:03:17,480 --> 00:03:19,260
+more background threads to block
+
+59
+00:03:19,260 --> 00:03:22,810
+synchronously while processing long
+duration operations.
+
+60
+00:03:22,810 --> 00:03:26,560
+And then pass the results by a queue to
+the user interface thread which
+
+61
+00:03:26,560 --> 00:03:29,130
+only performs short duration, non blocking
+or
+
+62
+00:03:29,130 --> 00:03:32,322
+asynchronous operations, as discussed in
+these upcoming videos.
+
+63
+00:03:33,460 --> 00:03:35,470
+The broker pattern connects clients with
+remote
+
+64
+00:03:35,470 --> 00:03:38,280
+objects by mediating invocations from
+clients to these
+
+65
+00:03:38,280 --> 00:03:41,780
+objects, while encapsulating the details
+of the underlying
+
+66
+00:03:41,780 --> 00:03:45,300
+interprocess communication mechanisms, as
+described at this link.
+
+67
+00:03:46,690 --> 00:03:49,860
+Android applies the broker pattern to
+support object oriented remote
+
+68
+00:03:49,860 --> 00:03:53,630
+procedure calls between activities and
+services running in different processes.
+
+69
+00:03:54,860 --> 00:03:57,304
+The broker pattern is actually a pattern
+language.
+
+70
+00:03:57,304 --> 00:03:59,068
+It applies many other Gang of Four
+
+71
+00:03:59,068 --> 00:04:01,750
+and POSA patterns, as described in these
+books.
+
+72
+00:04:01,750 --> 00:04:08,790
+[MUSIC].
+
+73
+00:04:08,790 --> 00:04:11,500
+Although the Gang of Four patterns don't
+focus on concurrency and
+
+74
+00:04:11,500 --> 00:04:13,850
+communication per se, these patterns are
+
+75
+00:04:13,850 --> 00:04:16,230
+applied in many object oriented
+frameworks.
+
+76
+00:04:16,230 --> 00:04:19,400
+Including the Android concurrency and
+communication frameworks.
+
+77
+00:04:19,400 --> 00:04:22,850
+For example, the template method pattern
+provides a skeleton of an algorithm
+
+78
+00:04:22,850 --> 00:04:26,819
+and a method deferring some steps as
+subclasses as described at this link.
+
+79
+00:04:27,980 --> 00:04:30,593
+The Android HandlerThread class applies
+this
+
+80
+00:04:30,593 --> 00:04:33,072
+pattern to allow subclasses to create
+their
+
+81
+00:04:33,072 --> 00:04:36,422
+desired handlers by overriding the
+onLooperPrepared hook
+
+82
+00:04:36,422 --> 00:04:38,750
+method as shown in this upcoming video.
+
+83
+00:04:39,960 --> 00:04:42,320
+The strategy pattern defines a family of
+
+84
+00:04:42,320 --> 00:04:45,580
+algorithms, encapsulates each one and
+makes them
+
+85
+00:04:45,580 --> 00:04:48,420
+interchangeable, so that clients and
+algorithms can
+
+86
+00:04:48,420 --> 00:04:51,070
+vary independently as described at this
+link.
+
+87
+00:04:52,355 --> 00:04:56,090
+The Android AsyncTask framework applies
+this pattern to configure which
+
+88
+00:04:56,090 --> 00:04:59,310
+type of executor is used to run async
+tasks, which
+
+89
+00:04:59,310 --> 00:05:02,620
+can be serialized or run in the thread
+pool, depending
+
+90
+00:05:02,620 --> 00:05:06,030
+on the designated strategy, as described
+in this upcoming video.
+
+91
+00:05:07,150 --> 00:05:09,380
+The factory method pattern provides an
+interface
+
+92
+00:05:09,380 --> 00:05:11,310
+for creating an object, but leaves a
+
+93
+00:05:11,310 --> 00:05:15,650
+choice at the objects concrete type to a
+subclass as described at this link.
+
+94
+00:05:16,770 --> 00:05:20,136
+The THREAD_POOL_EXECUTOR class in the
+Android AsyncTask
+
+95
+00:05:20,136 --> 00:05:22,842
+framework applies this pattern to
+designate the
+
+96
+00:05:22,842 --> 00:05:25,218
+subclass of ThreadFactory used to create a
+
+97
+00:05:25,218 --> 00:05:29,150
+thread whose name encodes the unique
+AsyncTask number.
+
+98
+00:05:29,150 --> 00:05:32,120
+Which serves as debugging aid as shown in
+this upcoming video.
+
+99
+00:05:33,570 --> 00:05:37,180
+The frameworks in Android are built using
+some of the Java concurrency
+
+100
+00:05:37,180 --> 00:05:41,280
+mechanisms in the java.util.concurrent and
+java.util.concurrent_locks
+
+101
+00:05:41,280 --> 00:05:43,550
+packages covered in an upcoming section.
+
+102
+00:05:44,700 --> 00:05:46,100
+In addition to the patterns outlined
+
+103
+00:05:46,100 --> 00:05:50,000
+above, Androids concurrency and
+communication frameworks and
+
+104
+00:05:50,000 --> 00:05:51,970
+the underlying Java mechanisms upon which
+they
+
+105
+00:05:51,970 --> 00:05:54,900
+are built also apply many other patterns.
+
+106
+00:05:54,900 --> 00:06:00,730
+Such as monitor object, proxy, guarded
+suspension, thread safe interface, future,
+
+107
+00:06:00,730 --> 00:06:07,910
+bridge, adapter and iterator as discussed
+throughout this movie.
+
+108
+00:06:07,910 --> 00:06:12,087
+[MUSIC].
+
+109
+00:06:12,087 --> 00:06:16,370
+In summary Android applies many POSA and
+Gang of Four patterns.
+
+110
+00:06:16,370 --> 00:06:17,570
+To help improve the structure and
+
+111
+00:06:17,570 --> 00:06:19,780
+functionality of it's concurrency and
+communication
+
+112
+00:06:19,780 --> 00:06:24,960
+frameworks, as well as the applications
+and services built using these frameworks.
+
+113
+00:06:24,960 --> 00:06:28,290
+These techniques, tools and methods codify
+software design and architecture
+
+114
+00:06:28,290 --> 00:06:29,870
+best practices in the form
+
+115
+00:06:29,870 --> 00:06:32,293
+of systematically reusable implementation
+artifacts.
+
+116
+00:06:33,300 --> 00:06:35,856
+Some of these patterns and frameworks
+focus on Androids
+
+117
+00:06:35,856 --> 00:06:40,560
+middleware layers, whereas others focus on
+writing applications and services.
+
+118
+00:06:40,560 --> 00:06:44,280
+Regardless of their scope these patterns
+and frameworks help developers
+
+119
+00:06:44,280 --> 00:06:47,490
+in the Android platform be more productive
+and write better
+
+120
+00:06:47,490 --> 00:06:50,680
+quality software, by allowing them to
+focus on their business
+
+121
+00:06:50,680 --> 00:06:54,360
+logic at whatever layer of the Android
+stack they deal with.
+
+122
+00:06:54,360 --> 00:06:56,600
+Rather than wrestling with low level
+tedious
+
+123
+00:06:56,600 --> 00:06:59,250
+and error prone concurrency and
+communication details.
+
+124
+00:07:00,850 --> 00:07:02,340
+A great deal of the success of the
+
+125
+00:07:02,340 --> 00:07:04,170
+Android platform stems from
+
+126
+00:07:04,170 --> 00:07:06,489
+it's pattern-oriented, framework-based
+architecture.
+
+127
+00:07:07,748 --> 00:07:11,870
+Since Android is largely available as open
+source, it's an ideal environment
+
+128
+00:07:11,870 --> 00:07:16,350
+for learning about and experimenting with
+these powerful forms of systematic reuse.
+
+129
+00:07:17,740 --> 00:07:20,620
+I therefore strongly encourage you to
+download
+
+130
+00:07:20,620 --> 00:07:23,578
+the Android source code available at this
+link.
+
+131
+00:07:23,578 --> 00:07:29,868
+We'll analyze many examples from this code
+
+132
+00:07:29,868 --> 00:07:35,528
+base throughout the rest of this MOOC.
+
+133
+00:07:35,528 --> 00:07:37,459
+[MUSIC]
+

@@ -1,0 +1,148 @@
+1
+00:00:00,000 --> 00:00:08,980
+[MUSIC].
+
+2
+00:00:08,980 --> 00:00:10,710
+Welcome to the section on Android
+
+3
+00:00:10,710 --> 00:00:14,730
+Concurrency which explores the motivations
+for, challenges
+
+4
+00:00:14,730 --> 00:00:17,420
+of, and techniques tools, and methods
+associated
+
+5
+00:00:17,420 --> 00:00:20,420
+with developing concurrent software for
+mobile devices.
+
+6
+00:00:21,420 --> 00:00:23,870
+Concurrent software can simultaneously run
+multiple
+
+7
+00:00:23,870 --> 00:00:26,229
+computations that potentially interact
+with each other.
+
+8
+00:00:27,290 --> 00:00:29,990
+To insure that interactions between
+running computations occur in
+
+9
+00:00:29,990 --> 00:00:33,820
+the right order and don't accidentally
+corrupt shared data.
+
+10
+00:00:33,820 --> 00:00:35,710
+Synchronization, and scheduling mechanisms
+are needed.
+
+11
+00:00:36,780 --> 00:00:40,590
+This section focuses on the mechanisms
+that Android provides to create,
+
+12
+00:00:40,590 --> 00:00:44,110
+control, and terminate multiple threads
+that run concurrently within a process.
+
+13
+00:00:45,330 --> 00:00:47,450
+Some Android concurrency mechanisms we
+cover.
+
+14
+00:00:47,450 --> 00:00:50,810
+Are based on standard Java features such
+as threads,
+
+15
+00:00:50,810 --> 00:00:52,610
+synchronized methods and statements,
+[UNKNOWN]
+
+16
+00:00:52,610 --> 00:00:55,640
+locks, condition objects and semaphores.
+
+17
+00:00:55,640 --> 00:01:00,090
+We also cover several Android concurrency
+frameworks, such as its handlers,
+
+18
+00:01:00,090 --> 00:01:05,630
+runables and messages or hammer framework,
+and it's asynced tasked framework.
+
+19
+00:01:05,630 --> 00:01:07,730
+Throughout this section, we'll illustrate
+by
+
+20
+00:01:07,730 --> 00:01:10,230
+example how concurrent Android
+applications and
+
+21
+00:01:10,230 --> 00:01:14,130
+frameworks are developed by applying many
+Gang of Four and POSA patterns.
+
+22
+00:01:14,130 --> 00:01:16,400
+Such as template method, strategy,.
+
+23
+00:01:16,400 --> 00:01:19,690
+Factory method, command processor, active
+object and monitor
+
+24
+00:01:19,690 --> 00:01:23,820
+object, half synch, half asynch and
+thread-specific storage.
+
+25
+00:01:23,820 --> 00:01:26,610
+You not only learn what goes on at the
+surface of the Android application
+
+26
+00:01:26,610 --> 00:01:28,720
+layers, but you also learn what goes
+
+27
+00:01:28,720 --> 00:01:31,669
+on underneath, inside the Android
+middleware itself.
+
+28
+00:01:32,850 --> 00:01:36,490
+We examine a lot of Java programming in
+this section so you may want to
+
+29
+00:01:36,490 --> 00:01:41,453
+download the Android open source code
+available from the Poso moot website, and
+
+30
+00:01:41,453 --> 00:01:46,628
+follow along.
+
+31
+00:01:46,628 --> 00:01:50,879
+[MUSIC]
+

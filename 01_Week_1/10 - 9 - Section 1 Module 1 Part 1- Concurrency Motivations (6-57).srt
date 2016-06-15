@@ -1,0 +1,643 @@
+1
+00:00:00,000 --> 00:00:08,470
+[MUSIC]
+
+2
+00:00:08,470 --> 00:00:13,110
+Welcome the first part of the module on
+concurrency motivations and challenges.
+
+3
+00:00:13,110 --> 00:00:15,030
+In this part we explore key
+
+4
+00:00:15,030 --> 00:00:18,550
+motivations for developing current mobile
+device software.
+
+5
+00:00:18,550 --> 00:00:21,150
+These days, a prime reason for using
+concurrency
+
+6
+00:00:21,150 --> 00:00:23,235
+is to leverage advances in hardware and
+software.
+
+7
+00:00:23,235 --> 00:00:27,380
+Multi-core processors are becoming
+ubiquitous to the point where it's getting
+
+8
+00:00:27,380 --> 00:00:30,030
+hard to buy a computing device that just
+has one core.
+
+9
+00:00:31,080 --> 00:00:34,179
+This link describes a wide range of quad
+core Android phones.
+
+10
+00:00:35,250 --> 00:00:39,050
+Operating systems like Unix, Windows and
+VxWorks are optimized to
+
+11
+00:00:39,050 --> 00:00:42,730
+exploit these multiple cores efficiently
+via threads, which are the
+
+12
+00:00:42,730 --> 00:00:46,360
+smallest sequence of program instructions
+that can be managed independently
+
+13
+00:00:46,360 --> 00:00:49,360
+by an operating system scheduler, as
+described at this link.
+
+14
+00:00:50,500 --> 00:00:55,970
+Likewise, middleware such as Java virtual
+machines, web servers, Android .Net, DDS
+
+15
+00:00:55,970 --> 00:00:59,970
+and Corba can take advantage of multiple
+cores as described at this link.
+
+16
+00:01:01,420 --> 00:01:04,408
+Knowledge of concurrency is therefore
+necessary to program
+
+17
+00:01:04,408 --> 00:01:07,900
+multi-thread and multi-core systems
+effectively, and improve various
+
+18
+00:01:07,900 --> 00:01:11,820
+software quality attributes such as
+simplifying program structures,
+
+19
+00:01:11,820 --> 00:01:16,070
+to avoid overly complex entangled event
+driven software architectures.
+
+20
+00:01:16,070 --> 00:01:18,930
+Increasing performance by overlapping
+communication and computation
+
+21
+00:01:18,930 --> 00:01:22,320
+to run in parallel, and improving
+responsiveness
+
+22
+00:01:22,320 --> 00:01:24,440
+by processing user interface operations in
+a
+
+23
+00:01:24,440 --> 00:01:28,370
+different thread in other background
+processing operations.
+
+24
+00:01:28,370 --> 00:01:31,360
+The rest of this video explores each of
+these motivations in more detail.
+
+25
+00:01:31,360 --> 00:01:32,711
+[BLANK_AUDIO]
+
+26
+00:01:32,711 --> 00:01:35,229
+[MUSIC].
+
+27
+00:01:35,229 --> 00:01:35,729
+[BLANK_AUDIO].
+
+28
+00:01:37,900 --> 00:01:40,820
+Hardware and software advances can help
+improve the way programs
+
+29
+00:01:40,820 --> 00:01:42,350
+are structured to avoid overly
+
+30
+00:01:42,350 --> 00:01:46,210
+complex, entangled event driven software
+architectures.
+
+31
+00:01:46,210 --> 00:01:49,130
+Historically, the GUIs and early versions
+of Windows, Mac OS
+
+32
+00:01:49,130 --> 00:01:52,250
+and Unix were structured using an event
+driven programming model.
+
+33
+00:01:52,250 --> 00:01:55,140
+Where a single event loop processed user
+interface events and
+
+34
+00:01:55,140 --> 00:01:58,340
+initiated file and network IO operations
+in one thread of control.
+
+35
+00:01:59,650 --> 00:02:01,840
+This link provides more information on
+event driven programming.
+
+36
+00:02:03,170 --> 00:02:06,850
+Programming purely event driven software
+is hard however, since the structure
+
+37
+00:02:06,850 --> 00:02:10,470
+of its control flow is obscured in both
+time and space.
+
+38
+00:02:10,470 --> 00:02:13,780
+In particular, any time a program might
+block, such as when it
+
+39
+00:02:13,780 --> 00:02:16,910
+performed a read operation on a network
+connection, it had to post
+
+40
+00:02:16,910 --> 00:02:19,630
+an event on a message queue and handle the
+operation later in
+
+41
+00:02:19,630 --> 00:02:23,490
+its event loop, which was awkward to
+program and hard to optimize.
+
+42
+00:02:23,490 --> 00:02:26,870
+This link describes the pros and cons of a
+
+43
+00:02:26,870 --> 00:02:29,820
+pattern called the reactor, it's common in
+event driven programs.
+
+44
+00:02:31,200 --> 00:02:33,020
+Now that modern middleware, operating
+systems
+
+45
+00:02:33,020 --> 00:02:36,230
+and hardware have better concurrency
+support, more
+
+46
+00:02:36,230 --> 00:02:38,430
+effective ways of structuring application
+and
+
+47
+00:02:38,430 --> 00:02:41,940
+system software have emerged, based on
+multi-threading.
+
+48
+00:02:41,940 --> 00:02:44,690
+Which enables blocking operations that
+detangle event
+
+49
+00:02:44,690 --> 00:02:46,860
+driven programs as described at this link.
+
+50
+00:02:48,130 --> 00:02:50,850
+For example, Android provides several
+concurrency
+
+51
+00:02:50,850 --> 00:02:52,670
+frameworks that enable multiple threads to
+
+52
+00:02:52,670 --> 00:02:54,340
+perform long running computations in the
+
+53
+00:02:54,340 --> 00:02:58,360
+background, which maps efficiently onto
+multiple cores.
+
+54
+00:02:58,360 --> 00:03:01,150
+Moreover, these background computations
+can block
+
+55
+00:03:01,150 --> 00:03:02,660
+independently of each other and the
+
+56
+00:03:02,660 --> 00:03:04,970
+user interface thread, which allows
+developers
+
+57
+00:03:04,970 --> 00:03:07,150
+to structure their software more
+cohesively.
+
+58
+00:03:08,730 --> 00:03:11,360
+Using these Android frameworks effectively
+requires knowledge of
+
+59
+00:03:11,360 --> 00:03:14,050
+concurrency patterns, which are described
+at this link.
+
+60
+00:03:15,300 --> 00:03:18,996
+To illustrate one common Android
+concurrency model that uses so-called
+
+61
+00:03:18,996 --> 00:03:22,260
+worker threads, here's a snippet of code
+from an application
+
+62
+00:03:22,260 --> 00:03:25,620
+we'll explore throughout this MOOC, that
+enables a user to
+
+63
+00:03:25,620 --> 00:03:28,320
+download an image from a remote server
+across the network.
+
+64
+00:03:30,100 --> 00:03:33,020
+The structure of this code is based on the
+half-sync, half-async
+
+65
+00:03:33,020 --> 00:03:36,030
+pattern described at this link, and
+covered later in this section.
+
+66
+00:03:37,690 --> 00:03:39,500
+This example has a click listener, that
+
+67
+00:03:39,500 --> 00:03:41,760
+handles button pressed on the Android
+touch screen.
+
+68
+00:03:43,390 --> 00:03:46,930
+When a user presses the Download button,
+this code starts a worker
+
+69
+00:03:46,930 --> 00:03:50,359
+thread that runs in the background and
+blocks while downloading an image.
+
+70
+00:03:51,910 --> 00:03:54,230
+After the image is downloaded and
+processed,
+
+71
+00:03:54,230 --> 00:03:56,170
+it's displayed via the User Interface
+thread.
+
+72
+00:03:57,500 --> 00:03:58,830
+If you look carefully at this code
+
+73
+00:03:58,830 --> 00:04:01,630
+snippet, you'll see how concisely
+structured it is.
+
+74
+00:04:02,630 --> 00:04:05,470
+In particular, the image download and
+display logic
+
+75
+00:04:05,470 --> 00:04:08,090
+is cohesive in time and space rather than
+
+76
+00:04:08,090 --> 00:04:10,410
+being scattered throughout the code, as
+would be
+
+77
+00:04:10,410 --> 00:04:12,470
+the case in a purely event driven
+solution.
+
+78
+00:04:13,970 --> 00:04:16,410
+This link describes the Android worker
+threads concurrency
+
+79
+00:04:16,410 --> 00:04:18,518
+model, which we'll cover later in this
+section.
+
+80
+00:04:18,518 --> 00:04:20,990
+[BLANK_AUDIO]
+
+81
+00:04:20,990 --> 00:04:22,866
+[MUSIC].
+
+82
+00:04:22,866 --> 00:04:24,498
+[BLANK_AUDIO].
+
+83
+00:04:24,498 --> 00:04:26,048
+Hardware and software advances also
+
+84
+00:04:26,048 --> 00:04:28,248
+allow software developers to increase
+application
+
+85
+00:04:28,248 --> 00:04:32,230
+and system performance, which is a key
+motivation for using concurrency.
+
+86
+00:04:32,230 --> 00:04:34,590
+In particular, performance can be
+accelerated
+
+87
+00:04:34,590 --> 00:04:37,840
+via parallelism as described in this link.
+
+88
+00:04:37,840 --> 00:04:40,460
+Android accelerates performance by
+parallelism in several ways.
+
+89
+00:04:41,590 --> 00:04:43,300
+One way is to overlap computation
+
+90
+00:04:43,300 --> 00:04:46,770
+and communication operations via it's
+multithreading mechanisms.
+
+91
+00:04:46,770 --> 00:04:49,250
+For example, in the image downloading
+application we
+
+92
+00:04:49,250 --> 00:04:52,730
+examined earlier, the background threads
+that download images
+
+93
+00:04:52,730 --> 00:04:54,750
+can run in parallel with each other, and
+
+94
+00:04:54,750 --> 00:04:56,260
+with a thread that interacts with the
+user.
+
+95
+00:04:57,520 --> 00:05:00,700
+This link provides more information on
+Android multi-threaded mechanisms.
+
+96
+00:05:01,880 --> 00:05:03,720
+Another way to accelerate performance on
+Android,
+
+97
+00:05:03,720 --> 00:05:06,600
+is to use the render script framework,
+which
+
+98
+00:05:06,600 --> 00:05:09,520
+paralyzes work across all processors
+available on a
+
+99
+00:05:09,520 --> 00:05:14,480
+device, such as multicore CPU's, GPUs or
+DSPs.
+
+100
+00:05:15,790 --> 00:05:19,700
+RenderScript is targeted at applications
+performing image processing, computational
+
+101
+00:05:19,700 --> 00:05:23,145
+photography or computer vision as
+described at this link.
+
+102
+00:05:23,145 --> 00:05:25,086
+[BLANK_AUDIO]
+
+103
+00:05:25,086 --> 00:05:26,180
+[MUSIC]
+
+104
+00:05:26,180 --> 00:05:29,330
+[BLANK_AUDIO].
+
+105
+00:05:29,330 --> 00:05:31,572
+Despite advances in the hardware, not
+every
+
+106
+00:05:31,572 --> 00:05:35,020
+computing platform in use today supports
+multiple cores.
+
+107
+00:05:35,020 --> 00:05:38,730
+For example, you may have an older device
+with just one core or there
+
+108
+00:05:38,730 --> 00:05:41,870
+may be other constraints that make it hard
+to take full advantage of parallelism.
+
+109
+00:05:42,940 --> 00:05:44,660
+Concurrency can still be useful however to
+
+110
+00:05:44,660 --> 00:05:47,300
+improve perceived response time, such as
+ensuring
+
+111
+00:05:47,300 --> 00:05:48,960
+the user interface doesn't ignore input
+from
+
+112
+00:05:48,960 --> 00:05:52,010
+users while other operations are being
+processed.
+
+113
+00:05:52,010 --> 00:05:54,860
+For example, the Android user interface
+thread can interact
+
+114
+00:05:54,860 --> 00:05:57,980
+responsively to user gestures and other
+input, while worker
+
+115
+00:05:57,980 --> 00:06:01,150
+threads concurrently execute long running
+computations in the background,
+
+116
+00:06:01,150 --> 00:06:04,960
+and perform blocking operations on the
+file system and network.
+
+117
+00:06:04,960 --> 00:06:09,879
+This link provides more information on
+responsiveness and computing systems.
+
+118
+00:06:09,879 --> 00:06:10,720
+[BLANK_AUDIO]
+
+119
+00:06:10,720 --> 00:06:10,930
+[MUSIC]
+
+120
+00:06:10,930 --> 00:06:11,430
+[BLANK_AUDIO].
+
+121
+00:06:14,410 --> 00:06:16,680
+In summary, there are several motivations
+
+122
+00:06:16,680 --> 00:06:19,760
+for developing concurrent software for
+mobile devices.
+
+123
+00:06:19,760 --> 00:06:22,670
+It helps developers effectively leverage
+technology advances,
+
+124
+00:06:22,670 --> 00:06:24,380
+such as Moore's law and other means
+
+125
+00:06:24,380 --> 00:06:26,650
+by which commoditized hardware and
+software gets
+
+126
+00:06:26,650 --> 00:06:28,600
+better, faster, and cheaper at a regular
+pace.
+
+127
+00:06:29,820 --> 00:06:31,860
+Concurrency also helps developers meet the
+quality
+
+128
+00:06:31,860 --> 00:06:33,530
+and performance needs of their
+applications and
+
+129
+00:06:33,530 --> 00:06:35,810
+services, by going beyond what's provided
+by
+
+130
+00:06:35,810 --> 00:06:37,860
+the lower level infrastructure's software
+and hardware.
+
+131
+00:06:38,970 --> 00:06:41,660
+For example, concurrency allows developers
+to structure
+
+132
+00:06:41,660 --> 00:06:43,620
+their software so it's more responsive to
+user
+
+133
+00:06:43,620 --> 00:06:45,660
+interaction patterns, as well as easier to
+
+134
+00:06:45,660 --> 00:06:47,860
+understand and evolve over the software
+life cycle.
+
+135
+00:06:47,860 --> 00:06:57,119
+[MUSIC]
+

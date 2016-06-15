@@ -1,0 +1,577 @@
+1
+00:00:00,000 --> 00:00:08,550
+[MUSIC]
+
+2
+00:00:08,550 --> 00:00:11,990
+Welcome to the next part of the
+introduction section.
+
+3
+00:00:11,990 --> 00:00:15,520
+Which outlines the course prerequisites
+and learning strategies.
+
+4
+00:00:15,520 --> 00:00:18,340
+In this part, we'll explain the
+background, students
+
+5
+00:00:18,340 --> 00:00:21,260
+taking this MOCC are expected to have, and
+provide
+
+6
+00:00:21,260 --> 00:00:23,630
+some tips to help students learn the
+material
+
+7
+00:00:23,630 --> 00:00:26,810
+covered in the videos, and successfully
+complete the assignments.
+
+8
+00:00:28,260 --> 00:00:31,540
+When we teach classes on mobile cloud
+computing with Android.
+
+9
+00:00:31,540 --> 00:00:34,910
+At Vanderbilt University, and the
+University of Maryland, we
+
+10
+00:00:34,910 --> 00:00:38,320
+can rely on the students having taken the
+prerequisites.
+
+11
+00:00:38,320 --> 00:00:42,420
+In contrast, one of the challenges of
+teaching a MOOC, is that we don't
+
+12
+00:00:42,420 --> 00:00:45,170
+really know what you know, and whether
+
+13
+00:00:45,170 --> 00:00:47,150
+you're prepared to master the topics we
+cover.
+
+14
+00:00:48,810 --> 00:00:52,580
+We developed this MOOC, with certain
+assumptions about, and expectations
+
+15
+00:00:52,580 --> 00:00:56,090
+of students who take this course, which
+are summarized here.
+
+16
+00:00:57,650 --> 00:01:02,480
+To help align our expectations, here are
+some things we'd like you to know.
+
+17
+00:01:02,480 --> 00:01:03,913
+To get the most out of this MOOC.
+
+18
+00:01:05,400 --> 00:01:09,120
+First and foremost, it's essential for you
+to have a good understanding
+
+19
+00:01:09,120 --> 00:01:11,440
+of object oriented programming in general,
+
+20
+00:01:11,440 --> 00:01:14,350
+and the Java programming language in
+particular.
+
+21
+00:01:14,350 --> 00:01:16,390
+For example, you need to understand
+
+22
+00:01:16,390 --> 00:01:19,830
+Java features like classes, inheritance,
+dynamic
+
+23
+00:01:19,830 --> 00:01:24,360
+binding and generics, so you can follow
+along with the examples we cover.
+
+24
+00:01:24,360 --> 00:01:26,300
+It's also important to understand core
+
+25
+00:01:26,300 --> 00:01:30,210
+Android programming elements, such as
+activities, intense,
+
+26
+00:01:30,210 --> 00:01:32,110
+and user interface components, as well
+
+27
+00:01:32,110 --> 00:01:34,230
+as the Eclipse Android development tools
+environment.
+
+28
+00:01:35,260 --> 00:01:37,570
+If you're rusty on these topics, we
+strongly
+
+29
+00:01:37,570 --> 00:01:41,140
+recommend you leverage resources available
+on the web.
+
+30
+00:01:41,140 --> 00:01:42,950
+Starting with those summarized
+
+31
+00:01:45,880 --> 00:01:47,185
+at this link.
+
+32
+00:01:47,185 --> 00:01:50,700
+[MUSIC]
+
+33
+00:01:50,700 --> 00:01:54,610
+In addition to being proficient with Java,
+it's also useful to understand
+
+34
+00:01:54,610 --> 00:01:57,370
+fundamental object oriented design
+concepts, such
+
+35
+00:01:57,370 --> 00:02:01,970
+as encapsulation, abstraction,
+polymorphism, and extensibility.
+
+36
+00:02:01,970 --> 00:02:03,680
+Object oriented design is a method of
+planning
+
+37
+00:02:03,680 --> 00:02:06,990
+a system with interacting objects to solve
+software problems,
+
+38
+00:02:06,990 --> 00:02:10,400
+by specifying crisply defined conceptual
+boundaries, that combine
+
+39
+00:02:10,400 --> 00:02:14,220
+methods and data, to hide information
+likely to change.
+
+40
+00:02:14,220 --> 00:02:15,630
+Thereby minimizing rework.
+
+41
+00:02:15,630 --> 00:02:19,160
+As requirements and environments evolve,
+as described at this link.
+
+42
+00:02:20,160 --> 00:02:24,250
+Likewise, knowledge of class and sequence
+diagrams, defined by the Unified
+
+43
+00:02:24,250 --> 00:02:28,850
+Modeling Language, or UML, will help you
+understand the structure and interactions.
+
+44
+00:02:28,850 --> 00:02:30,980
+Between key elements of the Java and
+
+45
+00:02:30,980 --> 00:02:33,680
+Android examples, we analyze throughout
+this MOOC.
+
+46
+00:02:34,730 --> 00:02:36,578
+You don't need to be a UML expert to make
+
+47
+00:02:36,578 --> 00:02:39,602
+sense of these examples, but we recommend
+you read the material
+
+48
+00:02:39,602 --> 00:02:42,570
+available on UML available at this link,
+and on other websites
+
+49
+00:02:42,570 --> 00:02:46,069
+and books, so you'll understand the
+notations used in our diagrams.
+
+50
+00:02:47,220 --> 00:02:49,540
+Finally, it would be helpful, if you're
+
+51
+00:02:49,540 --> 00:02:52,820
+familiar with common systems and network
+programming concepts
+
+52
+00:02:52,820 --> 00:02:57,510
+and mechanisms, such as event loops,
+multi-threading, multi-processing,
+
+53
+00:02:57,510 --> 00:03:02,240
+synchronization, scheduling and local and
+remote interprocess communication.
+
+54
+00:03:02,240 --> 00:03:04,430
+You don't need a deep background in these
+areas.
+
+55
+00:03:04,430 --> 00:03:07,100
+Since we'll review them as needed
+throughout this MOOC.
+
+56
+00:03:07,100 --> 00:03:10,845
+However, if you're interested in learning
+more about these topics, section
+
+57
+00:03:10,845 --> 00:03:14,550
+one of the 2013 POSA MOOC, provides an
+overview at this
+
+58
+00:03:18,310 --> 00:03:19,090
+link.
+
+59
+00:03:19,090 --> 00:03:19,590
+[MUSIC].
+
+60
+00:03:22,880 --> 00:03:25,480
+This MOOC covers a lot of material, and
+some
+
+61
+00:03:25,480 --> 00:03:28,530
+requires a lot of thinking and practice to
+master.
+
+62
+00:03:28,530 --> 00:03:30,780
+Even if you've successfully completed
+Professor Porter's MOOC.
+
+63
+00:03:30,780 --> 00:03:34,310
+To help you learn all this material, here
+are
+
+64
+00:03:34,310 --> 00:03:36,960
+some strategies you should consider, when
+taking this MOOC.
+
+65
+00:03:38,030 --> 00:03:42,180
+First, watch the lectures carefully,
+perhaps multiple times.
+
+66
+00:03:42,180 --> 00:03:46,480
+And at different rates of speed, to fully
+comprehend the topics that we're covering.
+
+67
+00:03:47,750 --> 00:03:50,060
+Many topics are technically deep,
+especially
+
+68
+00:03:50,060 --> 00:03:54,360
+concurrency, interprocess communication,
+and application security.
+
+69
+00:03:54,360 --> 00:03:56,410
+Although we can't possible address all
+aspects
+
+70
+00:03:56,410 --> 00:03:59,110
+of this material in our limited time
+together.
+
+71
+00:03:59,110 --> 00:04:00,810
+You may benefit from learning more about
+
+72
+00:04:00,810 --> 00:04:04,860
+these topics, either during, or after this
+MOOC.
+
+73
+00:04:04,860 --> 00:04:09,230
+Therefore, many slides contain links to
+articles, documentation, and
+
+74
+00:04:09,230 --> 00:04:12,410
+source code that you can read as time
+permits.
+
+75
+00:04:12,410 --> 00:04:16,100
+However, no quiz questions relate to this
+material,
+
+76
+00:04:16,100 --> 00:04:17,579
+so feel free to read it at your leisure.
+
+77
+00:04:18,830 --> 00:04:22,120
+Additional tips for learning the material
+in the videos, appear at this
+
+78
+00:04:25,680 --> 00:04:26,080
+link.
+
+79
+00:04:26,080 --> 00:04:29,820
+[MUSIC].
+
+80
+00:04:29,820 --> 00:04:32,208
+Although reading the freely available
+material
+
+81
+00:04:32,208 --> 00:04:35,190
+online is helpful, more comprehensive
+information,
+
+82
+00:04:35,190 --> 00:04:39,550
+can often be found in the recommended
+reading list, that appears here.
+
+83
+00:04:39,550 --> 00:04:41,060
+On the POSA MOOC home page.
+
+84
+00:04:42,560 --> 00:04:45,280
+I encourage you to read these books, to
+gain even
+
+85
+00:04:45,280 --> 00:04:47,890
+more insights into the material we cover
+in the lectures.
+
+86
+00:04:49,000 --> 00:04:50,550
+I also urge you to seek out Coursera
+
+87
+00:04:50,550 --> 00:04:54,780
+meetup groups in your area, which are
+summarized here.
+
+88
+00:04:54,780 --> 00:04:57,210
+Where you can get together face to face
+with fellow
+
+89
+00:04:57,210 --> 00:05:00,679
+students, and further immerse yourselves
+in the topics we cover.
+
+90
+00:05:02,690 --> 00:05:06,470
+Another way to make this MOOC feel more
+like a face to face course, is to attend
+
+91
+00:05:06,470 --> 00:05:10,010
+virtual office hours, where we'll answer
+your questions, and
+
+92
+00:05:10,010 --> 00:05:15,220
+lead impromptu discussions live, via
+Google Hangout and YouTube.
+
+93
+00:05:15,220 --> 00:05:17,930
+All virtual office hours will also be
+recorded and uploaded to the
+
+94
+00:05:17,930 --> 00:05:21,900
+POSA website, so you can watch them at
+your convenience, as described here.
+
+95
+00:05:23,480 --> 00:05:26,090
+Even if you aren't able to join us live,
+we encourage
+
+96
+00:05:26,090 --> 00:05:29,760
+you to participate in the online
+discussion forums, where you can interact
+
+97
+00:05:29,760 --> 00:05:35,250
+with other students, post questions, give
+answers, clarify points of confusion,
+
+98
+00:05:35,250 --> 00:05:38,550
+and learn who else is wrestling with the
+same challenges as you.
+
+99
+00:05:40,040 --> 00:05:42,800
+We regularly monitor the forums, and we'll
+provide tips
+
+100
+00:05:42,800 --> 00:05:46,150
+and pointers, to mentor you through the
+learning process.
+
+101
+00:05:46,150 --> 00:05:48,510
+However, there are only a handful of us,
+
+102
+00:05:48,510 --> 00:05:51,350
+but tens of thousands of you, so please
+read
+
+103
+00:05:51,350 --> 00:05:53,480
+our policies on the forum postings at this
+
+104
+00:05:53,480 --> 00:05:57,910
+link, and be respectful of fellow students
+and staff.
+
+105
+00:05:57,910 --> 00:06:00,371
+[MUSIC]
+
+106
+00:06:00,371 --> 00:06:07,690
+In summary, our goal on teaching this
+MOOC, is to help as many students
+
+107
+00:06:07,690 --> 00:06:09,610
+as possible, gain access to a world
+
+108
+00:06:09,610 --> 00:06:12,229
+class education, on mobile cloud computing
+with Android.
+
+109
+00:06:13,280 --> 00:06:18,120
+However, the topics we cover are
+technically deep, and take time to master.
+
+110
+00:06:18,120 --> 00:06:21,240
+So, we encourage you to leverage multiple
+sources of learning,
+
+111
+00:06:21,240 --> 00:06:23,600
+many of which are listed in the FAQ at
+this link.
+
+112
+00:06:24,650 --> 00:06:27,660
+I strongly encourage you to read the
+entire FAQ, since it
+
+113
+00:06:27,660 --> 00:06:32,050
+provides a wealth of information to help
+you succeed in this MOOC.
+
+114
+00:06:32,050 --> 00:06:35,944
+If you're inspired to learn more about
+mobile cloud computing with Android,
+
+115
+00:06:35,944 --> 00:06:40,074
+and associated topics like patterns and
+frameworks, I recommend you check out the
+
+116
+00:06:40,074 --> 00:06:42,375
+digital learning resources available at
+this
+
+117
+00:06:42,375 --> 00:06:44,440
+link, which provide dozens more hours of
+
+118
+00:06:44,440 --> 00:06:49,006
+videos and screencasts on object oriented
+design and programming with Java and C++.
+
+119
+00:06:49,006 --> 00:06:53,380
+Patterns and frameworks for concurrent and
+network software,
+
+120
+00:06:53,380 --> 00:06:57,678
+and Android middle ware and systems
+programming mechanisms.
+
+121
+00:06:57,678 --> 00:07:05,629
+[MUSIC]
+

@@ -1,0 +1,469 @@
+1
+00:00:00,000 --> 00:00:07,108
+[MUSIC].
+
+2
+00:00:07,108 --> 00:00:11,320
+Welcome to the first part of the module on
+Java concurrency mechanisms.
+
+3
+00:00:11,320 --> 00:00:13,296
+In this part we present an overview of the
+Java
+
+4
+00:00:13,296 --> 00:00:14,856
+mechanisms available on Android to
+
+5
+00:00:14,856 --> 00:00:17,400
+implement concurrent software via
+multi-threading.
+
+6
+00:00:18,460 --> 00:00:19,680
+Android supports many standard
+
+7
+00:00:19,680 --> 00:00:22,290
+Java concurrency and synchronization
+mechanisms.
+
+8
+00:00:22,290 --> 00:00:25,140
+We covered Java threads in the first
+several parts of this module.
+
+9
+00:00:25,140 --> 00:00:26,240
+And then covered the core Java
+
+10
+00:00:26,240 --> 00:00:28,790
+synchronization mechanisms in the later
+parts.
+
+11
+00:00:28,790 --> 00:00:30,580
+If you're already familiar with Java
+threading, you
+
+12
+00:00:30,580 --> 00:00:32,760
+can skim through this video or skip it
+altogether.
+
+13
+00:00:33,840 --> 00:00:36,330
+There are several ways to understand Java
+threads.
+
+14
+00:00:36,330 --> 00:00:40,570
+First, there's a conceptual view, where
+Java threads are units of computation that
+
+15
+00:00:40,570 --> 00:00:43,340
+can run simultaneously within a process,
+which
+
+16
+00:00:43,340 --> 00:00:45,290
+is ultimately a Linux process on Android.
+
+17
+00:00:46,490 --> 00:00:47,900
+These threads can communicate with each
+
+18
+00:00:47,900 --> 00:00:49,920
+other via shared objects or message
+passing.
+
+19
+00:00:51,270 --> 00:00:53,630
+Second, there's an implementation view.
+
+20
+00:00:53,630 --> 00:00:55,200
+Where each Java thread has a stack,
+
+21
+00:00:55,200 --> 00:00:57,870
+a program counter, and other registers,
+which
+
+22
+00:00:57,870 --> 00:01:02,420
+comprise state that's unique to each
+thread, as well as heap and static areas.
+
+23
+00:01:02,420 --> 00:01:05,160
+Which comprise state that's shared by all
+threads within a process.
+
+24
+00:01:05,160 --> 00:01:11,830
+[MUSIC].
+
+25
+00:01:11,830 --> 00:01:13,730
+Now that I've given a brief overview of
+Java
+
+26
+00:01:13,730 --> 00:01:17,360
+threads, let's show how to program threads
+in Android.
+
+27
+00:01:17,360 --> 00:01:20,250
+All Java threads must be given some code
+to run.
+
+28
+00:01:20,250 --> 00:01:22,780
+Which is typically done in one of two
+ways.
+
+29
+00:01:22,780 --> 00:01:26,110
+One way is to extend the thread class and
+override its run hook method.
+
+30
+00:01:26,110 --> 00:01:27,950
+As shown in the code snippet on
+
+31
+00:01:27,950 --> 00:01:31,220
+this slide, where my thread inherits from
+thread.
+
+32
+00:01:31,220 --> 00:01:34,810
+And defines a run method that's invoked
+automatically when my thread is started.
+
+33
+00:01:36,130 --> 00:01:37,600
+Another way is to implement the runnable
+
+34
+00:01:37,600 --> 00:01:41,250
+interface and override its run hook
+method.
+
+35
+00:01:41,250 --> 00:01:44,120
+There's several ways to implement the
+runnable interface.
+
+36
+00:01:44,120 --> 00:01:48,010
+The approach shown in this slide defines a
+named runnable implementation,
+
+37
+00:01:48,010 --> 00:01:52,040
+passes it to an anonymous thread object,
+then calls its start method.
+
+38
+00:01:52,040 --> 00:01:54,670
+Which instructs the Java virtual machine
+to create the resources
+
+39
+00:01:54,670 --> 00:01:57,510
+needed to run the thread, and invokes its
+run hook method.
+
+40
+00:01:58,580 --> 00:02:02,300
+Alternatively, the approach shown on this
+slide, defines and starts
+
+41
+00:02:02,300 --> 00:02:05,530
+a thread, using an anonymous inner class
+as the runnable.
+
+42
+00:02:05,530 --> 00:02:08,959
+Which is a common idiom used throughout
+Android.
+
+43
+00:02:08,959 --> 00:02:11,450
+This link compares and contrasts these
+various approaches.
+
+44
+00:02:12,800 --> 00:02:15,070
+Regardless of how a thread is created, the
+
+45
+00:02:15,070 --> 00:02:18,360
+Java virtual machine, known as Dalvic on
+Android, creates
+
+46
+00:02:18,360 --> 00:02:21,100
+the threads, resources and invokes its run
+hook method
+
+47
+00:02:21,100 --> 00:02:23,510
+when another thread calls start on the
+thread instance.
+
+48
+00:02:24,930 --> 00:02:27,090
+That run method can execute concurrently
+with
+
+49
+00:02:27,090 --> 00:02:29,130
+respect to other computations in other
+threads.
+
+50
+00:02:30,130 --> 00:02:32,700
+It can call blocking IO operations on
+network connections and
+
+51
+00:02:32,700 --> 00:02:36,310
+files, receive messages from a looper and
+process them, et cetera.
+
+52
+00:02:37,330 --> 00:02:39,775
+You can generally run any code in a
+thread.
+
+53
+00:02:39,775 --> 00:02:42,730
+Though Android restrict GUI operations to
+the user interface thread.
+
+54
+00:02:42,730 --> 00:02:46,640
+A thread can execute as long as it's run
+hook method hasn't returned.
+
+55
+00:02:47,730 --> 00:02:50,840
+Though the Android Linux thread scheduler
+can transparently suspend and
+
+56
+00:02:50,840 --> 00:02:53,270
+resume a thread many times through out
+it's life cycle.
+
+57
+00:02:54,490 --> 00:02:57,060
+If a thread needs to run forever, it
+requires
+
+58
+00:02:57,060 --> 00:02:59,670
+some sort of infinite loop that prevents
+run from returning.
+
+59
+00:03:01,070 --> 00:03:03,290
+After the run hook method returns, the
+thread
+
+60
+00:03:03,290 --> 00:03:05,842
+is no longer active and various things can
+happen.
+
+61
+00:03:05,842 --> 00:03:10,250
+For example, another thread might have
+called the thread's join method
+
+62
+00:03:10,250 --> 00:03:14,300
+to wait for it to complete, or the thread
+could simply evaporate.
+
+63
+00:03:14,300 --> 00:03:15,990
+The Java virtual machine reclaims and
+
+64
+00:03:15,990 --> 00:03:18,710
+recycles the thread's resources once its
+complete.
+
+65
+00:03:18,710 --> 00:03:21,100
+While allowing other threads in the
+program to continue running.
+
+66
+00:03:21,100 --> 00:03:27,440
+[MUSIC]
+
+67
+00:03:27,440 --> 00:03:31,260
+the Java thread class has dozens of
+methods that are documented in this link.
+
+68
+00:03:32,310 --> 00:03:35,040
+We've covered some of the most important
+methods already.
+
+69
+00:03:35,040 --> 00:03:38,710
+For example, the start method initiates
+thread execution.
+
+70
+00:03:38,710 --> 00:03:42,950
+Join waits for a thread to finish, and run
+is a hook method that executes user code.
+
+71
+00:03:44,240 --> 00:03:46,060
+Some other methods commonly used in
+Android
+
+72
+00:03:46,060 --> 00:03:48,000
+software, and shown later in this mook,
+
+73
+00:03:48,000 --> 00:03:52,200
+include sleep, which causes a thread to
+sleep for a given period of time.
+
+74
+00:03:52,200 --> 00:03:54,510
+Interrupt, which posts an interrupt
+request to a
+
+75
+00:03:54,510 --> 00:03:58,381
+thread indicating that it should shut
+itself down voluntarily.
+
+76
+00:03:58,381 --> 00:04:01,846
+And current thread, which returns the
+thread object
+
+77
+00:04:01,846 --> 00:04:05,782
+associated with a currently executing
+thread of control.
+
+78
+00:04:05,782 --> 00:04:09,718
+[MUSIC].
+
+79
+00:04:09,718 --> 00:04:13,678
+In summary, some concurrency mechanisms
+supported by Android are based on standard
+
+80
+00:04:13,678 --> 00:04:15,493
+Java threading classes which provide a
+
+81
+00:04:15,493 --> 00:04:18,190
+programming model that's familiar to many
+developers.
+
+82
+00:04:19,800 --> 00:04:22,210
+This link points to a tutorial on the
+concurrency support
+
+83
+00:04:22,210 --> 00:04:24,989
+provided by the Java programming language
+and its class libraries.
+
+84
+00:04:26,340 --> 00:04:28,820
+Android also supports powerful concurrency
+mechanisms from the
+
+85
+00:04:28,820 --> 00:04:32,220
+Java util concurrent package documented at
+this link.
+
+86
+00:04:32,220 --> 00:04:34,840
+For example, it's thread pull, executor
+and future are
+
+87
+00:04:34,840 --> 00:04:37,256
+used in various parts of the Android
+middleware itself.
+
+88
+00:04:38,880 --> 00:04:42,450
+Writing an Android programs using Java
+threads has drawbacks however.
+
+89
+00:04:42,450 --> 00:04:44,070
+Since it's subtly different than writing
+
+90
+00:04:44,070 --> 00:04:46,287
+multi-threaded Java programs in other
+environments.
+
+91
+00:04:46,287 --> 00:04:49,101
+For example, Android doesn't allow
+background
+
+92
+00:04:49,101 --> 00:04:51,379
+Java threads to access the display, but
+
+93
+00:04:51,379 --> 00:04:53,791
+instead requires them to post runnables or
+
+94
+00:04:53,791 --> 00:04:56,597
+messages to the user interface threads
+looper.
+
+95
+00:04:56,597 --> 00:04:59,677
+In practice therefore, many Android
+applications
+
+96
+00:04:59,677 --> 00:05:02,687
+use the idiomatic concurrency frameworks
+that are
+
+97
+00:05:02,687 --> 00:05:06,841
+described in this link and covered in the
+next module in this section.
+
+98
+00:05:06,841 --> 00:05:14,749
+[MUSIC]
+

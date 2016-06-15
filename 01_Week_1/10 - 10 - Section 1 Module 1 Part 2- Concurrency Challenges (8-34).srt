@@ -1,0 +1,736 @@
+1
+00:00:00,000 --> 00:00:05,020
+[MUSIC]
+
+2
+00:00:05,020 --> 00:00:05,700
+Welcome
+
+3
+00:00:08,570 --> 00:00:13,140
+to the second part of the module on
+concurrency, motivations, and challenges.
+
+4
+00:00:13,140 --> 00:00:16,660
+In this part, we explore key challenges
+that you need to understand, to
+
+5
+00:00:16,660 --> 00:00:18,970
+cut the Gordian Knot of complexity,
+related
+
+6
+00:00:18,970 --> 00:00:21,379
+to developing concurrent software for
+mobile devices.
+
+7
+00:00:23,000 --> 00:00:24,180
+Some of these challenges are called
+
+8
+00:00:24,180 --> 00:00:27,200
+accidental complexities, which arise from
+limitations
+
+9
+00:00:27,200 --> 00:00:31,330
+with the tools, techniques and methods we
+commonly use to build software.
+
+10
+00:00:31,330 --> 00:00:34,510
+For example, concurrent programs are often
+written using low
+
+11
+00:00:34,510 --> 00:00:38,390
+level application programming interfaces,
+written in languages like C.
+
+12
+00:00:38,390 --> 00:00:40,150
+And debug, using tools that aren't well
+
+13
+00:00:40,150 --> 00:00:42,850
+equipped to detect common hazards of
+concurrent programming.
+
+14
+00:00:44,060 --> 00:00:46,200
+All too frequently, these problems are
+self
+
+15
+00:00:46,200 --> 00:00:48,370
+inflicted, because we don't always have to
+
+16
+00:00:48,370 --> 00:00:50,520
+use these tools, techniques, and methods,
+it's
+
+17
+00:00:50,520 --> 00:00:53,170
+often just conventional wisdom, or common
+practise.
+
+18
+00:00:54,410 --> 00:00:56,920
+Other challenges are called inherent
+complexities.
+
+19
+00:00:56,920 --> 00:00:59,140
+Which arrives from fundamental problems in
+the domain
+
+20
+00:00:59,140 --> 00:01:03,062
+of concurrent software, such as deadlock,
+scheduling, and synchronization.
+
+21
+00:01:03,062 --> 00:01:04,082
+[MUSIC]
+
+22
+00:01:04,082 --> 00:01:08,000
+These inherent complexities constitute the
+rocket science of the domain of
+
+23
+00:01:08,000 --> 00:01:11,590
+concurrent programming, and require deep
+thinking and analysis to get right.
+
+24
+00:01:18,810 --> 00:01:20,640
+A common accidental complexity is the
+
+25
+00:01:20,640 --> 00:01:23,720
+use of low-level Application Programming
+Interfaces, or
+
+26
+00:01:23,720 --> 00:01:27,870
+APIs, which are tedious, error-prone, and
+non-portable
+
+27
+00:01:27,870 --> 00:01:30,500
+when used to develop a concurrent
+software.
+
+28
+00:01:30,500 --> 00:01:33,320
+For example, consider the pthread's
+concurrency API.
+
+29
+00:01:33,320 --> 00:01:35,920
+It's available in Unix, including the
+versions of
+
+30
+00:01:35,920 --> 00:01:38,650
+Linux using Android, as shown at this path
+name.
+
+31
+00:01:39,730 --> 00:01:41,840
+A number of accidental complexities are
+associated with
+
+32
+00:01:41,840 --> 00:01:45,020
+using the pthread API to write concurrent
+software.
+
+33
+00:01:45,020 --> 00:01:48,690
+First, it uses low-level and error-prone
+data types, such as
+
+34
+00:01:48,690 --> 00:01:51,798
+pointer dysfunctions that are passed when
+a pthread is created.
+
+35
+00:01:51,798 --> 00:01:54,800
+Likewise, type caster needed to pass a
+data structure
+
+36
+00:01:54,800 --> 00:01:57,030
+as a void pointer when a thread is
+created.
+
+37
+00:01:57,030 --> 00:02:00,125
+As well as the cast the void pointer back
+to whatever structures you
+
+38
+00:02:00,125 --> 00:02:05,317
+use, to pass data between he caller and
+the callee in the pthreads environment.
+
+39
+00:02:05,317 --> 00:02:08,287
+Casts disable compiler type checking,
+which allows
+
+40
+00:02:08,287 --> 00:02:10,800
+subtle layers to creep into your software.
+
+41
+00:02:12,030 --> 00:02:14,506
+Another problem is use of quasi type
+thread
+
+42
+00:02:14,506 --> 00:02:18,070
+handles, which are error-prone, since
+compilers can't provide
+
+43
+00:02:18,070 --> 00:02:20,570
+effective type checking, if the wrong type
+of
+
+44
+00:02:20,570 --> 00:02:23,534
+handle is accidentally passed to a pthread
+function.
+
+45
+00:02:24,700 --> 00:02:29,530
+Finally, since we're programming to the
+pthreads API explicitly, this code
+
+46
+00:02:29,530 --> 00:02:34,260
+won't be portable to non-POSIX platforms,
+such as Windows or VxWorks.
+
+47
+00:02:34,260 --> 00:02:37,380
+Lest that you think that we're unfairly
+
+48
+00:02:37,380 --> 00:02:40,230
+picking on pthreads, most operating
+systems today
+
+49
+00:02:40,230 --> 00:02:42,506
+have these kinds of problems, when
+low-level
+
+50
+00:02:42,506 --> 00:02:44,319
+C APIs are used to write concurrent
+programs.
+
+51
+00:02:45,710 --> 00:02:48,885
+Some other accidental complexities
+associated with concurrency, stem from
+
+52
+00:02:48,885 --> 00:02:51,900
+limitations with our debugging
+environments, and our debugging tools.
+
+53
+00:02:52,950 --> 00:02:57,260
+A well written and properly functioning
+concurrent program, is a thing of beauty.
+
+54
+00:02:57,260 --> 00:02:59,520
+But what happens when something goes
+wrong?
+
+55
+00:02:59,520 --> 00:03:02,450
+What tools enable you to drill down, and
+look inside of your
+
+56
+00:03:02,450 --> 00:03:04,050
+software to figure out what's happening,
+
+57
+00:03:04,050 --> 00:03:06,799
+and then take the appropriate remedial
+action?
+
+58
+00:03:08,300 --> 00:03:09,630
+There are a number of challenges here.
+
+59
+00:03:10,750 --> 00:03:13,090
+One problem, is that the behavior you see
+in the
+
+60
+00:03:13,090 --> 00:03:18,670
+debugger, doesn't necessarily reflect the
+actual behavior of the deployed software.
+
+61
+00:03:18,670 --> 00:03:21,830
+Which is often called a Heisenbug, since
+the act of observing
+
+62
+00:03:21,830 --> 00:03:25,760
+a system inevitably alters its state, as
+described with this link.
+
+63
+00:03:26,790 --> 00:03:28,990
+For example, you may use a debugger
+
+64
+00:03:28,990 --> 00:03:31,310
+to single-step through some code in one
+thread.
+
+65
+00:03:31,310 --> 00:03:35,510
+While other threads are running, but the
+execution sequence, and the execution
+
+66
+00:03:35,510 --> 00:03:39,480
+times, may differ if the program was
+running outside of the debug.
+
+67
+00:03:40,860 --> 00:03:45,330
+This divergence makes certain types of
+scheduling hazards and timing problems.
+
+68
+00:03:45,330 --> 00:03:47,670
+Hard to identify and hard to rectify.
+
+69
+00:03:48,690 --> 00:03:51,440
+This link describes some multithreading
+debugging techniques,
+
+70
+00:03:51,440 --> 00:03:53,260
+that may be helpful in addressing these
+problems.
+
+71
+00:03:54,590 --> 00:03:56,810
+Another problem, stems from race
+conditions that
+
+72
+00:03:56,810 --> 00:04:00,380
+occur, when multiple threads
+simultaneously crash into
+
+73
+00:04:00,380 --> 00:04:03,230
+unprotected data structures and corrupt
+them, which
+
+74
+00:04:03,230 --> 00:04:05,700
+yields defects that are often hard to
+detect.
+
+75
+00:04:05,700 --> 00:04:07,280
+Until your program is deployed in its
+
+76
+00:04:07,280 --> 00:04:09,764
+target environment, as described at this
+link.
+
+77
+00:04:11,210 --> 00:04:13,700
+Many debuggers have poor support for
+detecting
+
+78
+00:04:13,700 --> 00:04:17,270
+race conditions, during the development of
+concurrent software.
+
+79
+00:04:17,270 --> 00:04:20,030
+To handle these types of problems, you
+need advanced
+
+80
+00:04:20,030 --> 00:04:23,140
+methods and tools, such as static or
+dynamic analysis.
+
+81
+00:04:24,450 --> 00:04:26,750
+These links describe some relevent
+technologies and
+
+82
+00:04:26,750 --> 00:04:29,010
+tools, some of which are targeted at
+Android.
+
+83
+00:04:29,010 --> 00:04:32,786
+[MUSIC]
+
+84
+00:04:32,786 --> 00:04:36,328
+[BLANK_AUDIO]
+
+85
+00:04:36,328 --> 00:04:41,540
+Some common inherent complexities of
+concurrent
+
+86
+00:04:41,540 --> 00:04:44,480
+software relate to synchronization and
+scheduling,
+
+87
+00:04:44,480 --> 00:04:47,259
+which deal with the order and/or time in
+which operations are performed.
+
+88
+00:04:48,320 --> 00:04:50,320
+Synchronization ensures that multiple
+concurrent
+
+89
+00:04:50,320 --> 00:04:52,430
+threads, don't execute critical sections
+of
+
+90
+00:04:52,430 --> 00:04:55,620
+a program at the same time, and thus
+corrupt shared resources.
+
+91
+00:04:56,700 --> 00:04:59,240
+Synchronization also occurs in our daily
+lives.
+
+92
+00:04:59,240 --> 00:05:03,370
+For example, air traffic controllers must
+synchronize access to a runway, which
+
+93
+00:05:03,370 --> 00:05:08,110
+is a shared resource, to ensure airplanes
+don't collide on takeoff or landing.
+
+94
+00:05:08,110 --> 00:05:10,488
+Likewise, Android needs to synchronize
+access
+
+95
+00:05:10,488 --> 00:05:12,634
+to the SQLite Contacts Database, to ensure
+
+96
+00:05:12,634 --> 00:05:14,954
+that applications running concurrently on
+the
+
+97
+00:05:14,954 --> 00:05:17,550
+device, don't corrupt the raw contact
+entries.
+
+98
+00:05:18,670 --> 00:05:20,780
+This link contains more information on
+synchronization.
+
+99
+00:05:22,190 --> 00:05:24,240
+Scheduling insures that threads processes,
+or data
+
+100
+00:05:24,240 --> 00:05:27,690
+flows are given proper access to system
+resources.
+
+101
+00:05:27,690 --> 00:05:30,790
+For example, air traffic controllers need
+to schedule the
+
+102
+00:05:30,790 --> 00:05:34,280
+arrival and departure of airplanes, based
+on limited resources.
+
+103
+00:05:34,280 --> 00:05:38,240
+Such as gates and runways, likewise,
+Android
+
+104
+00:05:38,240 --> 00:05:40,560
+scheduler must ensure that an emergency
+call
+
+105
+00:05:40,560 --> 00:05:44,700
+isn't missed, just because the user is
+playing the Angry Birds game on the phone.
+
+106
+00:05:46,380 --> 00:05:48,880
+Getting all this right is hard, since
+there're many
+
+107
+00:05:48,880 --> 00:05:51,750
+states to manage in concurrent programs,
+and it's hard to
+
+108
+00:05:51,750 --> 00:05:53,960
+keep track of them all to insure that the
+software
+
+109
+00:05:53,960 --> 00:05:58,540
+does the right thing, under both expected
+and unexpected conditions.
+
+110
+00:05:59,760 --> 00:06:01,659
+This link contains more information on
+scheduling.
+
+111
+00:06:02,770 --> 00:06:05,270
+Another inherent complexity is deadlock,
+which
+
+112
+00:06:05,270 --> 00:06:07,290
+occurs when two or more competing actions
+
+113
+00:06:07,290 --> 00:06:11,010
+are each waiting for the other to finish,
+and thus, none ever do.
+
+114
+00:06:12,410 --> 00:06:16,880
+The diagram on this slide shows a deadlock
+where thread T1 owns lock
+
+115
+00:06:16,880 --> 00:06:22,350
+L1, and needs to acquire lock L2, while
+thread T2 owns lock L2.
+
+116
+00:06:22,350 --> 00:06:25,080
+It needs to acquire lock L1.
+
+117
+00:06:25,080 --> 00:06:29,750
+This circular wait or deadly embrace,
+blocks the threads indefinitely.
+
+118
+00:06:29,750 --> 00:06:32,950
+Identifying, detecting and removing
+deadlocks is an
+
+119
+00:06:32,950 --> 00:06:36,160
+inherent complexity of developed in
+current software.
+
+120
+00:06:36,160 --> 00:06:39,460
+For example, you wouldn't want the Android
+Gmail application to
+
+121
+00:06:39,460 --> 00:06:44,090
+deadlock on resources held by the Calendar
+application and vice versa.
+
+122
+00:06:44,090 --> 00:06:46,000
+This link provides more information on
+deadlock.
+
+123
+00:06:46,000 --> 00:06:49,823
+[MUSIC]
+
+124
+00:06:49,823 --> 00:06:54,920
+In summary, several types of complexity
+can make
+
+125
+00:06:54,920 --> 00:06:57,870
+it hard to develop and assure concurrent
+software.
+
+126
+00:06:57,870 --> 00:07:00,900
+As covered in the POSA2 book, and more
+generally in
+
+127
+00:07:00,900 --> 00:07:04,124
+the classic, No Silver Bullet paper,
+described at this link.
+
+128
+00:07:05,580 --> 00:07:09,250
+Accidental complexities arise from
+self-inflicted wounds, such as
+
+129
+00:07:09,250 --> 00:07:13,490
+limitations with low-level application
+programming interfaces written in C.
+
+130
+00:07:13,490 --> 00:07:15,210
+If you follow this link, you'll learn
+
+131
+00:07:15,210 --> 00:07:18,700
+more about accidental complexities and
+developing concurrent software.
+
+132
+00:07:18,700 --> 00:07:19,860
+As well as some tips on how
+
+133
+00:07:19,860 --> 00:07:22,009
+patterns and frameworks help to alleviate
+these complexities.
+
+134
+00:07:23,390 --> 00:07:26,910
+Inherent complexities arise from
+fundamental challenges in particular
+
+135
+00:07:26,910 --> 00:07:30,370
+domains, such as the domain of concurrent
+software.
+
+136
+00:07:30,370 --> 00:07:33,310
+Solving these hard problems, involves deep
+thinking, and
+
+137
+00:07:33,310 --> 00:07:36,669
+may require applying sophisticated
+analysis methods and tools.
+
+138
+00:07:38,090 --> 00:07:40,090
+The book at this link describes many
+algorithms
+
+139
+00:07:40,090 --> 00:07:43,520
+and mechanisms, for addressing inherent
+complexities of concurrent software.
+
+140
+00:07:44,740 --> 00:07:47,270
+As concurrent software becomes more
+pervasive in mobile cloud
+
+141
+00:07:47,270 --> 00:07:51,136
+computing systems, and, as users
+increasingly rely on mobile devices.
+
+142
+00:07:51,136 --> 00:07:54,436
+For mission-critical and
+lifestyle-critical tasks, such as
+
+143
+00:07:54,436 --> 00:07:58,876
+security, e-commerce, geo-positioning, and
+transportation, it's essential
+
+144
+00:07:58,876 --> 00:08:04,150
+to understand the challenges described in
+this part of the module, and resolve them.
+
+145
+00:08:04,150 --> 00:08:07,250
+So you'd be better positioned to slay the
+dragons of complexity.
+
+146
+00:08:08,910 --> 00:08:10,590
+A key part of the solution, that
+
+147
+00:08:10,590 --> 00:08:13,090
+we'll explore throughout the rest of this
+section.
+
+148
+00:08:13,090 --> 00:08:16,370
+Is how Android codifies time-proven
+experience, in
+
+149
+00:08:16,370 --> 00:08:18,670
+the form of reasonable patterns and
+frameworks,
+
+150
+00:08:18,670 --> 00:08:21,140
+that help overcome key inherent and
+accidental
+
+151
+00:08:21,140 --> 00:08:24,420
+complexities of developing concurrent
+software for mobile devices.
+
+152
+00:08:24,420 --> 00:08:34,420
+[MUSIC]
+

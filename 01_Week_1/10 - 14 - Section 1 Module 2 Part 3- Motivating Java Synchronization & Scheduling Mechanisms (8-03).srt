@@ -1,0 +1,636 @@
+1
+00:00:00,000 --> 00:00:08,530
+[MUSIC].
+
+2
+00:00:08,530 --> 00:00:12,410
+Welcome to, the next part of the module on
+Android concurrency.
+
+3
+00:00:12,410 --> 00:00:14,530
+Now that we've described the structure and
+functionality
+
+4
+00:00:14,530 --> 00:00:17,870
+of Java threads, we'll motivate the need
+for Java's
+
+5
+00:00:17,870 --> 00:00:21,390
+synchronization and scheduling mechanisms
+to protect against data corruption,
+
+6
+00:00:21,390 --> 00:00:24,190
+due to race conditions, which arise when
+an app.
+
+7
+00:00:24,190 --> 00:00:26,640
+Location depends on the sequence or timing
+of
+
+8
+00:00:26,640 --> 00:00:29,740
+the processes or threads for it to operate
+properly.
+
+9
+00:00:29,740 --> 00:00:32,980
+As described in this link, and ensure
+threads execute in
+
+10
+00:00:32,980 --> 00:00:34,430
+the right order, to meet
+
+11
+00:00:34,430 --> 00:00:36,620
+their synchronization and scheduling
+requirements.
+
+12
+00:00:37,830 --> 00:00:40,600
+To make the discussion concrete, we'll
+motivate the need
+
+13
+00:00:40,600 --> 00:00:43,270
+for these mechanisms in the context of two
+examples.
+
+14
+00:00:44,330 --> 00:00:47,560
+The first example, is a program with two
+Java threads.
+
+15
+00:00:47,560 --> 00:00:50,670
+That attempt to communicate, by passing
+messages via a shared queue.
+
+16
+00:00:50,670 --> 00:00:55,290
+The second example is a program with 2
+Java threads, that
+
+17
+00:00:55,290 --> 00:00:58,670
+attempt to alternate printing ping and
+pong on the computer console.
+
+18
+00:01:00,610 --> 00:01:02,560
+Even if you have a lot of experience
+developing
+
+19
+00:01:02,560 --> 00:01:06,020
+concurrent software, you might want to
+skim through this video.
+
+20
+00:01:06,020 --> 00:01:08,020
+Since we'll revisit these examples
+throughout the rest of
+
+21
+00:01:08,020 --> 00:01:12,130
+this module, to illustrate key Java
+synchronization and scheduling mechanisms.
+
+22
+00:01:12,130 --> 00:01:19,050
+[MUSIC].
+
+23
+00:01:19,050 --> 00:01:23,080
+Our first example is a simple concurrent
+producer consumer program.
+
+24
+00:01:23,080 --> 00:01:26,410
+It attempts to pass messages via an object
+whose interface is
+
+25
+00:01:26,410 --> 00:01:31,460
+modeled loosely, on the Java util
+concurrent array blocking queue class.
+
+26
+00:01:31,460 --> 00:01:34,100
+Described in this link, whose put and take
+
+27
+00:01:34,100 --> 00:01:37,750
+methods, NQ, and DQ, elements in a
+synchronized manner.
+
+28
+00:01:39,600 --> 00:01:43,360
+This UML sequence diagram, shows the
+design of the program,
+
+29
+00:01:43,360 --> 00:01:46,620
+which has a main entry point method that
+creates an instance
+
+30
+00:01:46,620 --> 00:01:50,930
+of buggy queue, and then creates and
+starts producer and consumer
+
+31
+00:01:50,930 --> 00:01:56,020
+threads, whose run methods called Buggy
+Queues Put and Take methods.
+
+32
+00:01:56,020 --> 00:01:59,360
+To pass messages concurrently from the
+producer to the consumer.
+
+33
+00:02:00,970 --> 00:02:04,550
+To showcase a common synchronization
+problem, we'll examine the
+
+34
+00:02:04,550 --> 00:02:07,630
+buggy queue implementation, which is
+available at this link.
+
+35
+00:02:09,260 --> 00:02:12,280
+The elements in the queue are stored in a
+resizable Java
+
+36
+00:02:12,280 --> 00:02:16,380
+array list, described at this link, that's
+instantiated with a string.
+
+37
+00:02:18,140 --> 00:02:21,840
+Buggy ques, put and take methods, and and
+remove strings from
+
+38
+00:02:21,840 --> 00:02:25,060
+the tale and the head of the underlying MQ
+list respectively.
+
+39
+00:02:26,850 --> 00:02:31,620
+The main entry point method of this
+program, creates and starts two threads.
+
+40
+00:02:31,620 --> 00:02:34,970
+Whose run hook methods, called
+BuggyQueue's, put and
+
+41
+00:02:34,970 --> 00:02:38,730
+take methods, to produce and consume
+string messages concurrently.
+
+42
+00:02:40,210 --> 00:02:43,370
+So far the implementation seems straight
+forward.
+
+43
+00:02:43,370 --> 00:02:47,520
+However, the important question is what
+output will this code produce?
+
+44
+00:02:49,110 --> 00:02:51,240
+Depending on various factors, such as
+
+45
+00:02:51,240 --> 00:02:54,310
+the underlying hardware and software
+infrastructure.
+
+46
+00:02:54,310 --> 00:02:57,400
+The answer most likely will be scrambled
+output, or
+
+47
+00:02:57,400 --> 00:02:59,860
+an index out of bounds exception due to
+race conditions.
+
+48
+00:03:01,480 --> 00:03:03,520
+The problem with BuggyQueue, is that
+
+49
+00:03:03,520 --> 00:03:06,560
+it's implementation doesn't prevent
+critical sections
+
+50
+00:03:06,560 --> 00:03:10,410
+in the put and take methods from being run
+by multiple threads concurrently.
+
+51
+00:03:12,240 --> 00:03:14,230
+The array list documentation at this link
+
+52
+00:03:14,230 --> 00:03:18,080
+clearly states, that its implementation is
+not synchronized.
+
+53
+00:03:18,080 --> 00:03:21,300
+Therefore, if multiple threads access an
+array list instance
+
+54
+00:03:21,300 --> 00:03:24,200
+concurrently, and at least one of the
+threads calls Remove
+
+55
+00:03:24,200 --> 00:03:27,010
+as we do on this example, it must be
+synchronized
+
+56
+00:03:27,010 --> 00:03:30,040
+externally or the list can be corrupted by
+concurrent access.
+
+57
+00:03:31,110 --> 00:03:33,140
+These types of race conditions are harder
+to detect
+
+58
+00:03:33,140 --> 00:03:36,500
+and debug, do to the inherent complexities
+of concurrency.
+
+59
+00:03:36,500 --> 00:03:37,960
+Discussed in this earlier video.
+
+60
+00:03:38,980 --> 00:03:42,110
+For example, the behavior of this program
+will vary
+
+61
+00:03:42,110 --> 00:03:44,990
+depending on factors like the number of
+cores, or properties
+
+62
+00:03:44,990 --> 00:03:48,220
+that the underlying operating system
+scheduler, which makes development
+
+63
+00:03:48,220 --> 00:03:51,590
+and quality assurance processes tedious,
+error prone, and non portable.
+
+64
+00:03:53,060 --> 00:03:55,310
+We'll fix these problems, by applying
+various Java
+
+65
+00:03:55,310 --> 00:03:58,520
+synchronization and scheduling mechanisms,
+covered later in this module.
+
+66
+00:03:58,520 --> 00:04:02,790
+[MUSIC].
+
+67
+00:04:02,790 --> 00:04:05,910
+[MUSIC].
+
+68
+00:04:05,910 --> 00:04:10,430
+Our second example, shows how two Java
+threads can be created and used
+
+69
+00:04:10,430 --> 00:04:14,140
+in an attempt to alternate printing ping,
+and pong, on the computer console.
+
+70
+00:04:15,430 --> 00:04:17,660
+We use a Java console application, to
+avoid
+
+71
+00:04:17,660 --> 00:04:20,730
+dealing with some Android multi threading
+design restrictions.
+
+72
+00:04:20,730 --> 00:04:23,530
+Described at this link, until after we've
+discussed
+
+73
+00:04:23,530 --> 00:04:26,180
+its user interface threading model later
+in this section.
+
+74
+00:04:28,010 --> 00:04:30,490
+This slide shows a UML sequence diagram,
+
+75
+00:04:30,490 --> 00:04:32,910
+that depicts the design of our example
+program.
+
+76
+00:04:34,780 --> 00:04:40,100
+The main, thread invokes the main, entry
+point method of the ping-pong wrong class.
+
+77
+00:04:40,100 --> 00:04:43,510
+Which creates and starts two other Java
+threads, whose
+
+78
+00:04:43,510 --> 00:04:46,970
+run hook methods implement, the ping pong
+algorithm concurrently.
+
+79
+00:04:48,540 --> 00:04:50,650
+This link contains the code, we're about
+to examine.
+
+80
+00:04:52,440 --> 00:04:54,620
+The entire example is implemented within
+
+81
+00:04:54,620 --> 00:04:57,650
+the PingPongWrong class, which contains a
+static
+
+82
+00:04:57,650 --> 00:05:01,940
+data member that stores the number of
+times each thread prints ping and pong.
+
+83
+00:05:03,010 --> 00:05:07,520
+It also contains a static nested class,
+called play ping-pong thread
+
+84
+00:05:07,520 --> 00:05:12,346
+that extends the Java thread class and
+runs the ping-pong logic concurrently.
+
+85
+00:05:12,346 --> 00:05:15,280
+The play ping-pong thread constructor
+stores a stream
+
+86
+00:05:15,280 --> 00:05:17,348
+to print for each ping and pong operation.
+
+87
+00:05:17,348 --> 00:05:20,800
+The play ping-pong thread run hook method.
+
+88
+00:05:20,800 --> 00:05:25,100
+Contains a loop, that performs the ping
+pong algorithm, which iterates for
+
+89
+00:05:25,100 --> 00:05:28,460
+the designated number of times and prints
+some information to the console.
+
+90
+00:05:30,250 --> 00:05:31,570
+Note the lack of proper synchronization,
+
+91
+00:05:31,570 --> 00:05:34,690
+which we'll discuss shortly and remedy
+later.
+
+92
+00:05:35,770 --> 00:05:40,180
+When the loop is done, the method and thus
+the thread exits.
+
+93
+00:05:40,180 --> 00:05:42,779
+Here's the main entry point method of the
+PingPongWrong class.
+
+94
+00:05:43,890 --> 00:05:45,290
+This method executes in the main
+
+95
+00:05:45,290 --> 00:05:49,620
+thread, and creates two PlayPingPongThread
+objects, passing
+
+96
+00:05:49,620 --> 00:05:53,080
+in parameters that will indicate whether
+to print a Ping, or a Pong, string.
+
+97
+00:05:54,340 --> 00:05:57,130
+It then starts both threads, which
+triggers the
+
+98
+00:05:57,130 --> 00:05:59,554
+Java virtual machine to invoke their run
+hook methods.
+
+99
+00:05:59,554 --> 00:06:03,870
+To execute the ping-pong element
+concurrently.
+
+100
+00:06:03,870 --> 00:06:07,720
+Next, it calls the threads join methods,
+and waits for both of
+
+101
+00:06:07,720 --> 00:06:11,360
+them to exit before wrapping up and
+returning from the main thread.
+
+102
+00:06:13,640 --> 00:06:15,700
+This second example showed how to create,
+
+103
+00:06:15,700 --> 00:06:18,360
+start, run, and join multiple Java
+threads.
+
+104
+00:06:19,370 --> 00:06:21,590
+Although these methods are used properly.
+
+105
+00:06:21,590 --> 00:06:24,800
+The results are incorrect, since there's
+no synchronization,
+
+106
+00:06:24,800 --> 00:06:28,410
+to ensure the threads alternate their
+output as intended.
+
+107
+00:06:28,410 --> 00:06:32,130
+In particular, the ping thread prints of
+its output, and then
+
+108
+00:06:32,130 --> 00:06:35,000
+exits, before the pong thread even has a
+chance to thread.
+
+109
+00:06:36,750 --> 00:06:38,160
+We'll fix this problem later in this
+
+110
+00:06:38,160 --> 00:06:42,430
+module, after we cover Java semaphores and
+CountDownLatches.
+
+111
+00:06:42,430 --> 00:06:43,820
+So that the ping and pong threads
+
+112
+00:06:43,820 --> 00:06:45,920
+will alternate, putting their output to
+the console.
+
+113
+00:06:45,920 --> 00:06:47,330
+As shown on this slide.
+
+114
+00:06:47,330 --> 00:06:51,189
+[MUSIC].
+
+115
+00:06:51,189 --> 00:06:55,089
+In summary, synchronization and scheduling
+mechanisms are
+
+116
+00:06:55,089 --> 00:06:58,614
+important for multi-threaded Java
+programs, such as
+
+117
+00:06:58,614 --> 00:07:01,314
+our buggy producer and consumer, and ping
+
+118
+00:07:01,314 --> 00:07:04,390
+pong program examples described in this
+video.
+
+119
+00:07:05,820 --> 00:07:09,470
+The buggy producer consumer program,
+showed how race conditions can occur if.
+
+120
+00:07:09,470 --> 00:07:13,540
+Critical sections, are properly protected
+via synchronization mechanisms.
+
+121
+00:07:14,690 --> 00:07:18,810
+Once we fix these problems, we'll see that
+there also scheduling issues to resolve.
+
+122
+00:07:19,870 --> 00:07:23,610
+Likewise, the buggy ping pong program,
+show how results may
+
+123
+00:07:23,610 --> 00:07:27,100
+be incorrect, if threads don't execute in
+the right order.
+
+124
+00:07:28,640 --> 00:07:31,740
+Our examples also have other design
+limitations.
+
+125
+00:07:31,740 --> 00:07:34,660
+For example, they're hard coated and thus
+hand
+
+126
+00:07:34,660 --> 00:07:37,900
+cuffed to work only and Java console
+applications.
+
+127
+00:07:37,900 --> 00:07:40,590
+And can't be run without modifications in
+Android, where
+
+128
+00:07:40,590 --> 00:07:43,060
+only the user interface threat can print
+to display.
+
+129
+00:07:44,420 --> 00:07:47,220
+Our revised solutions covered throughout
+this module, will
+
+130
+00:07:47,220 --> 00:07:50,420
+therefore apply various gang of four and
+posso patterns.
+
+131
+00:07:50,420 --> 00:07:59,635
+To make these multi-threaded programs,
+more portable, reuseable, and extensible.
+
+132
+00:07:59,635 --> 00:08:03,549
+[MUSIC]
+

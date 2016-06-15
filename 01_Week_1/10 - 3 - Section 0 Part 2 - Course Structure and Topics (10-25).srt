@@ -1,0 +1,900 @@
+1
+00:00:00,000 --> 00:00:08,267
+[MUSIC].
+
+2
+00:00:08,267 --> 00:00:11,068
+Welcome to the next part of the
+introduction section.
+
+3
+00:00:11,068 --> 00:00:16,465
+We will explain the organization of and
+topics presented in this MOOC.
+
+4
+00:00:16,465 --> 00:00:18,530
+This part summarizes the structure of the
+
+5
+00:00:18,530 --> 00:00:21,185
+course, describes what assignments we'll
+have and
+
+6
+00:00:21,185 --> 00:00:23,368
+how they'll be accessed, and outlines the
+
+7
+00:00:23,368 --> 00:00:25,780
+main topics, covered in the course
+sections.
+
+8
+00:00:27,320 --> 00:00:30,740
+Once we're done with this brief
+introduction section, the remainder of
+
+9
+00:00:30,740 --> 00:00:34,780
+the course is organized into three
+sections, which focus on Android
+
+10
+00:00:34,780 --> 00:00:37,850
+concurrency mechanisms and frameworks,
+Android
+
+11
+00:00:37,850 --> 00:00:40,610
+services, interprocess communication
+mechanisms, and application
+
+12
+00:00:40,610 --> 00:00:42,860
+security, and software patterns for
+
+13
+00:00:42,860 --> 00:00:45,680
+concurrency and inter and intraprocess
+communication.
+
+14
+00:00:46,950 --> 00:00:49,940
+Each section is composed of modules, which
+focused on a group
+
+15
+00:00:49,940 --> 00:00:51,900
+of related topics, such as Android
+
+16
+00:00:51,900 --> 00:00:54,610
+concurrency frameworks, or interprocess
+communication patterns.
+
+17
+00:00:55,730 --> 00:00:58,720
+Each module is composed of multiple parts,
+which cover a
+
+18
+00:00:58,720 --> 00:01:04,340
+particular topic, such as Java semaphores,
+or the Android AsyncTask framework.
+
+19
+00:01:04,340 --> 00:01:09,700
+Each part is presented as a single video,
+roughly five to 15 minutes in length.
+
+20
+00:01:09,700 --> 00:01:14,130
+Each part is composed of segments, which
+are short one to three minute video clips.
+
+21
+00:01:14,130 --> 00:01:18,140
+The focus on one aspect of a topic, such
+as starting or stopping java threads.
+
+22
+00:01:19,180 --> 00:01:22,230
+An in video quiz will periodically pop up,
+so you
+
+23
+00:01:22,230 --> 00:01:24,630
+can check if you've mastered the material
+covered in the video.
+
+24
+00:01:25,720 --> 00:01:27,726
+If you download the videos and watch them
+
+25
+00:01:27,726 --> 00:01:31,030
+locally on your computer however, these
+quizzes won't appear,
+
+26
+00:01:31,030 --> 00:01:32,918
+but some of the questions may show up on
+
+27
+00:01:32,918 --> 00:01:36,226
+the weekly stand alone quizzes, which
+we'll discuss shortly.
+
+28
+00:01:36,226 --> 00:01:38,642
+[BLANK_AUDIO]
+
+29
+00:01:38,642 --> 00:01:41,529
+[MUSIC].
+
+30
+00:01:41,529 --> 00:01:43,713
+[BLANK_AUDIO].
+
+31
+00:01:43,713 --> 00:01:45,253
+There will be roughly a half dozen
+
+32
+00:01:45,253 --> 00:01:49,150
+programming assignments, all written in
+Java, using Eclipse.
+
+33
+00:01:49,150 --> 00:01:53,390
+Though you can use other environments as
+long as you can support them yourself,
+
+34
+00:01:53,390 --> 00:01:55,320
+or with help from other students on
+
+35
+00:01:55,320 --> 00:01:58,039
+the discussion forums, as described in the
+FAQ.
+
+36
+00:01:59,710 --> 00:02:02,740
+All Java and Android source code for
+assignments and
+
+37
+00:02:02,740 --> 00:02:07,560
+examples can be downloaded from my GitHub
+repository, available here.
+
+38
+00:02:09,270 --> 00:02:11,930
+The programming assignments will provide
+you with a range of
+
+39
+00:02:11,930 --> 00:02:16,170
+experience developing Android
+applications, services,
+
+40
+00:02:16,170 --> 00:02:17,970
+and frameworks as discussed here.
+
+41
+00:02:19,210 --> 00:02:21,010
+The first several assignments will give
+
+42
+00:02:21,010 --> 00:02:25,010
+you experience applying and developing
+concurrency mechanisms.
+
+43
+00:02:25,010 --> 00:02:28,540
+For example, you'll implement simple
+Atomic Long
+
+44
+00:02:28,540 --> 00:02:32,450
+and Semaphore classes using Javaa
+ReentrantReadWriteLock, randrant
+
+45
+00:02:32,450 --> 00:02:34,690
+locks and condition objects and then test
+
+46
+00:02:34,690 --> 00:02:36,590
+them in the Java console environment and
+Eclipse.
+
+47
+00:02:37,660 --> 00:02:40,030
+In the next several assignments, you'll
+implement part
+
+48
+00:02:40,030 --> 00:02:43,280
+of a multithreaded ping-pong application
+that applies gang of
+
+49
+00:02:43,280 --> 00:02:46,270
+four patterns to develop a framework that
+simplifies porting
+
+50
+00:02:46,270 --> 00:02:49,800
+the application between Android and
+console configurations and Eclipse.
+
+51
+00:02:50,950 --> 00:02:54,250
+The final assignment, is an integrative
+project that will give
+
+52
+00:02:54,250 --> 00:02:56,280
+you experience applying pattern oriented
+
+53
+00:02:56,280 --> 00:02:58,720
+concurrency mechanisms and Android
+concurrency
+
+54
+00:02:58,720 --> 00:03:03,050
+and communication frameworks and security
+mechanisms to the iRemember application,
+
+55
+00:03:03,050 --> 00:03:06,490
+introduced in Professor Porter's MOOC as
+described at this link.
+
+56
+00:03:07,990 --> 00:03:10,360
+Quizzes will be entirely auto graded.
+
+57
+00:03:10,360 --> 00:03:13,110
+And programming assignments will be
+assessed by a combination
+
+58
+00:03:13,110 --> 00:03:16,590
+of auto-grading, and peer grading, as
+discussed in the FAQ.
+
+59
+00:03:17,820 --> 00:03:20,150
+If you're taking his MOOC to get a
+statement
+
+60
+00:03:20,150 --> 00:03:24,590
+of accomplishment, or a verified
+certificate, then you're required
+
+61
+00:03:24,590 --> 00:03:27,450
+to do the quizzes and or the assignments,
+which
+
+62
+00:03:27,450 --> 00:03:31,100
+we'll evaluate using the grading criteria
+described at this link.
+
+63
+00:03:32,190 --> 00:03:36,890
+Naturally, if you want to take this MOOC
+solely to learn the material
+
+64
+00:03:36,890 --> 00:03:39,170
+and expand your knowledge, you don't need
+
+65
+00:03:39,170 --> 00:03:41,633
+to submit any quizzes or assignment
+solutions.
+
+66
+00:03:41,633 --> 00:03:45,574
+[BLANK_AUDIO]
+
+67
+00:03:45,574 --> 00:03:48,403
+[MUSIC]
+
+68
+00:03:48,403 --> 00:03:50,521
+[BLANK_AUDIO].
+
+69
+00:03:50,521 --> 00:03:52,839
+Now that we've explained the overall
+course
+
+70
+00:03:52,839 --> 00:03:56,120
+organization, we'll outline the contents
+of each section.
+
+71
+00:03:57,150 --> 00:04:01,290
+Section one, covers Android concurrency,
+which exports tools techniques
+
+72
+00:04:01,290 --> 00:04:05,720
+and methods associated with developing
+concurrent software for mobile devices.
+
+73
+00:04:05,720 --> 00:04:10,180
+After briefly covering the motivations for
+and challenges of concurrency.
+
+74
+00:04:10,180 --> 00:04:12,600
+This section focuses on concurrency
+mechanisms,
+
+75
+00:04:12,600 --> 00:04:15,040
+frameworks and patterns that Androids
+applies and
+
+76
+00:04:15,040 --> 00:04:17,800
+provides to create control and terminate
+
+77
+00:04:17,800 --> 00:04:21,230
+multiple threads run concurrently within a
+process.
+
+78
+00:04:21,230 --> 00:04:23,100
+Some Android concurrency mechanisms
+discussed in
+
+79
+00:04:23,100 --> 00:04:25,170
+this section are based on standard Java
+
+80
+00:04:25,170 --> 00:04:28,040
+features such as threads, synchronized
+methods and
+
+81
+00:04:28,040 --> 00:04:31,820
+statements, reentrant locks, addition
+objects, and semaphores.
+
+82
+00:04:31,820 --> 00:04:35,760
+We also cover key Android concurrency
+frameworks such as its handlers,
+
+83
+00:04:35,760 --> 00:04:40,850
+runnables, and messages or hammer
+framework, and the async task framework.
+
+84
+00:04:40,850 --> 00:04:42,630
+Throughout this section, we'll illustrate
+by
+
+85
+00:04:42,630 --> 00:04:45,420
+example, how concurrent Android
+applications and frameworks
+
+86
+00:04:45,420 --> 00:04:47,440
+are developed, by applying many common
+
+87
+00:04:47,440 --> 00:04:50,780
+patterns documented in popular books and
+websites.
+
+88
+00:04:50,780 --> 00:04:52,340
+These patterns focus on general
+
+89
+00:04:52,340 --> 00:04:54,590
+object oriented software decomposition and
+composition
+
+90
+00:04:54,590 --> 00:04:57,020
+techniques, as well as concurrency,
+
+91
+00:04:57,020 --> 00:04:59,389
+synchronization, and communication
+mechanisms and protocols.
+
+92
+00:05:00,600 --> 00:05:04,500
+Many patterns appear on the pattern to
+software architecture or POSA book, and
+
+93
+00:05:04,500 --> 00:05:06,820
+design patterns, elements of reasonable
+object
+
+94
+00:05:06,820 --> 00:05:09,185
+writed software, or gang for a book.
+
+95
+00:05:09,185 --> 00:05:10,998
+[BLANK_AUDIO]
+
+96
+00:05:10,998 --> 00:05:13,856
+[MUSIC].
+
+97
+00:05:13,856 --> 00:05:16,062
+[BLANK_AUDIO].
+
+98
+00:05:16,062 --> 00:05:18,150
+Section two covers Android's services,
+
+99
+00:05:18,150 --> 00:05:21,960
+inter-process communication and
+application security.
+
+100
+00:05:21,960 --> 00:05:24,885
+Although the activity components covered
+in week two
+
+101
+00:05:24,885 --> 00:05:28,265
+of Professor Porter's MOOC, provide a
+visual interface for
+
+102
+00:05:28,265 --> 00:05:31,515
+interactions with the user, Android also
+defines service
+
+103
+00:05:31,515 --> 00:05:35,281
+components which run on separate
+background thread or process.
+
+104
+00:05:35,281 --> 00:05:37,459
+Services don't interact with the user
+
+105
+00:05:37,459 --> 00:05:40,231
+directly, instead, activities use services
+to
+
+106
+00:05:40,231 --> 00:05:45,470
+perform long duration operations or access
+remote resources on behalf of users.
+
+107
+00:05:45,470 --> 00:05:47,900
+Such as downloading files from a server in
+the Cloud.
+
+108
+00:05:49,610 --> 00:05:52,010
+This section examines several types of
+Android
+
+109
+00:05:52,010 --> 00:05:56,380
+services, including started services that
+usually perform a
+
+110
+00:05:56,380 --> 00:05:59,890
+single operation, and bounce services that
+allow
+
+111
+00:05:59,890 --> 00:06:03,690
+clients to conduct longer conversations
+with service implementations.
+
+112
+00:06:04,970 --> 00:06:08,020
+Activities and services interact via
+mechanisms that are
+
+113
+00:06:08,020 --> 00:06:11,470
+optimized for inter-process communication,
+within a mobile device.
+
+114
+00:06:13,060 --> 00:06:15,720
+We cover several Android inter-process
+communication mechanisms
+
+115
+00:06:15,720 --> 00:06:19,100
+in section two, including intents, which
+are passed
+
+116
+00:06:19,100 --> 00:06:21,610
+when an activity or service is started,
+and
+
+117
+00:06:21,610 --> 00:06:25,400
+messengers, which enable message based
+communication across processes.
+
+118
+00:06:26,520 --> 00:06:30,450
+We also cover the binder object oriented
+remote procedure call mechanism, and the
+
+119
+00:06:30,450 --> 00:06:33,600
+Android interface definition language that
+simplifies Java
+
+120
+00:06:33,600 --> 00:06:36,640
+application access to the binder
+communication capabilities.
+
+121
+00:06:37,960 --> 00:06:41,300
+Section two also focuses on Android
+application security.
+
+122
+00:06:41,300 --> 00:06:43,770
+Where we first describe Android security
+model,
+
+123
+00:06:43,770 --> 00:06:47,030
+and explain some of its risks, and
+limitations.
+
+124
+00:06:47,030 --> 00:06:50,660
+We then discuss various tools, techniques,
+and methods, for building more
+
+125
+00:06:50,660 --> 00:06:54,750
+secure Android applications, which is a
+particularly important topic these days.
+
+126
+00:06:54,750 --> 00:06:57,812
+[BLANK_AUDIO]
+
+127
+00:06:57,812 --> 00:07:00,919
+[MUSIC].
+
+128
+00:07:00,919 --> 00:07:02,946
+[BLANK_AUDIO].
+
+129
+00:07:02,946 --> 00:07:05,634
+Section three covers patterns for
+concurrency and inter
+
+130
+00:07:05,634 --> 00:07:09,650
+and intra process communication, that are
+applied in Android.
+
+131
+00:07:09,650 --> 00:07:12,040
+The patterns we cover all come from the
+pattern oriented
+
+132
+00:07:12,040 --> 00:07:14,250
+software architecture books, which
+document
+
+133
+00:07:14,250 --> 00:07:16,239
+fundamental concurrency and communication
+patterns.
+
+134
+00:07:17,240 --> 00:07:20,710
+For example, Android applies the monitor
+object pattern to implement
+
+135
+00:07:20,710 --> 00:07:24,680
+the link blocking queue class in the Java
+util concurrent package.
+
+136
+00:07:24,680 --> 00:07:26,950
+It applies thread specific storage pattern
+to
+
+137
+00:07:26,950 --> 00:07:30,220
+ensure only one looper is created per
+thread.
+
+138
+00:07:30,220 --> 00:07:34,480
+It applies the command processing pattern,
+to enable code in a background thread to
+
+139
+00:07:34,480 --> 00:07:36,510
+post a runnable command that's in queue
+
+140
+00:07:36,510 --> 00:07:39,660
+and processed later in the user interface
+thread.
+
+141
+00:07:39,660 --> 00:07:41,240
+Android also applies this patter to
+
+142
+00:07:41,240 --> 00:07:43,690
+its intents service, which handles
+asynchronous
+
+143
+00:07:43,690 --> 00:07:49,280
+requests expressed as intents on-demand in
+the background thread of a service.
+
+144
+00:07:49,280 --> 00:07:52,660
+It applies a variant of the active object
+pattern to enable a client
+
+145
+00:07:52,660 --> 00:07:56,830
+in one thread, to send messages to our
+handler running in another thread.
+
+146
+00:07:56,830 --> 00:07:59,750
+It applies the half sync, half async
+pattern to allow one
+
+147
+00:07:59,750 --> 00:08:01,260
+or more background threads to block
+
+148
+00:08:01,260 --> 00:08:04,460
+synchronously, while processing long
+duration operations.
+
+149
+00:08:04,460 --> 00:08:07,380
+And then pass the results via a
+synchronized queue to the
+
+150
+00:08:07,380 --> 00:08:12,350
+user interface thread, which only perform
+short duration, non blocking operations.
+
+151
+00:08:12,350 --> 00:08:15,920
+Finally it applies the broker pattern to
+support object oriented
+
+152
+00:08:15,920 --> 00:08:18,020
+remote method calls, between activities
+
+153
+00:08:18,020 --> 00:08:20,190
+and services running in different
+processes.
+
+154
+00:08:21,250 --> 00:08:24,243
+Naturally, these fundamental patterns are
+not
+
+155
+00:08:24,243 --> 00:08:27,451
+limited to Android or mobile device
+programming.
+
+156
+00:08:27,451 --> 00:08:30,165
+So, learning them will not only make you
+more fluent,
+
+157
+00:08:30,165 --> 00:08:32,938
+with the topics we cover with the mobile
+cloud computing
+
+158
+00:08:32,938 --> 00:08:36,301
+with Android specialization, but they'll
+also provide you with a
+
+159
+00:08:36,301 --> 00:08:38,602
+solid foundation for programming
+concurrent
+
+160
+00:08:38,602 --> 00:08:40,778
+and network software in other platforms.
+
+161
+00:08:40,778 --> 00:08:43,362
+[BLANK_AUDIO]
+
+162
+00:08:43,362 --> 00:08:46,139
+[MUSIC].
+
+163
+00:08:46,139 --> 00:08:48,382
+[BLANK_AUDIO].
+
+164
+00:08:48,382 --> 00:08:50,722
+In summary, the topics in this MOOC cover
+a
+
+165
+00:08:50,722 --> 00:08:55,467
+range of Android concurrency mechanisms
+and frameworks, services and interprocess
+
+166
+00:08:55,467 --> 00:09:00,082
+communication mechanisms, and application
+security models, as well as patterns
+
+167
+00:09:00,082 --> 00:09:04,532
+that guide the design of Android
+mechanisms, frameworks, and applications.
+
+168
+00:09:04,532 --> 00:09:08,116
+After watching the videos, completing the
+assignments and participating
+
+169
+00:09:08,116 --> 00:09:10,692
+in the online discussion forums, you
+should be able to
+
+170
+00:09:10,692 --> 00:09:14,444
+recognize the inherent and accidental
+complexities involved with developing
+
+171
+00:09:14,444 --> 00:09:18,440
+a current software that communicates
+securely between processes and threads.
+
+172
+00:09:19,490 --> 00:09:23,250
+Likewise, you'll understand how pattern
+oriented software architecture and
+
+173
+00:09:23,250 --> 00:09:27,360
+framework techniques can, and cannot help,
+to alleviate these complexities.
+
+174
+00:09:28,450 --> 00:09:32,260
+You'll also learn how to apply patterns
+and frameworks, to develop reusable and
+
+175
+00:09:32,260 --> 00:09:34,920
+resilient concurrent applications and
+services, using
+
+176
+00:09:34,920 --> 00:09:37,170
+Java programming language features, and
+Android middleware.
+
+177
+00:09:38,280 --> 00:09:40,350
+Finally, if you follow up on all the
+
+178
+00:09:40,350 --> 00:09:42,990
+links referenced in the slides, you'll
+know where to
+
+179
+00:09:42,990 --> 00:09:45,350
+find additional sources of information, on
+how to
+
+180
+00:09:45,350 --> 00:09:48,610
+program mobile applications and services
+on Android handheld systems.
+
+181
+00:09:49,750 --> 00:09:52,690
+We analyze lots of Android software
+throughout this MOOC.
+
+182
+00:09:52,690 --> 00:09:56,013
+So you'll need a solid understanding of
+Java to follow along.
+
+183
+00:09:56,013 --> 00:09:58,463
+Much of this code comes straight out of
+the
+
+184
+00:09:58,463 --> 00:10:02,265
+Android open source release, which is
+available at this link.
+
+185
+00:10:02,265 --> 00:10:05,925
+This link also provides several pattern
+orientated applications that
+
+186
+00:10:05,925 --> 00:10:10,195
+demonstrate key Java concurrency and inter
+process communication mechanisms and
+
+187
+00:10:10,195 --> 00:10:13,184
+frameworks, which we analyze in detail, to
+showcase the
+
+188
+00:10:13,184 --> 00:10:17,592
+applications of patterns and frameworks in
+the Android development environment.
+
+189
+00:10:17,592 --> 00:10:25,659
+[MUSIC]
+

@@ -1,0 +1,226 @@
+1
+00:00:00,000 --> 00:00:08,940
+[MUSIC].
+
+2
+00:00:08,940 --> 00:00:10,910
+Hello, my name is Doug Schmitt.
+
+3
+00:00:10,910 --> 00:00:15,330
+And I'd like to welcome you to our MOOC on
+programming mobile services for
+
+4
+00:00:15,330 --> 00:00:18,300
+Android handheld systems, which focuses on
+a
+
+5
+00:00:18,300 --> 00:00:21,950
+range of Android application and
+middleware programming topics.
+
+6
+00:00:21,950 --> 00:00:25,140
+Including threading and concurrency
+control mechanisms, background
+
+7
+00:00:25,140 --> 00:00:29,920
+service processing, local inter-process
+communication, and application security.
+
+8
+00:00:29,920 --> 00:00:31,340
+This is the second course in our
+
+9
+00:00:31,340 --> 00:00:34,080
+specialization on mobile cloud computing
+with Android.
+
+10
+00:00:34,080 --> 00:00:36,450
+Which is the first trans-institutional
+sequence of
+
+11
+00:00:36,450 --> 00:00:38,800
+MOOCs taught on the Coursera platform by
+
+12
+00:00:38,800 --> 00:00:41,210
+myself, Professor Adam Porter at
+University of
+
+13
+00:00:41,210 --> 00:00:45,210
+Maryland, and Professor Jules White at
+Vanderbilt University.
+
+14
+00:00:45,210 --> 00:00:48,820
+Before we delve into techniques, tools,
+and methods associated
+
+15
+00:00:48,820 --> 00:00:52,630
+with the program and concurrent
+applications and services on Android.
+
+16
+00:00:52,630 --> 00:00:54,840
+This section gives an overview of the
+entire
+
+17
+00:00:54,840 --> 00:00:58,850
+specialization in general, and this MOOC
+in particular.
+
+18
+00:00:58,850 --> 00:01:02,220
+We start by outlining how the MOOCs in our
+specialization built upon
+
+19
+00:01:02,220 --> 00:01:04,150
+and codified decades of research and
+
+20
+00:01:04,150 --> 00:01:06,560
+development we've conducted together and
+separately.
+
+21
+00:01:06,560 --> 00:01:10,460
+To provide you with an integrated learning
+experience that blends coverage
+
+22
+00:01:10,460 --> 00:01:12,960
+of software design and architecture,
+
+23
+00:01:12,960 --> 00:01:16,420
+human computer interaction, accessibility
+and useability.
+
+24
+00:01:16,420 --> 00:01:18,000
+Java programming language features and
+
+25
+00:01:18,000 --> 00:01:20,850
+idioms, communication and concurrency
+patterns and
+
+26
+00:01:20,850 --> 00:01:24,320
+frameworks, database design and
+programming techniques,
+
+27
+00:01:24,320 --> 00:01:28,010
+cyber security, automated testing and
+more.
+
+28
+00:01:28,010 --> 00:01:29,440
+Next, I'll explain the course
+
+29
+00:01:29,440 --> 00:01:32,860
+organization, assignments and assessment
+methods.
+
+30
+00:01:32,860 --> 00:01:35,350
+As well as outline the main topics in each
+section.
+
+31
+00:01:36,760 --> 00:01:40,180
+Since teaching and taking MOOCs is
+different from traditional face
+
+32
+00:01:40,180 --> 00:01:45,330
+to face courses, I'll also explain this
+course's prerequisites and expectations.
+
+33
+00:01:45,330 --> 00:01:49,230
+As well as provide some tips on how to
+leverage online resources to
+
+34
+00:01:49,230 --> 00:01:50,800
+master the material we cover in the
+
+35
+00:01:50,800 --> 00:01:53,930
+videos and successfully complete the
+programming assignments.
+
+36
+00:01:54,950 --> 00:01:59,280
+Finally, I'll present an overview of
+patterns and frameworks.
+
+37
+00:01:59,280 --> 00:02:02,185
+Which are topics that underline most
+material in this MOOC.
+
+38
+00:02:03,410 --> 00:02:05,828
+Throughout this MOOC, we'll analyze dozens
+
+39
+00:02:05,828 --> 00:02:09,360
+of pattern-oriented Java and Android
+applications.
+
+40
+00:02:09,360 --> 00:02:11,080
+Some of which we've developed.
+
+41
+00:02:11,080 --> 00:02:14,990
+And others that reside in Android's
+middleware, class libraries
+
+42
+00:02:14,990 --> 00:02:18,320
+and packaged applications which apply many
+patterns and frameworks.
+
+43
+00:02:19,620 --> 00:02:21,862
+These examples showcase the pattern
+[UNKNOWN]
+
+44
+00:02:21,862 --> 00:02:24,930
+software architecture techniques, tools,
+and methods you
+
+45
+00:02:24,930 --> 00:02:26,818
+need to successfully develop your own
+
+46
+00:02:26,818 --> 00:02:29,930
+concurrent mobile applications and
+services on Android.
+
+47
+00:02:29,930 --> 00:02:32,898
+[MUSIC]
+
+48
+00:02:32,898 --> 00:02:38,429
+[MUSIC]
+

@@ -1,0 +1,589 @@
+1
+00:00:00,000 --> 00:00:00,749
+[MUSIC]
+
+2
+00:00:00,749 --> 00:00:08,313
+Welcome to the first part of the
+Introduction section, which provides an
+
+3
+00:00:08,313 --> 00:00:15,720
+overview of our mobile cloud computing
+with Android specialization.
+
+4
+00:00:16,950 --> 00:00:20,160
+Everyday millions of people around the
+world, use handheld smartphone
+
+5
+00:00:20,160 --> 00:00:24,400
+and tablet devices, that are increasingly
+based on the Android platform.
+
+6
+00:00:24,400 --> 00:00:25,369
+As shown at this link.
+
+7
+00:00:26,610 --> 00:00:30,250
+These Android devices run software
+applications, that direct users to
+
+8
+00:00:30,250 --> 00:00:34,280
+the places they want to go, securely
+provide information about the
+
+9
+00:00:34,280 --> 00:00:38,440
+people, locations, goods and services near
+them, and help them
+
+10
+00:00:38,440 --> 00:00:41,340
+interact with the people they care about,
+and do business with.
+
+11
+00:00:42,820 --> 00:00:45,670
+These applications increasingly rely on
+three synergistic
+
+12
+00:00:45,670 --> 00:00:49,718
+computing technologies, collectively known
+as mobile cloud computing.
+
+13
+00:00:49,718 --> 00:00:52,430
+Where applications are designed to run on
+smart mobile devices,
+
+14
+00:00:53,490 --> 00:00:56,340
+connected to elastic computing services,
+
+15
+00:00:56,340 --> 00:00:58,390
+that are accessible over wireless
+networks.
+
+16
+00:00:59,850 --> 00:01:01,970
+Mobile cloud computing, represents the
+confluence
+
+17
+00:01:01,970 --> 00:01:04,090
+of advances in multicore and distributed
+
+18
+00:01:04,090 --> 00:01:08,460
+core processors, inexpensive mass storage,
+ubiquitous
+
+19
+00:01:08,460 --> 00:01:11,330
+wireless connectivity, and commodity
+harbor platforms.
+
+20
+00:01:12,930 --> 00:01:15,180
+The demand for applications that run on
+these platforms is
+
+21
+00:01:15,180 --> 00:01:19,370
+growing rapidly, which is motivating the
+need for software practitioners
+
+22
+00:01:19,370 --> 00:01:22,580
+and researchers, who understand how to
+develop concurrent and network
+
+23
+00:01:22,580 --> 00:01:26,440
+software for mobile devices, that connect
+to powerful cloud platforms.
+
+24
+00:01:27,520 --> 00:01:30,870
+However, despite continuous improvements
+in hardware and
+
+25
+00:01:30,870 --> 00:01:34,930
+software infrastructure, it remains
+frustratingly hard to develop
+
+26
+00:01:34,930 --> 00:01:37,780
+high quality software applications, for
+mobile devices
+
+27
+00:01:37,780 --> 00:01:40,668
+and computing clouds, on time and under
+budget.
+
+28
+00:01:40,668 --> 00:01:42,962
+The impediments to success in this domain,
+
+29
+00:01:42,962 --> 00:01:46,558
+arise from various inherent and accidental
+complexities, ranging
+
+30
+00:01:46,558 --> 00:01:50,030
+from self-inflicted limitations with
+tedious and error-prone
+
+31
+00:01:50,030 --> 00:01:53,810
+techniques tools and methods used to
+develop software.
+
+32
+00:01:53,810 --> 00:01:57,410
+To fundamental challenges of concurrency
+and resilience that scale.
+
+33
+00:01:57,410 --> 00:01:57,942
+[MUSIC]
+
+34
+00:01:57,942 --> 00:02:00,694
+To help meet the needs and overcome the
+
+35
+00:02:00,694 --> 00:02:05,682
+impediments outlined earlier, I've teamed
+up with professor Adam
+
+36
+00:02:05,682 --> 00:02:10,584
+Porter from the University of Maryland,
+and Professor Jules White
+
+37
+00:02:10,584 --> 00:02:16,220
+from Vanderbilt University, to create a
+Coursera specialization.
+
+38
+00:02:16,220 --> 00:02:19,750
+It covers many techniques, tools, and
+methods, aimed at alleviating the
+
+39
+00:02:19,750 --> 00:02:21,920
+inherent and accidental complexities of
+developing
+
+40
+00:02:21,920 --> 00:02:23,940
+mobile cloud computing applications with
+Android.
+
+41
+00:02:25,240 --> 00:02:27,680
+Specializations are a new form of MOOC.
+
+42
+00:02:27,680 --> 00:02:29,780
+Aimed at fostering collaborations among
+
+43
+00:02:29,780 --> 00:02:32,470
+teachers and students, that span
+traditional
+
+44
+00:02:32,470 --> 00:02:35,060
+inter and intra-institution and
+disciplinary
+
+45
+00:02:35,060 --> 00:02:37,410
+boundaries, as described at this link.
+
+46
+00:02:39,128 --> 00:02:41,550
+The first MOOC in this sequence, the
+
+47
+00:02:41,550 --> 00:02:44,700
+University of Maryland's course,
+Programming Mobile Applications for
+
+48
+00:02:44,700 --> 00:02:48,630
+Android Handheld Systems, taught by
+Professor Porter, focused
+
+49
+00:02:48,630 --> 00:02:52,490
+on the design and implementation of
+user-facing applications.
+
+50
+00:02:52,490 --> 00:02:55,020
+Covering the fundamental programming
+principles,
+
+51
+00:02:55,020 --> 00:02:57,200
+software architecture, and user experience
+
+52
+00:02:57,200 --> 00:03:00,470
+considerations underlying handheld
+software applications,
+
+53
+00:03:00,470 --> 00:03:01,809
+in the Android development environment.
+
+54
+00:03:03,170 --> 00:03:07,240
+The first lecture of week one of Professor
+Porter's MOOC, presents an overview of the
+
+55
+00:03:07,240 --> 00:03:09,900
+Android platform, which you should watch
+to
+
+56
+00:03:09,900 --> 00:03:12,980
+understand the key components in Android's
+software architecture.
+
+57
+00:03:14,648 --> 00:03:18,780
+The second MOOC on programming mobile
+services for Android handheld systems,
+
+58
+00:03:18,780 --> 00:03:22,060
+is being taught by me and Professor White,
+from Vanderbilt University.
+
+59
+00:03:23,800 --> 00:03:27,810
+We focus on a range of Android application
+and middle work programming topics.
+
+60
+00:03:27,810 --> 00:03:31,090
+Including threading and concurrency
+control mechanisms, background
+
+61
+00:03:31,090 --> 00:03:34,900
+service processing, local interprocess
+communication, and application security.
+
+62
+00:03:36,000 --> 00:03:37,990
+This MOOC builds upon and extends the
+
+63
+00:03:37,990 --> 00:03:41,550
+user-facing applications, covered earlier
+in Professor Porter's MOOC.
+
+64
+00:03:41,550 --> 00:03:44,920
+Diving deeper into the guts of Android's
+powerful middle work platform.
+
+65
+00:03:46,070 --> 00:03:48,985
+For example, we focus on how Android
+combines
+
+66
+00:03:48,985 --> 00:03:52,900
+advances in hardware and software
+infrastructure support for concurrency.
+
+67
+00:03:52,900 --> 00:03:56,730
+Together with pattern arc software
+architecture and framework techniques.
+
+68
+00:03:56,730 --> 00:03:59,930
+To improve the performance,
+responsiveness, security
+
+69
+00:03:59,930 --> 00:04:02,190
+and structure of mobile applications, so
+they
+
+70
+00:04:02,190 --> 00:04:06,620
+are more efficient, resilient and easier
+to evolve over the software life cycle.
+
+71
+00:04:06,620 --> 00:04:07,265
+[MUSIC].
+
+72
+00:04:07,265 --> 00:04:14,036
+>> Hi, I'm Jules White, and I'm teaming up
+with Doug Schmidt to teach the
+
+73
+00:04:14,036 --> 00:04:21,490
+third MOOC in the mobile cloud computing
+with Android specialization.
+
+74
+00:04:21,490 --> 00:04:25,840
+Entitled, Programming Cloud Services for
+Android Handheld Systems.
+
+75
+00:04:25,840 --> 00:04:28,150
+This MOOC rounds out our coverage of
+mobile cloud
+
+76
+00:04:28,150 --> 00:04:31,430
+computing, by focusing on how to connect
+mobile devices
+
+77
+00:04:31,430 --> 00:04:34,890
+to cloud computing and data storage
+resources, turning a
+
+78
+00:04:34,890 --> 00:04:38,710
+mobile device into an extension of
+powerful cloud-based services.
+
+79
+00:04:40,100 --> 00:04:43,120
+We'll extend the handheld systems topics
+covered in the first two
+
+80
+00:04:43,120 --> 00:04:48,710
+MOOCs, to focus on architectures for
+communicating with the cloud using HDP.
+
+81
+00:04:48,710 --> 00:04:52,620
+Server side processing of mobile data,
+using serverlets and the Java spring
+
+82
+00:04:52,620 --> 00:04:55,460
+framework, in scalable storage of data,
+
+83
+00:04:55,460 --> 00:04:58,180
+using no SQL databases and other
+platforms.
+
+84
+00:04:59,410 --> 00:05:04,432
+Since building a slow or insecure mobile
+cloud application is unacceptable.
+
+85
+00:05:04,432 --> 00:05:07,630
+This MOOC will not only show you how to
+program handheld program systems
+
+86
+00:05:07,630 --> 00:05:12,312
+that talk to the cloud, but how to do it
+securely, scalably, and efficiently.
+
+87
+00:05:13,490 --> 00:05:17,630
+This speciation has three MOOCs, plus a
+Capstone project.
+
+88
+00:05:17,630 --> 00:05:20,020
+Signature track students, who receive a
+verified
+
+89
+00:05:20,020 --> 00:05:24,330
+certificate with distinction in three
+MOOCs, can combine
+
+90
+00:05:24,330 --> 00:05:26,850
+what they've learned to build a complete
+
+91
+00:05:26,850 --> 00:05:29,840
+mobile cloud computing application, from
+the ground up.
+
+92
+00:05:29,840 --> 00:05:37,480
+[MUSIC].
+
+93
+00:05:37,480 --> 00:05:39,920
+>> The material covered in our MOOC
+specialization,
+
+94
+00:05:39,920 --> 00:05:41,970
+is based on experience we've gained during
+the
+
+95
+00:05:41,970 --> 00:05:46,650
+past several decades researching,
+developing, and applying concurrent
+
+96
+00:05:46,650 --> 00:05:50,310
+and network software, written in C++ and
+Java.
+
+97
+00:05:50,310 --> 00:05:54,510
+The software we've developed has been used
+by thousands of projects around the world.
+
+98
+00:05:54,510 --> 00:05:56,910
+Often, for mission critical systems, where
+the right
+
+99
+00:05:56,910 --> 00:05:59,619
+answered delivered too late, becomes the
+wrong answer.
+
+100
+00:06:01,550 --> 00:06:03,380
+We're delighted to have the opportunity to
+share
+
+101
+00:06:03,380 --> 00:06:06,640
+the key techniques and practices, we've
+devised and learned
+
+102
+00:06:06,640 --> 00:06:09,020
+over the years, to help you become more
+
+103
+00:06:09,020 --> 00:06:12,420
+effective, at developing software for
+mobile devices and clouds.
+
+104
+00:06:14,120 --> 00:06:17,160
+In our experience, the principles,
+methods,
+
+105
+00:06:17,160 --> 00:06:20,030
+and skills required to develop such
+software.
+
+106
+00:06:20,030 --> 00:06:23,300
+Are best learned by attaining mastery of
+patterns and frameworks.
+
+107
+00:06:24,510 --> 00:06:27,870
+A pattern describes a reasonable solution
+to a common problem that
+
+108
+00:06:27,870 --> 00:06:30,930
+arises within a particular context, which
+can be as broad as
+
+109
+00:06:30,930 --> 00:06:34,110
+the domain of mobile cloud computing, or
+as narrow as ensuring
+
+110
+00:06:34,110 --> 00:06:38,226
+Android smartphone users, are informed
+when their battery levels are low.
+
+111
+00:06:39,320 --> 00:06:42,590
+A framework is an integrated set of
+components, that collaborate to
+
+112
+00:06:42,590 --> 00:06:44,750
+provide a reuseable architecture, for our
+
+113
+00:06:44,750 --> 00:06:46,750
+family of related applications or
+services.
+
+114
+00:06:47,800 --> 00:06:51,160
+Frameworks can also be viewed as concrete
+realizations of pattern,
+
+115
+00:06:51,160 --> 00:06:54,290
+that facilitate directory use of detail
+designs and source code.
+
+116
+00:06:55,630 --> 00:06:59,030
+We look forward to interacting with you
+over the next several months.
+
+117
+00:06:59,030 --> 00:07:03,060
+To help you learn and apply these patterns
+and frameworks in your own work on mobile
+
+118
+00:07:03,060 --> 00:07:05,285
+cloud computing with Android, just as we
+do
+
+119
+00:07:05,285 --> 00:07:08,300
+at Vanderbilt University, and the
+University of Maryland.
+
+120
+00:07:08,300 --> 00:07:10,660
+You'll not only become more productive,
+but you'll also have a
+
+121
+00:07:10,660 --> 00:07:13,430
+lot more fun, and look at the world in new
+ways.
+
+122
+00:07:13,430 --> 00:07:23,430
+[MUSIC]
+

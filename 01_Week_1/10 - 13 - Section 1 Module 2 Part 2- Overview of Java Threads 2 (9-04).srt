@@ -1,0 +1,760 @@
+1
+00:00:00,000 --> 00:00:04,249
+[MUSIC].
+
+2
+00:00:04,249 --> 00:00:12,380
+Welcome to the second part of the module,
+on Java concurrency and mechanisms.
+
+3
+00:00:12,380 --> 00:00:15,198
+Now that we explored the basics of Java
+concurrency in part one,
+
+4
+00:00:15,198 --> 00:00:19,109
+this part dwells deeper into the structure
+and functionality of Java threads.
+
+5
+00:00:20,140 --> 00:00:22,950
+Even if you're already familiar with Java
+threads, you may learn something from
+
+6
+00:00:22,950 --> 00:00:24,810
+this video, since we discuss various
+thread
+
+7
+00:00:24,810 --> 00:00:27,060
+implementation aspects of the android
+software stack.
+
+8
+00:00:27,060 --> 00:00:29,850
+A thread is a complex piece of software
+
+9
+00:00:29,850 --> 00:00:32,490
+that interacts with other hardware and
+software entities.
+
+10
+00:00:32,490 --> 00:00:33,590
+To get a bird's eye view of these
+
+11
+00:00:33,590 --> 00:00:35,960
+interactions, the state machine on this
+slide that
+
+12
+00:00:35,960 --> 00:00:37,460
+depicts the key states of the thread
+during
+
+13
+00:00:37,460 --> 00:00:39,859
+its life cycle, which are documented in
+this link.
+
+14
+00:00:40,950 --> 00:00:42,780
+Although you don't need all these details
+
+15
+00:00:42,780 --> 00:00:45,110
+to program Java threads effectively, we
+will
+
+16
+00:00:45,110 --> 00:00:46,710
+walk through each state, to help you
+
+17
+00:00:46,710 --> 00:00:49,200
+better understand a thread's behavior and
+interactions.
+
+18
+00:00:50,960 --> 00:00:54,810
+When a Java program creates a thread
+object, it's initially in a new state.
+
+19
+00:00:55,850 --> 00:00:58,720
+After the program calls the start method
+on the thread.
+
+20
+00:00:58,720 --> 00:01:01,010
+The state machine transitions to the
+runnable state.
+
+21
+00:01:02,300 --> 00:01:04,710
+When the Android Linux, scheduler selects
+the thread
+
+22
+00:01:04,710 --> 00:01:07,950
+to execute, it transitions to the running
+state, at
+
+23
+00:01:07,950 --> 00:01:09,980
+which point the Java virtual machine
+invokes its
+
+24
+00:01:09,980 --> 00:01:12,580
+run hook method to start executing user
+provided code.
+
+25
+00:01:14,080 --> 00:01:18,210
+If this user calls sleep or other timed
+operations, the state machines
+
+26
+00:01:18,210 --> 00:01:21,360
+transitions to the timed waiting for state
+for the designated period of time.
+
+27
+00:01:22,720 --> 00:01:25,250
+When this wait time elapses the thread
+becomes runable again.
+
+28
+00:01:26,760 --> 00:01:29,480
+After the thread scheduler starts running
+the thread,
+
+29
+00:01:29,480 --> 00:01:32,630
+it might attempt to access a guarded
+resource.
+
+30
+00:01:32,630 --> 00:01:37,100
+Such as the synchronize method or block,
+protected by a lock, which will
+
+31
+00:01:37,100 --> 00:01:39,960
+transition the thread to the block state
+if the lock is not available.
+
+32
+00:01:41,490 --> 00:01:44,550
+When the resource is obtained the thread
+becomes runnable again.
+
+33
+00:01:45,900 --> 00:01:49,270
+After the thread scheduler starts running
+the thread, it might wait on
+
+34
+00:01:49,270 --> 00:01:51,310
+a condition variable, causing the state
+
+35
+00:01:51,310 --> 00:01:53,089
+machine to transition to the waiting
+state.
+
+36
+00:01:54,350 --> 00:01:56,000
+When another thread notifies this
+condition
+
+37
+00:01:56,000 --> 00:01:58,240
+variable, the thread again becomes
+runable.
+
+38
+00:01:59,270 --> 00:02:02,860
+Finally, when a thread's run method
+returns, the thread is
+
+39
+00:02:02,860 --> 00:02:06,310
+terminated and its resources are released
+by the Java virtual machine.
+
+40
+00:02:07,840 --> 00:02:09,290
+This link contains a UML state
+
+41
+00:02:09,290 --> 00:02:11,920
+chart visualizing and summarizing all
+these states.
+
+42
+00:02:11,920 --> 00:02:17,710
+[MUSIC]
+
+43
+00:02:17,710 --> 00:02:19,460
+The two most fundamental phases of a Java
+
+44
+00:02:19,460 --> 00:02:22,510
+threads life cycle involves starting and
+stopping it.
+
+45
+00:02:22,510 --> 00:02:24,560
+So we'll examine these phases in the
+remainder of
+
+46
+00:02:24,560 --> 00:02:27,440
+this video, since they raise some
+interesting implementation issues.
+
+47
+00:02:28,690 --> 00:02:31,969
+We'll start at the very beginning, which
+is a very good place to start.
+
+48
+00:02:33,050 --> 00:02:36,580
+When start is called on the thread object,
+the Java virtual machine allocates
+
+49
+00:02:36,580 --> 00:02:40,960
+the resources needed to execute the
+thread, then calls its run hook method.
+
+50
+00:02:40,960 --> 00:02:43,400
+Many steps occur at the Java middleware,
+virtual machine
+
+51
+00:02:43,400 --> 00:02:45,830
+and operating system layers to make all
+this happen.
+
+52
+00:02:45,830 --> 00:02:48,010
+Again, you don't need to understand all
+these
+
+53
+00:02:48,010 --> 00:02:50,770
+details to program Java threads
+effectively, but the
+
+54
+00:02:50,770 --> 00:02:52,970
+following discussion will help you
+appreciate what the
+
+55
+00:02:52,970 --> 00:02:56,210
+Android software stack is doing on your
+program's behalf.
+
+56
+00:02:56,210 --> 00:02:59,320
+Moreover, the source files containing each
+implementation step
+
+57
+00:02:59,320 --> 00:03:00,630
+are shown at the bottom of each slide.
+
+58
+00:03:02,090 --> 00:03:04,810
+When a program invokes the start method on
+the thread object,
+
+59
+00:03:04,810 --> 00:03:08,090
+it's actually invoking the start method of
+the underlying Java thread
+
+60
+00:03:08,090 --> 00:03:10,670
+class, which in turn, calls
+
+61
+00:03:10,670 --> 00:03:13,350
+the VMThread.creat native method, which
+triggers
+
+62
+00:03:13,350 --> 00:03:17,870
+several calls to other Java native
+interface and dalvic internal methods.
+
+63
+00:03:17,870 --> 00:03:23,050
+That ultimately invoke pthread_create,
+which is a standard Posix function.
+
+64
+00:03:23,050 --> 00:03:25,070
+It interacts with the Linux kernel, to
+
+65
+00:03:25,070 --> 00:03:27,860
+create a runtime stack and other pthread
+resources.
+
+66
+00:03:28,900 --> 00:03:33,050
+For brevity, we skip these kernel steps in
+our analysis.
+
+67
+00:03:33,050 --> 00:03:37,090
+The InterpThreadStart function is passed
+to pthread_create, which then invokes
+
+68
+00:03:37,090 --> 00:03:39,749
+this function, in the context of the newly
+created thread.
+
+69
+00:03:41,660 --> 00:03:43,871
+Interp thread start, calls the dalvik
+
+70
+00:03:43,871 --> 00:03:46,551
+internal DVM call method, which
+subsequently
+
+71
+00:03:46,551 --> 00:03:50,790
+invokes, the thread objects run hook
+method to execute user define code.
+
+72
+00:03:51,880 --> 00:03:53,470
+Of course, all these Android
+
+73
+00:03:53,470 --> 00:03:56,060
+implementation details are subject to
+change.
+
+74
+00:03:56,060 --> 00:03:59,790
+For example, this link contains a brief
+summary of the new android run time
+
+75
+00:03:59,790 --> 00:04:02,120
+called art, that provided as an
+experimental
+
+76
+00:04:02,120 --> 00:04:05,470
+option in the android 4.4 release, art
+replaces
+
+77
+00:04:05,470 --> 00:04:07,670
+the register based interpreter and dalvik
+with
+
+78
+00:04:07,670 --> 00:04:09,920
+a head of time processing which bit code
+
+79
+00:04:09,920 --> 00:04:11,710
+is recompiled in the machine language
+where
+
+80
+00:04:11,710 --> 00:04:14,142
+an application is installed on an android
+device.
+
+81
+00:04:14,142 --> 00:04:21,660
+[MUSIC].
+
+82
+00:04:21,660 --> 00:04:25,060
+Now that we've covered how threads get
+started and run, let's
+
+83
+00:04:25,060 --> 00:04:28,040
+cover the other end of the lifecycle,
+where we bid them farewell.
+
+84
+00:04:29,090 --> 00:04:32,050
+Stopping Java threads is surprisingly
+hard.
+
+85
+00:04:32,050 --> 00:04:36,320
+Just like the classic animated film the
+sorcerers apprentice, which shows how its
+
+86
+00:04:36,320 --> 00:04:39,820
+often easier to set things in motion, than
+it is to shut them down.
+
+87
+00:04:40,850 --> 00:04:44,540
+In particular, other than returning from
+run, there's no built
+
+88
+00:04:44,540 --> 00:04:48,700
+in safe method for involuntary stopping a
+java thread in android.
+
+89
+00:04:48,700 --> 00:04:51,920
+The stop method has been deprecated, for
+the reasons described at this link.
+
+90
+00:04:53,110 --> 00:04:56,860
+Therefore, if a thread performs long
+duration operations.
+
+91
+00:04:56,860 --> 00:04:59,450
+Programmers should ensure it can stop
+itself voluntarily.
+
+92
+00:05:00,700 --> 00:05:02,790
+One way to instruct a long duration
+operation in a
+
+93
+00:05:02,790 --> 00:05:04,870
+thread to shut down, is to use a stop
+flag.
+
+94
+00:05:05,950 --> 00:05:08,260
+The my runnable implementation on this
+slide.
+
+95
+00:05:08,260 --> 00:05:12,480
+Contains a volatile Boolean flag called is
+stopped, that's initially set to false.
+
+96
+00:05:13,750 --> 00:05:17,850
+The Java volatile type qualifier, enforces
+a global ordering on reads and rights to a
+
+97
+00:05:17,850 --> 00:05:19,990
+variable, so it can be used correctly in
+
+98
+00:05:19,990 --> 00:05:22,440
+a multi-threaded program, as described at
+this link.
+
+99
+00:05:23,680 --> 00:05:27,800
+My runnable also defines a stop me method,
+that sets is stop to true.
+
+100
+00:05:29,160 --> 00:05:32,030
+Finally, the run method periodically
+checks is stopped.
+
+101
+00:05:32,030 --> 00:05:36,200
+To see if the thread's been instructed to
+stop itself, and returns if it has.
+
+102
+00:05:37,440 --> 00:05:39,290
+Although this solution is lightweight, it
+
+103
+00:05:39,290 --> 00:05:41,880
+isn't integrated into the Java virtual
+machine.
+
+104
+00:05:41,880 --> 00:05:46,400
+Therefore, it won't wake up blocking
+operations, such as reads, waits,
+
+105
+00:05:46,400 --> 00:05:50,600
+joins, sleeps, or interruptible locks,
+which will impede the shutdown process.
+
+106
+00:05:50,600 --> 00:05:58,230
+[MUSIC].
+
+107
+00:05:58,230 --> 00:06:00,280
+Another way to stop a thread, is to use
+
+108
+00:06:00,280 --> 00:06:03,520
+the standard Java interrupt method, which
+posts a request
+
+109
+00:06:03,520 --> 00:06:05,650
+to a thread, asking it to stop what it's
+
+110
+00:06:05,650 --> 00:06:08,879
+doing and do something else, as described
+in this link.
+
+111
+00:06:09,970 --> 00:06:13,750
+For example, the main thread shown on this
+slide creates and starts a new
+
+112
+00:06:13,750 --> 00:06:18,400
+thread T1, who's run hook method performs
+several types of processing in a loop.
+
+113
+00:06:19,700 --> 00:06:24,890
+When the main thread wants T1 to stop, it
+calls T1's interrupt method.
+
+114
+00:06:24,890 --> 00:06:26,580
+For the job of thread interruption
+mechanism
+
+115
+00:06:26,580 --> 00:06:29,890
+to work correctly, code running and thread
+T1.
+
+116
+00:06:29,890 --> 00:06:33,480
+Or a method called directly or indirectly
+by code in T1, must
+
+117
+00:06:33,480 --> 00:06:34,660
+check if it has a pending
+
+118
+00:06:34,660 --> 00:06:37,190
+interrupt request and handle the request
+accordingly.
+
+119
+00:06:38,550 --> 00:06:42,190
+There are two ways for a thread to check
+and handle interrupt requests.
+
+120
+00:06:42,190 --> 00:06:47,770
+If a thread frequently calls blocking
+methods such as wait, join, sleep
+
+121
+00:06:47,770 --> 00:06:52,510
+and lock interruptibly, as well as IO
+operations on a interruptible channel.
+
+122
+00:06:52,510 --> 00:06:55,410
+These methods internally check if they've
+been interrupted,
+
+123
+00:06:55,410 --> 00:06:59,280
+and if so, they automatically throw the
+interrupted exception.
+
+124
+00:06:59,280 --> 00:07:02,910
+Which can be caught and handled in the
+appropriate context.
+
+125
+00:07:02,910 --> 00:07:07,010
+Conversely, threads who computations don't
+invoke methods that thread
+
+126
+00:07:07,010 --> 00:07:12,010
+interrupted exception, must periodically
+call the thread interrupted method.
+
+127
+00:07:12,010 --> 00:07:15,830
+Which returns True if an interrupted
+request has been received,
+
+128
+00:07:15,830 --> 00:07:19,620
+thereby allowing the program to return or
+throw an interrupted exception.
+
+129
+00:07:21,050 --> 00:07:23,420
+Despite the name, Java thread interrupts
+
+130
+00:07:23,420 --> 00:07:26,540
+don't behave like traditional operating
+system interrupts.
+
+131
+00:07:26,540 --> 00:07:30,620
+In particular, they aren't delivered
+asynchronously and preemptively.
+
+132
+00:07:30,620 --> 00:07:35,180
+Instead, thread interrupt just sets an
+internal flag, that must be
+
+133
+00:07:35,180 --> 00:07:39,630
+tested for explicitly by calls to thread
+interrupted, which clears this flag.
+
+134
+00:07:41,020 --> 00:07:44,170
+This link examines the java thread
+interruption mechanism in more detail.
+
+135
+00:07:45,830 --> 00:07:48,470
+Both solutions we examined for stopping
+threads,
+
+136
+00:07:48,470 --> 00:07:51,500
+require the threads to cooperate, by
+checking periodically
+
+137
+00:07:51,500 --> 00:07:52,800
+to see if they've been instructed to
+
+138
+00:07:52,800 --> 00:07:55,950
+stop and voluntarily shutting themselves
+down if so.
+
+139
+00:07:57,020 --> 00:08:00,720
+Although this approach can be tedious to
+program, it's the recommended way
+
+140
+00:08:00,720 --> 00:08:04,540
+of stopping threads in Java and Android,
+as described at this link.
+
+141
+00:08:04,540 --> 00:08:08,140
+[MUSIC]
+
+142
+00:08:08,140 --> 00:08:08,840
+In
+
+143
+00:08:12,560 --> 00:08:16,040
+summary, Java threads are implemented
+using various mechanisms provided
+
+144
+00:08:16,040 --> 00:08:18,229
+by the lower layers of the Android
+software stack.
+
+145
+00:08:19,250 --> 00:08:21,390
+Although the implementation details of
+Dalvik differ
+
+146
+00:08:21,390 --> 00:08:23,500
+a bit from other Java virtual machines,
+
+147
+00:08:23,500 --> 00:08:24,780
+the features of the Java threads in
+
+148
+00:08:24,780 --> 00:08:27,270
+Android should be familiar to experienced
+Java developers.
+
+149
+00:08:28,360 --> 00:08:31,010
+This link provides more information on
+Dalvik and summarizes
+
+150
+00:08:31,010 --> 00:08:34,910
+characteristics that differentiate it from
+other standard Java virtual machines.
+
+151
+00:08:34,910 --> 00:08:36,630
+However, due to the programming
+
+152
+00:08:36,630 --> 00:08:38,720
+level similarities between Androids
+implementation
+
+153
+00:08:38,720 --> 00:08:42,160
+of Java threads and other Java virtual
+machines, you might consider
+
+154
+00:08:42,160 --> 00:08:44,720
+reading some good books on Java
+concurrency, to learn the
+
+155
+00:08:44,720 --> 00:08:48,449
+key patterns and best practices of
+programming multi threaded Java software.
+
+156
+00:08:49,510 --> 00:08:52,710
+These books will help you to master
+creating, managing, and
+
+157
+00:08:52,710 --> 00:08:55,920
+using Java threads on a range of platforms
+including Android.
+
+158
+00:08:55,920 --> 00:09:04,979
+[MUSIC]
+

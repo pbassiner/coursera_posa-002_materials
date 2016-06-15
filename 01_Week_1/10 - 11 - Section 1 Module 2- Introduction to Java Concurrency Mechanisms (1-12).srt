@@ -1,0 +1,95 @@
+1
+00:00:00,000 --> 00:00:08,890
+[MUSIC].
+
+2
+00:00:08,890 --> 00:00:11,430
+Welcome to the module on Java Concurrency
+Mechanisms.
+
+3
+00:00:12,430 --> 00:00:13,800
+At the core of Android's concurrency
+
+4
+00:00:13,800 --> 00:00:16,890
+infrastructure, are standard Java language
+and library
+
+5
+00:00:16,890 --> 00:00:19,370
+features that create and manage threads,
+as
+
+6
+00:00:19,370 --> 00:00:21,439
+well as synchronize and schedule their
+interactions.
+
+7
+00:00:22,770 --> 00:00:25,200
+This module presents an overview of these
+Java Concurrency
+
+8
+00:00:25,200 --> 00:00:29,370
+Mechanisms, focusing on the core
+properties of Java threads
+
+9
+00:00:29,370 --> 00:00:32,200
+and key Java synchronizers and scheduling
+mechanisms, such as
+
+10
+00:00:32,200 --> 00:00:35,380
+Reentrant locks, condition objects,
+semaphores,
+
+11
+00:00:35,380 --> 00:00:36,950
+and synchronized methods and statements.
+
+12
+00:00:38,150 --> 00:00:40,250
+It also shows many examples of applying
+these
+
+13
+00:00:40,250 --> 00:00:43,770
+mechanisms in applications, and the
+Android middleware, to develop
+
+14
+00:00:43,770 --> 00:00:47,340
+effective and correct concurrent software,
+as well as demonstrating
+
+15
+00:00:47,340 --> 00:00:50,166
+problems that arise when these mechanisms
+are applied incorrectly.
+
+16
+00:00:50,166 --> 00:00:54,000
+In addition, we discussed how Java
+Concurrency
+
+17
+00:00:54,000 --> 00:00:56,880
+Mechanisms are enhanced by the application
+of common
+
+18
+00:00:56,880 --> 00:01:03,672
+Gang of Four and posted patterns, such as
+template method, strategy,
+
+19
+00:01:03,672 --> 00:01:09,824
+factory method, and monitor object.
+
+20
+00:01:09,824 --> 00:01:12,609
+[MUSIC]
+
