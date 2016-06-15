@@ -1,0 +1,782 @@
+1
+00:00:00,000 --> 00:00:08,155
+[BLANK_AUDIO]
+
+2
+00:00:08,155 --> 00:00:09,598
+Welcome to the next part of the
+
+3
+00:00:09,598 --> 00:00:12,374
+module on Android services and the local
+inter-process
+
+4
+00:00:12,374 --> 00:00:15,150
+communication mechanisms, which focuses on
+service to
+
+5
+00:00:15,150 --> 00:00:19,050
+activity communication via the Android
+messenger communication mechanism.
+
+6
+00:00:20,060 --> 00:00:22,120
+In this part, we'll first explain
+
+7
+00:00:22,120 --> 00:00:24,620
+how the messenger generalizes the hamMeR
+concurrency
+
+8
+00:00:24,620 --> 00:00:27,520
+framework's send message and handle
+message mechanisms
+
+9
+00:00:27,520 --> 00:00:30,300
+to work across component and process
+boundaries.
+
+10
+00:00:31,770 --> 00:00:34,380
+We'll also show how an Android messenger
+object can
+
+11
+00:00:34,380 --> 00:00:37,530
+be used by the download service to
+communicate the path
+
+12
+00:00:37,530 --> 00:00:39,850
+name to the retrieved image back to the
+download
+
+13
+00:00:39,850 --> 00:00:42,810
+activity, so the image can be displayed to
+the user.
+
+14
+00:00:44,910 --> 00:00:48,480
+We'll focus on using Messengers to send
+reply messages from started services
+
+15
+00:00:48,480 --> 00:00:52,380
+to activities, though they can also be
+used to communicate with bound services.
+
+16
+00:00:53,880 --> 00:00:57,250
+A Messenger is a proxy that encapsulates
+access to a Handler
+
+17
+00:00:57,250 --> 00:01:02,090
+in a Component, such as an activity or
+service shown here.
+
+18
+00:01:02,090 --> 00:01:05,060
+A reference to a Messenger can be passed
+to one or more
+
+19
+00:01:05,060 --> 00:01:09,970
+components via some communication
+mechanism, such as an extra to an intent.
+
+20
+00:01:11,510 --> 00:01:14,790
+The receiver generally does three things.
+
+21
+00:01:14,790 --> 00:01:17,620
+First, it obtains the Messenger.
+
+22
+00:01:17,620 --> 00:01:20,410
+For example, by extracting it as an extra
+from the intent.
+
+23
+00:01:21,760 --> 00:01:26,230
+Second, it performs some processing, such
+as retrieving an image from
+
+24
+00:01:26,230 --> 00:01:29,100
+a remote server and storing it in the file
+on the device.
+
+25
+00:01:30,260 --> 00:01:33,970
+Third, it uses the reference to the
+Messenger to send a reply back to the
+
+26
+00:01:33,970 --> 00:01:36,500
+handler in the activity, even if the
+handler
+
+27
+00:01:36,500 --> 00:01:38,401
+resides in a different process than the
+service.
+
+28
+00:01:39,660 --> 00:01:41,950
+For example, the download service sends
+the path name
+
+29
+00:01:41,950 --> 00:01:44,040
+for the image file back to the download
+activity.
+
+30
+00:01:45,800 --> 00:01:47,890
+The message sent by the receiver is
+ultimately
+
+31
+00:01:47,890 --> 00:01:51,040
+dispatched to the handler's handle message
+hook method.
+
+32
+00:01:51,040 --> 00:01:54,400
+For example, the download activity will
+use the path name return
+
+33
+00:01:54,400 --> 00:01:57,190
+by the download service to display the
+image to the user.
+
+34
+00:02:00,442 --> 00:02:06,396
+[SOUND] We'll now start delving deeper
+into how a Messenger can be used
+
+35
+00:02:06,396 --> 00:02:12,158
+to complete the download application,
+shown in earlier videos.
+
+36
+00:02:12,158 --> 00:02:17,490
+There are multiple classes, objects and
+processes involved in this application.
+
+37
+00:02:17,490 --> 00:02:19,670
+So we'll analyze it from several
+perspectives.
+
+38
+00:02:20,910 --> 00:02:24,800
+We'll begin by giving an overview and a
+recap of the steps performed by the
+
+39
+00:02:24,800 --> 00:02:28,650
+download activity and download service,
+focusing on the
+
+40
+00:02:28,650 --> 00:02:31,620
+implementation of the service handler and
+download handler.
+
+41
+00:02:33,290 --> 00:02:38,010
+The service handler's download image and
+reply method runs in a background thread
+
+42
+00:02:38,010 --> 00:02:41,760
+and sends the path name to the retrieved
+image file back to the DownloadActivity.
+
+43
+00:02:43,290 --> 00:02:47,100
+The handler message hook method of the
+DownloadHandler and DownloadActivity
+
+44
+00:02:47,100 --> 00:02:49,750
+uses this path name to display the image
+to the user.
+
+45
+00:02:51,380 --> 00:02:54,420
+The DownloadActivity performs several
+steps.
+
+46
+00:02:54,420 --> 00:02:57,080
+It first creates the DownloadHandler and
+then creates
+
+47
+00:02:57,080 --> 00:02:59,675
+a Messenger that encapsulates a reference
+to the handler.
+
+48
+00:02:59,675 --> 00:03:05,200
+DownloadActivity next creates an intent
+sed to start the download service.
+
+49
+00:03:06,960 --> 00:03:09,850
+The Messenger is passed as an extra to the
+intent, which
+
+50
+00:03:09,850 --> 00:03:13,060
+also stores the URL for the desired image
+to download as data.
+
+51
+00:03:14,590 --> 00:03:18,100
+Finally, DownloadActivity calls start
+service.
+
+52
+00:03:18,100 --> 00:03:19,770
+Passing the intent command as a parameter.
+
+53
+00:03:21,180 --> 00:03:23,490
+This configuration of the download
+application runs
+
+54
+00:03:23,490 --> 00:03:25,830
+the download service in a separate
+process.
+
+55
+00:03:25,830 --> 00:03:29,150
+So the Android activity manager service
+launches the service, if it's
+
+56
+00:03:29,150 --> 00:03:33,040
+not already running, and sends the intent
+across the process boundary.
+
+57
+00:03:34,430 --> 00:03:36,410
+At this point, control shifts to the
+
+58
+00:03:36,410 --> 00:03:39,220
+download service, which also performs
+several steps.
+
+59
+00:03:40,230 --> 00:03:42,592
+It creates a handler thread and a service
+handler
+
+60
+00:03:42,592 --> 00:03:45,680
+and queues the intent in the service
+handler's message que.
+
+61
+00:03:47,470 --> 00:03:49,710
+The handler's thread then uses the
+underlying
+
+62
+00:03:49,710 --> 00:03:52,880
+Android looper to deque the intent and
+dispatch
+
+63
+00:03:52,880 --> 00:03:56,150
+the service handler's handle message hook
+method, which
+
+64
+00:03:56,150 --> 00:03:59,100
+calls download image and reply to retrieve
+the
+
+65
+00:03:59,100 --> 00:04:03,480
+image, store it in a local file on the
+device and return the path name
+
+66
+00:04:03,480 --> 00:04:05,990
+of the file to the DownloadActivity by
+sending
+
+67
+00:04:05,990 --> 00:04:08,250
+a message, via the Messenger past the
+intent.
+
+68
+00:04:10,410 --> 00:04:14,370
+This message crosses the process boundary
+back to the DownloadActivity,
+
+69
+00:04:14,370 --> 00:04:19,320
+where it's dispatched to the reply
+handlers handle message hook method.
+
+70
+00:04:19,320 --> 00:04:23,942
+This method displays the image to the
+user.
+
+71
+00:04:23,942 --> 00:04:28,764
+[MUSIC]
+
+72
+00:04:28,764 --> 00:04:31,137
+Now that we've given an overview of the
+steps
+
+73
+00:04:31,137 --> 00:04:35,072
+performed by the DownloadActivity and
+download service, we'll analyze
+
+74
+00:04:35,072 --> 00:04:37,883
+the source code, focusing on the methods
+in download
+
+75
+00:04:37,883 --> 00:04:41,640
+handler and service handler that weren't
+covered in earlier videos.
+
+76
+00:04:42,860 --> 00:04:46,030
+All this source code is available at this
+URL, which I
+
+77
+00:04:46,030 --> 00:04:48,640
+encourage you to download and review as
+you watch this video.
+
+78
+00:04:48,640 --> 00:04:54,640
+We'll start by recapping key portions of
+the DownloadActivity, which creates
+
+79
+00:04:54,640 --> 00:04:56,580
+an instance of download handler that
+
+80
+00:04:56,580 --> 00:04:58,940
+processes replies from the download
+service.
+
+81
+00:05:00,430 --> 00:05:03,830
+The download image method dispatch in
+response to a button click from
+
+82
+00:05:03,830 --> 00:05:07,880
+the user, calls the make intent factory
+method, defined in download service.
+
+83
+00:05:09,170 --> 00:05:12,070
+This method localizes the logic for making
+the right intent.
+
+84
+00:05:13,100 --> 00:05:15,940
+In particular, it creates a new Messenger
+that
+
+85
+00:05:15,940 --> 00:05:18,950
+encapsulates a reference to the download
+handler and
+
+86
+00:05:18,950 --> 00:05:20,630
+adds a reference to the Messenger as an
+
+87
+00:05:20,630 --> 00:05:23,310
+extra to the intent under the name
+Messenger.
+
+88
+00:05:24,870 --> 00:05:27,766
+The intent returned from make intent is
+then
+
+89
+00:05:27,766 --> 00:05:30,896
+passed to the start service method, which
+runs
+
+90
+00:05:30,896 --> 00:05:34,260
+the download service in a separate
+process, which
+
+91
+00:05:34,260 --> 00:05:37,169
+is launched if it hasn't been started yet.
+
+92
+00:05:37,169 --> 00:05:43,101
+[MUSIC]
+
+93
+00:05:43,101 --> 00:05:47,111
+This analysis of download service focuses
+on its download image and
+
+94
+00:05:47,111 --> 00:05:51,683
+reply method, which retrieves the
+designated image, copies it into a local
+
+95
+00:05:51,683 --> 00:05:55,550
+file, extracts the Messenger stored as an
+extra in the intent and
+
+96
+00:05:55,550 --> 00:05:59,519
+passes the Messenger and path name to the
+send path helper method.
+
+97
+00:06:00,930 --> 00:06:04,300
+This method then calls the make reply
+message factor method to create
+
+98
+00:06:04,300 --> 00:06:07,670
+a message that encapsulates the path name
+for the downloaded image file.
+
+99
+00:06:09,500 --> 00:06:12,400
+In addition to storing whether the
+download succeeded or failed into
+
+100
+00:06:12,400 --> 00:06:16,430
+the message, make reply message also
+stores the path name in a
+
+101
+00:06:16,430 --> 00:06:22,760
+bundle, which is an object that map string
+values to parsable types
+
+102
+00:06:22,760 --> 00:06:26,250
+and can be used to pass data across
+processes as shown here.
+
+103
+00:06:28,160 --> 00:06:30,016
+The message returned for the make reply
+
+104
+00:06:30,016 --> 00:06:32,360
+message factory method is then passed back
+to
+
+105
+00:06:32,360 --> 00:06:34,920
+the download activity as a parameter to
+
+106
+00:06:34,920 --> 00:06:37,760
+the send method provided by the
+Messenger's reference.
+
+107
+00:06:39,380 --> 00:06:42,898
+The Android binder framework collaborates
+with the hamMeR concurrency
+
+108
+00:06:42,898 --> 00:06:45,970
+framework to dispatch this reply message
+as a parameter to
+
+109
+00:06:45,970 --> 00:06:49,000
+the download handlers handle message hook
+method in the user
+
+110
+00:06:49,000 --> 00:06:52,800
+interface thread of the process where the
+download activity resides.
+
+111
+00:06:54,520 --> 00:06:57,190
+This method extracts the bundle from the
+message
+
+112
+00:06:57,190 --> 00:06:59,520
+and uses it to obtain the encapsulated
+file name.
+
+113
+00:07:00,930 --> 00:07:03,790
+A check is then made to see if the
+download succeeded.
+
+114
+00:07:03,790 --> 00:07:07,210
+If it did, the image file is decoded, and
+the resulting
+
+115
+00:07:07,210 --> 00:07:10,360
+image is displayed in the context of the
+user interface thread.
+
+116
+00:07:12,260 --> 00:07:15,191
+Note how the use of started services,
+intents,
+
+117
+00:07:15,191 --> 00:07:19,481
+Messengers and handlers enables the
+DownloadActivity to retrieve and
+
+118
+00:07:19,481 --> 00:07:22,770
+display an image without performing any
+long duration
+
+119
+00:07:22,770 --> 00:07:27,364
+operations, that would block the user
+interface threads synchronously.
+
+120
+00:07:27,364 --> 00:07:32,290
+[MUSIC]
+
+121
+00:07:32,290 --> 00:07:35,771
+In summary, Messengers provide a flexible
+framework for itra-
+
+122
+00:07:35,771 --> 00:07:40,150
+and inter-process communication between
+activities and services in Android.
+
+123
+00:07:41,290 --> 00:07:44,506
+We showed how to download application uses
+a Messenger to communicate
+
+124
+00:07:44,506 --> 00:07:48,630
+a path name from the download service back
+to the DownloadActivity.
+
+125
+00:07:48,630 --> 00:07:52,850
+This design is consistent with the common
+idiom used throughout Android,
+
+126
+00:07:52,850 --> 00:07:56,500
+where an activity first creates a reply
+handler, next creates a
+
+127
+00:07:56,500 --> 00:08:00,530
+Messenger that encapsulates a reference to
+that handler and then passes
+
+128
+00:08:00,530 --> 00:08:03,940
+the Messenger to a started service as an
+extra to an intent.
+
+129
+00:08:05,310 --> 00:08:08,320
+When the service receives the intent, it
+extracts the
+
+130
+00:08:08,320 --> 00:08:11,180
+Messenger and uses it later to send a
+reply
+
+131
+00:08:11,180 --> 00:08:13,880
+message back to the activity, where the
+message is
+
+132
+00:08:13,880 --> 00:08:16,249
+delivered to the reply handler's handle
+message hook method.
+
+133
+00:08:18,180 --> 00:08:21,000
+Although we focused on how a started
+service can use
+
+134
+00:08:21,000 --> 00:08:24,730
+a Messenger to reply back to an activity,
+it's also
+
+135
+00:08:24,730 --> 00:08:28,040
+possible for a bound service to create a
+Messenger that
+
+136
+00:08:28,040 --> 00:08:30,360
+a client activity can use to pass messages
+to it.
+
+137
+00:08:31,770 --> 00:08:36,300
+In this variant, the bound service creates
+a Messenger that encapsulates a handler.
+
+138
+00:08:37,620 --> 00:08:40,010
+It then returns a reference to that
+Messenger via
+
+139
+00:08:40,010 --> 00:08:44,310
+the services on bind factory method, which
+is invoked automatically
+
+140
+00:08:44,310 --> 00:08:47,460
+by the Android service framework when an
+activity calls bind
+
+141
+00:08:47,460 --> 00:08:51,070
+service with an intent that's associated
+with that bound service.
+
+142
+00:08:52,930 --> 00:08:54,610
+Regardless of where the Messengers are
+used
+
+143
+00:08:54,610 --> 00:08:57,620
+for activity to service communication,
+service to
+
+144
+00:08:57,620 --> 00:09:00,890
+activity communication or communication
+with bound or
+
+145
+00:09:00,890 --> 00:09:03,680
+started services, they implement a variant
+of the
+
+146
+00:09:03,680 --> 00:09:06,190
+active object pattern, which defines the
+units
+
+147
+00:09:06,190 --> 00:09:08,370
+of concurrency in a component to the
+request
+
+148
+00:09:08,370 --> 00:09:10,580
+for service, which in this case are
+
+149
+00:09:10,580 --> 00:09:13,140
+the send methods calls on a Messenger
+reference.
+
+150
+00:09:14,150 --> 00:09:17,180
+This pattern allows the service request to
+be handled in a different thread or
+
+151
+00:09:17,180 --> 00:09:19,520
+process than the client thread that
+invoked
+
+152
+00:09:19,520 --> 00:09:22,359
+the request, as discussed in upcoming
+videos.
+
+153
+00:09:23,500 --> 00:09:26,830
+Messengers are best suited for relatively
+simple interactions between
+
+154
+00:09:26,830 --> 00:09:30,010
+activities and services that pass
+relatively simple data types.
+
+155
+00:09:31,110 --> 00:09:32,767
+When applications perform more
+
+156
+00:09:32,767 --> 00:09:35,222
+sophisticated interactions that involve
+more
+
+157
+00:09:35,222 --> 00:09:37,796
+complex data types, it may be more
+appropriate to
+
+158
+00:09:37,796 --> 00:09:41,171
+use the communication mechanisms based on
+the Android Interface
+
+159
+00:09:41,171 --> 00:09:44,811
+Definition of Language, which we'll
+discuss later in this module.
+
+160
+00:09:44,811 --> 00:09:44,943
+[BLANK_AUDIO]
+

@@ -1,0 +1,367 @@
+1
+00:00:00,008 --> 00:00:07,952
+[MUSIC].
+
+2
+00:00:07,952 --> 00:00:11,282
+One of the important properties or design
+principles
+
+3
+00:00:11,282 --> 00:00:13,502
+that we can use when we're trying to
+
+4
+00:00:13,502 --> 00:00:16,832
+build abstractions that help us improve
+the security
+
+5
+00:00:16,832 --> 00:00:20,472
+of our applications and prevent us from
+making mistakes.
+
+6
+00:00:20,472 --> 00:00:25,523
+Is to ensure that we don't tightly couple
+our data to our security state.
+
+7
+00:00:25,523 --> 00:00:27,219
+Now what do I mean by data?
+
+8
+00:00:27,219 --> 00:00:31,075
+Well, I'm talking about the things that
+our application
+
+9
+00:00:31,075 --> 00:00:34,064
+is doing as part of its normal function
+that,
+
+10
+00:00:34,064 --> 00:00:37,290
+let's say that we remove security for the
+moment
+
+11
+00:00:37,290 --> 00:00:40,765
+and we just needed to make decisions about
+the data.
+
+12
+00:00:40,765 --> 00:00:46,580
+The things like the values that the user
+is inputting into our user interface.
+
+13
+00:00:46,580 --> 00:00:49,420
+I'm talking about the temporary variables
+that
+
+14
+00:00:49,420 --> 00:00:51,930
+we're creating that are based on that
+data.
+
+15
+00:00:51,930 --> 00:00:55,290
+The data that we use to do calculations
+and methods
+
+16
+00:00:55,290 --> 00:00:57,880
+or the key names that we decide to store
+data with.
+
+17
+00:00:57,880 --> 00:01:02,933
+We want to separate those from the
+variables and the flags and the other
+
+18
+00:01:02,933 --> 00:01:08,260
+things that we're using to indicate how to
+securely process that data.
+
+19
+00:01:09,270 --> 00:01:13,690
+So if we take that, that principle and we
+look at this code base that we've
+
+20
+00:01:13,690 --> 00:01:16,210
+just looked at, what we see is, there's
+
+21
+00:01:16,210 --> 00:01:18,319
+a problem here where we're violating this
+principle.
+
+22
+00:01:19,440 --> 00:01:22,800
+And that is, we're coupling the security
+state of
+
+23
+00:01:22,800 --> 00:01:26,890
+the application to the data state of the
+application.
+
+24
+00:01:26,890 --> 00:01:30,530
+And that is this key that we're creating,
+and passing
+
+25
+00:01:30,530 --> 00:01:35,800
+into the store data method is serving two
+purposes simultaneously.
+
+26
+00:01:35,800 --> 00:01:38,961
+It's serving the purpose of deciding how
+we
+
+27
+00:01:38,961 --> 00:01:42,293
+associate and store that data on disk, and
+the
+
+28
+00:01:42,293 --> 00:01:46,224
+security decisions that are made with
+respect to where
+
+29
+00:01:46,224 --> 00:01:49,930
+that data gets saved and how it gets
+saved.
+
+30
+00:01:49,930 --> 00:01:54,670
+So we're simultaneously coupling this key
+to both the security
+
+31
+00:01:54,670 --> 00:01:58,379
+state of the application and the data
+state of the application.
+
+32
+00:01:59,580 --> 00:02:04,760
+So we have a simultaneous meaning for our
+key that's causing problems.
+
+33
+00:02:06,980 --> 00:02:09,410
+If we go and we change our key, as
+
+34
+00:02:09,410 --> 00:02:15,090
+we just saw, it can unfortunately change
+our security settings.
+
+35
+00:02:15,090 --> 00:02:17,840
+So, if we make a mistake in the key, we
+
+36
+00:02:17,840 --> 00:02:21,499
+will suddenly be making a mistake in our
+security settings.
+
+37
+00:02:22,580 --> 00:02:26,120
+And what's also problematic is, we've got
+a key
+
+38
+00:02:26,120 --> 00:02:29,530
+and a set of code that's being used to
+decide
+
+39
+00:02:29,530 --> 00:02:33,110
+security settings from the key's value,
+that's very hard
+
+40
+00:02:33,110 --> 00:02:37,330
+to test and prove from a security
+standpoint, is correct.
+
+41
+00:02:37,330 --> 00:02:39,956
+So if we look at this code, it's not
+
+42
+00:02:39,956 --> 00:02:44,170
+immediately obvious if the code is always
+going to work.
+
+43
+00:02:45,250 --> 00:02:49,373
+And if we hadn't happened to find the
+right test case, to show that this
+
+44
+00:02:49,373 --> 00:02:54,890
+test, that this, this code doesn't always
+work, we might assume that it was okay.
+
+45
+00:02:54,890 --> 00:02:59,380
+So by coupling our security and our data
+state, we're not only having the ability
+
+46
+00:02:59,380 --> 00:03:04,440
+that our data can change our security in a
+way that we don't want to happen.
+
+47
+00:03:04,440 --> 00:03:08,570
+But we're also making this much harder to
+test and prove.
+
+48
+00:03:08,570 --> 00:03:13,660
+The other problem with coupling the data
+and the security state is, if the key
+
+49
+00:03:13,660 --> 00:03:16,870
+was something, for example that was
+provided or
+
+50
+00:03:16,870 --> 00:03:21,610
+potentially interacted with data from the
+user interface.
+
+51
+00:03:21,610 --> 00:03:24,865
+Or from an intent or some other
+application,
+
+52
+00:03:24,865 --> 00:03:27,262
+then we could pretend, end up in a
+
+53
+00:03:27,262 --> 00:03:30,860
+situation where an outside attacker can
+inject or
+
+54
+00:03:30,860 --> 00:03:35,800
+easily manipulate the security state of
+our application.
+
+55
+00:03:35,800 --> 00:03:39,034
+For example, by somehow manipulating the
+keys so
+
+56
+00:03:39,034 --> 00:03:42,060
+that we save secure state in an insecure
+way.
+
+57
+00:03:42,060 --> 00:03:46,650
+And these are the types of flaws that
+attackers discover every day.
+
+58
+00:03:46,650 --> 00:03:49,650
+They discover things that the developer
+didn't
+
+59
+00:03:49,650 --> 00:03:53,310
+think through that expose the application
+to attack.
+
+60
+00:03:53,310 --> 00:03:56,740
+So how would we actually improve this
+specific code example?
+
+61
+00:03:57,820 --> 00:04:00,200
+Well, the first thing we would want to do
+
+62
+00:04:00,200 --> 00:04:04,150
+is separate this data state and the
+security state.
+
+63
+00:04:04,150 --> 00:04:06,670
+And we can do that fairly easily by
+
+64
+00:04:06,670 --> 00:04:10,790
+introducing a new method parameter that is
+secure.
+
+65
+00:04:10,790 --> 00:04:14,630
+That is, we want to have the security
+state in a separate variable that
+
+66
+00:04:14,630 --> 00:04:19,420
+is not tied to the data state, the key in
+the value that we're saving.
+
+67
+00:04:19,420 --> 00:04:24,273
+So, by separating these out, we're helping
+to prevent the ability for other
+
+68
+00:04:24,273 --> 00:04:28,550
+people to attack, and to have some of
+these issues we just looked at.
+
+69
+00:04:30,390 --> 00:04:34,000
+And it's definitely an improvement, but if
+we look
+
+70
+00:04:34,000 --> 00:04:36,560
+at this code, is this the best we can do?
+
+71
+00:04:37,680 --> 00:04:40,380
+And I think the answer is no, this is not
+the best we can do.
+
+72
+00:04:40,380 --> 00:04:42,810
+We can still do better than this.
+
+73
+00:04:42,810 --> 00:04:48,557
+Yes, we can apply decoupling to improve
+the application by separating the
+
+74
+00:04:48,557 --> 00:04:54,840
+security in the data state, but this alone
+doesn't get us a more secure abstraction.
+
+75
+00:04:54,840 --> 00:04:58,210
+Its gets a, a possibly more secure
+abstraction.
+
+76
+00:04:58,210 --> 00:04:59,710
+But we still have some other issues.
+

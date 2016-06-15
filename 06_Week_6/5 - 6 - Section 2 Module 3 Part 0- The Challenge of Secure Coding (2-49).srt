@@ -1,0 +1,190 @@
+1
+00:00:00,000 --> 00:00:08,809
+[MUSIC]
+
+2
+00:00:08,809 --> 00:00:12,152
+Now a lot of you are probably saying to
+yourselves,
+
+3
+00:00:12,152 --> 00:00:15,710
+I would never make such obvious mistakes
+in my code.
+
+4
+00:00:15,710 --> 00:00:19,690
+I would never go and take a user's
+password.
+
+5
+00:00:19,690 --> 00:00:23,580
+And store it to the external storage on an
+Android device.
+
+6
+00:00:23,580 --> 00:00:28,690
+And probably most of you wouldn't if the
+code was just that simple.
+
+7
+00:00:29,930 --> 00:00:32,736
+But in the real world, most of the code
+bases that we work
+
+8
+00:00:32,736 --> 00:00:37,310
+with are a lot more sophisticated than the
+ones that we've been looking at.
+
+9
+00:00:37,310 --> 00:00:42,280
+The examples that we've seen so far of
+leaking private data are purposely
+
+10
+00:00:42,280 --> 00:00:48,690
+simplified code examples that help us to
+illustrate the specific properties
+
+11
+00:00:48,690 --> 00:00:54,490
+that cause code to leak data on the
+external storage, or by
+
+12
+00:00:54,490 --> 00:00:58,600
+having the wrong permissions, or by
+inserting developer data inside of it.
+
+13
+00:00:59,830 --> 00:01:02,784
+But, in the real code basis that we work
+with they're much more
+
+14
+00:01:02,784 --> 00:01:04,736
+sophisticated, and so it's not quite as
+
+15
+00:01:04,736 --> 00:01:06,990
+straightforward to see these types of
+errors.
+
+16
+00:01:08,060 --> 00:01:13,250
+So what we're going to look at now is what
+makes it hard to write
+
+17
+00:01:13,250 --> 00:01:17,420
+applications that don't necessarily adhere
+to all
+
+18
+00:01:17,420 --> 00:01:20,180
+of the security practices we've just
+talked about.
+
+19
+00:01:20,180 --> 00:01:23,100
+And the approaches that we can use to help
+improve how we
+
+20
+00:01:23,100 --> 00:01:26,530
+write our code so that it's much more
+obvious when we're making
+
+21
+00:01:26,530 --> 00:01:30,214
+mistakes, and much easier to ensure that
+we don't make mistakes and
+
+22
+00:01:30,214 --> 00:01:33,930
+that other developers don't make mistakes
+in how they use our code.
+
+23
+00:01:35,180 --> 00:01:39,433
+The key thing that we're going to see is
+that when we
+
+24
+00:01:39,433 --> 00:01:44,619
+write apps, we typically don't write a
+simple app, but we
+
+25
+00:01:44,619 --> 00:01:49,910
+write an app that's built on a series of
+abstractions, that
+
+26
+00:01:49,910 --> 00:01:55,130
+get ever more, high level as we go up the
+stack.
+
+27
+00:01:55,130 --> 00:02:01,067
+And our app is built on top of these
+abstractions, and if we're not
+
+28
+00:02:01,067 --> 00:02:07,216
+careful about how we build these
+abstractions and how we use them, we
+
+29
+00:02:07,216 --> 00:02:13,683
+will end up in situations where it's very
+hard to see how an action appear
+
+30
+00:02:13,683 --> 00:02:19,860
+causes leakage of data out the bottom end
+of the set of abstractions.
+
+31
+00:02:21,080 --> 00:02:25,280
+And so what the goal, of, these, tips that
+we're going to talk about in a
+
+32
+00:02:25,280 --> 00:02:27,510
+minute, are, is to ensure that when we
+
+33
+00:02:27,510 --> 00:02:30,690
+build abstractions into our code, that we
+don't
+
+34
+00:02:30,690 --> 00:02:32,850
+build abstractions that make it hard to do
+
+35
+00:02:32,850 --> 00:02:35,840
+the right thing, but instead we build
+abstractions
+
+36
+00:02:35,840 --> 00:02:38,360
+and interfaces that make it easy for
+developers
+
+37
+00:02:38,360 --> 00:02:40,360
+to do the right thing with our code.
+
+38
+00:02:40,360 --> 00:02:42,780
+And make it easy for developers to see
+that code
+
+39
+00:02:42,780 --> 00:02:46,650
+written with our abstractions are doing
+things properly and securely.
+

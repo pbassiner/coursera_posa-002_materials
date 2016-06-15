@@ -1,0 +1,655 @@
+1
+00:00:00,091 --> 00:00:08,272
+[MUSIC].
+
+2
+00:00:08,272 --> 00:00:13,645
+Let's take a look at some of the ways that
+we can write apps that accidentally leak
+
+3
+00:00:13,645 --> 00:00:16,410
+data to other malicious apps on a device
+by
+
+4
+00:00:16,410 --> 00:00:20,849
+not properly securing our interactions
+with the storage system.
+
+5
+00:00:21,990 --> 00:00:25,031
+Now as we've seen, as is in most cases, we
+have a
+
+6
+00:00:25,031 --> 00:00:30,620
+process boundary which protects our app
+and its memory, from another app.
+
+7
+00:00:30,620 --> 00:00:33,390
+And also as we've discussed, we have an
+area,
+
+8
+00:00:33,390 --> 00:00:37,690
+within the storage system, that by
+default, whenever our
+
+9
+00:00:37,690 --> 00:00:41,280
+app saves data, allows us to save it
+privately
+
+10
+00:00:41,280 --> 00:00:43,570
+and prevent other apps from getting access
+to it.
+
+11
+00:00:44,840 --> 00:00:48,326
+But, there are certain types of
+interactions with the
+
+12
+00:00:48,326 --> 00:00:51,887
+file system that, if our app uses those
+interactions,
+
+13
+00:00:51,887 --> 00:00:54,006
+it will end up storing data in a way
+
+14
+00:00:54,006 --> 00:00:57,950
+that it's accessible to other apps on the
+device.
+
+15
+00:00:57,950 --> 00:01:00,328
+So, there are cases where we can store
+
+16
+00:01:00,328 --> 00:01:03,960
+data, and think that we're storing it
+securely.
+
+17
+00:01:03,960 --> 00:01:08,770
+But in reality, we're opening up the
+ability for malware to
+
+18
+00:01:08,770 --> 00:01:13,490
+get access to that data and then steal it
+from our application.
+
+19
+00:01:14,570 --> 00:01:17,253
+So we always want to make sure that
+whenever
+
+20
+00:01:17,253 --> 00:01:20,011
+we store private data on Android, that we
+do
+
+21
+00:01:20,011 --> 00:01:22,246
+it properly, and we don't do it in a
+
+22
+00:01:22,246 --> 00:01:25,840
+way that allows other applications to gain
+access to it.
+
+23
+00:01:27,180 --> 00:01:31,150
+So let's take a look at one particular way
+that we can
+
+24
+00:01:31,150 --> 00:01:35,500
+accidentally leak data from our app to
+other apps on the device.
+
+25
+00:01:35,500 --> 00:01:41,030
+And this is actually quite a common way
+that developers make mistakes
+
+26
+00:01:41,030 --> 00:01:45,849
+and end up exposing important settings or
+private user data to other apps.
+
+27
+00:01:47,140 --> 00:01:50,960
+So the way that, developers often make a
+mistake is they
+
+28
+00:01:50,960 --> 00:01:56,300
+assume that data that they're storing to
+the SD Card is secure.
+
+29
+00:01:56,300 --> 00:02:00,780
+Or they assume that other apps aren't
+going to look at the data, or
+
+30
+00:02:00,780 --> 00:02:05,029
+know to look for the data that their app
+is saving on the SD Card.
+
+31
+00:02:06,040 --> 00:02:08,220
+And this is actually not true.
+
+32
+00:02:08,220 --> 00:02:11,770
+If you store data on the SD card, it's
+
+33
+00:02:11,770 --> 00:02:16,790
+actually public to all other apps on a
+device.
+
+34
+00:02:16,790 --> 00:02:22,169
+So whenever you see code that has get
+external storage directory, you need to be
+
+35
+00:02:22,169 --> 00:02:25,541
+very careful that you ensure that nothing
+private
+
+36
+00:02:25,541 --> 00:02:29,170
+is being stored to that external storage
+directory.
+
+37
+00:02:30,210 --> 00:02:34,683
+And the reason is, is that the external
+storage directory
+
+38
+00:02:34,683 --> 00:02:38,515
+is typically the SD card, but it is almost
+always a
+
+39
+00:02:38,515 --> 00:02:43,538
+public area for storing information that
+any app can potentially
+
+40
+00:02:43,538 --> 00:02:48,768
+get access to regardless of what user
+account saved the data there.
+
+41
+00:02:48,768 --> 00:02:51,423
+So just because your app saves data there
+
+42
+00:02:51,423 --> 00:02:54,312
+and has a separate user account from
+another
+
+43
+00:02:54,312 --> 00:02:57,122
+app it doesn't mean that that data that's
+
+44
+00:02:57,122 --> 00:03:01,285
+stored on the external storage directory
+is actually secure.
+
+45
+00:03:01,285 --> 00:03:05,503
+So what you want to look for is the
+creation, for example, in this case
+
+46
+00:03:05,503 --> 00:03:07,613
+of a file that's being stored with
+
+47
+00:03:07,613 --> 00:03:12,080
+the parent directory being the external
+storage directory.
+
+48
+00:03:12,080 --> 00:03:17,510
+So in this case, the user that's logging
+in has a username and password, and
+
+49
+00:03:17,510 --> 00:03:20,620
+the developer is actually taking that
+password
+
+50
+00:03:20,620 --> 00:03:23,160
+and storing it on the external storage
+directory.
+
+51
+00:03:24,650 --> 00:03:28,235
+And then we see, finally, they write the
+actual password to
+
+52
+00:03:28,235 --> 00:03:32,315
+the external storage directory, and
+there's a whole host of issues
+
+53
+00:03:32,315 --> 00:03:35,900
+with storing passwords on disk, but, even
+if this wasn't a
+
+54
+00:03:35,900 --> 00:03:40,280
+password, it was some other secure
+setting, it's still a problem.
+
+55
+00:03:40,280 --> 00:03:42,524
+And the reason is is because we've gone
+
+56
+00:03:42,524 --> 00:03:45,788
+from secure data to the external storage
+directory, and
+
+57
+00:03:45,788 --> 00:03:48,508
+then written that data there, assuming
+that it
+
+58
+00:03:48,508 --> 00:03:51,450
+was private in some way, when actually it
+isn't.
+
+59
+00:03:52,540 --> 00:03:58,340
+As I mentioned a second ago, you don't
+really want to store passwords on disk.
+
+60
+00:03:58,340 --> 00:03:59,980
+If you can come up with a design
+
+61
+00:03:59,980 --> 00:04:03,730
+for your application that doesn't require
+storing passwords.
+
+62
+00:04:03,730 --> 00:04:07,586
+If you can use an, token authentication
+scheme, where you get
+
+63
+00:04:07,586 --> 00:04:10,785
+tokens from a server, or force the user to
+log in each
+
+64
+00:04:10,785 --> 00:04:15,587
+time, in order to gain access to critical
+settings or private settings,
+
+65
+00:04:15,587 --> 00:04:20,360
+you're probably much better off than if
+you're storing passwords on disk.
+
+66
+00:04:20,360 --> 00:04:24,469
+It's very difficult to store something
+sensitive like a password
+
+67
+00:04:24,469 --> 00:04:27,370
+on disk and do it in a very secure manner.
+
+68
+00:04:27,370 --> 00:04:31,500
+You have to know exactly what you're doing
+and be very, very careful with this.
+
+69
+00:04:31,500 --> 00:04:35,229
+If you absolutely have to store something
+sensitive,
+
+70
+00:04:35,229 --> 00:04:38,307
+like a password, on disk, you really need
+to
+
+71
+00:04:38,307 --> 00:04:41,548
+understand how to encrypt that data
+properly or
+
+72
+00:04:41,548 --> 00:04:46,180
+how to hash it properly using something
+like VCrypt.
+
+73
+00:04:46,180 --> 00:04:51,230
+And, you don't want to do this unless you
+absolutely understand what you're doing.
+
+74
+00:04:51,230 --> 00:04:53,717
+You don't want to develop your own
+
+75
+00:04:53,717 --> 00:04:58,630
+homegrown encryption scheme for storing
+stuff to disk.
+
+76
+00:04:58,630 --> 00:05:00,740
+And now there have been cases of apps
+where people
+
+77
+00:05:00,740 --> 00:05:06,320
+have taken things like Google protocol
+buffers, which encode data into
+
+78
+00:05:06,320 --> 00:05:11,230
+a binary format that isn't necessarily
+human readable and they've stored
+
+79
+00:05:11,230 --> 00:05:15,070
+data in that format assuming that it was
+secure on disk.
+
+80
+00:05:15,070 --> 00:05:19,736
+But the reality is, is that even something
+like Google protocol buffrs isn't secure.
+
+81
+00:05:19,736 --> 00:05:21,680
+It's not a real security mechanism.
+
+82
+00:05:21,680 --> 00:05:24,280
+If you're going to actually store
+something on
+
+83
+00:05:24,280 --> 00:05:25,840
+disk, you need to do it with a
+
+84
+00:05:25,840 --> 00:05:29,025
+real strong well known well studied
+encryption algorithm
+
+85
+00:05:29,025 --> 00:05:32,021
+and you don't need to build your own
+implementation.
+
+86
+00:05:32,021 --> 00:05:34,399
+You need to use an existing
+implementation.
+
+87
+00:05:35,440 --> 00:05:40,688
+The actual algorithms and processes for
+encrypting data and storing it on disc are
+
+88
+00:05:40,688 --> 00:05:45,325
+beyond the scope of this MOOC, but I
+encourage those who are out there and
+
+89
+00:05:45,325 --> 00:05:50,419
+are going to write applications that store
+data of this sensitivity on disk, to
+
+90
+00:05:50,419 --> 00:05:52,929
+go and look at the available encryption
+
+91
+00:05:52,929 --> 00:05:56,390
+options for storing data on disk on
+Android.
+
+92
+00:05:56,390 --> 00:06:00,420
+Regardless of if you're encrypting data or
+not, anything
+
+93
+00:06:00,420 --> 00:06:04,850
+private should never get stored on the
+external storage directory.
+
+94
+00:06:04,850 --> 00:06:09,810
+There is no reason to take data that's
+private, even if it's encrypted,
+
+95
+00:06:09,810 --> 00:06:14,390
+and possibly expose it to other
+applications by storing it on the SD card.
+
+96
+00:06:15,610 --> 00:06:18,020
+If you see direct data that's going to the
+external
+
+97
+00:06:18,020 --> 00:06:23,350
+storage directory, check and say is this
+data something that's public.
+
+98
+00:06:23,350 --> 00:06:26,200
+Do I want every other app to read it?
+
+99
+00:06:26,200 --> 00:06:28,580
+And if there's any case where you say I
+don't want another
+
+100
+00:06:28,580 --> 00:06:32,480
+app to read it, then you shouldn't be
+storing it on external storage.
+
+101
+00:06:32,480 --> 00:06:35,750
+You must approach external storage with
+the mentality that
+
+102
+00:06:35,750 --> 00:06:39,320
+anything you store there will be read by
+other applications.
+
+103
+00:06:39,320 --> 00:06:41,420
+And they will be able to interpret that
+data,
+
+104
+00:06:41,420 --> 00:06:43,960
+and they will be able to do things with
+it.
+
+105
+00:06:43,960 --> 00:06:46,740
+If you take that mentality, then it makes
+it easier to make a
+
+106
+00:06:46,740 --> 00:06:49,230
+decision about what goes on external
+
+107
+00:06:49,230 --> 00:06:52,000
+storage versus doesn't go on external
+storage.
+
+108
+00:06:52,000 --> 00:06:55,320
+And to make decisions that don't end up
+exposing
+
+109
+00:06:55,320 --> 00:06:58,290
+user data or exposing private settings
+from your application.
+
+110
+00:07:02,470 --> 00:07:07,354
+So what would be an acceptable use of
+external storage?
+
+111
+00:07:07,354 --> 00:07:12,634
+Well, one common acceptable use of
+external storage is to store photos.
+
+112
+00:07:12,634 --> 00:07:14,746
+So, for example, if you have a
+
+113
+00:07:14,746 --> 00:07:18,896
+custom camera application, you probably
+want to store those
+
+114
+00:07:18,896 --> 00:07:24,100
+photos to the SD card, so that the user
+can use their phone like a camera.
+
+115
+00:07:24,100 --> 00:07:25,630
+Pop in an SD card.
+
+116
+00:07:25,630 --> 00:07:26,970
+Take a bunch of photos.
+
+117
+00:07:26,970 --> 00:07:30,271
+Store them to the SD card, and then pull
+that SD card out, and put
+
+118
+00:07:30,271 --> 00:07:34,140
+a new SD card in when the SD card that
+they'd been using before became full.
+
+119
+00:07:35,160 --> 00:07:38,350
+So, in that case it probably does make
+sense
+
+120
+00:07:38,350 --> 00:07:41,650
+to store those photos on the external
+storage directory.
+
+121
+00:07:41,650 --> 00:07:45,270
+Also, if they're stored on the external
+storage directory, it can allow
+
+122
+00:07:45,270 --> 00:07:49,790
+things like the Gallery Application to
+more easily get access to them.
+
+123
+00:07:49,790 --> 00:07:54,110
+So, there are cases where we want to store
+to external storage.
+
+124
+00:07:54,110 --> 00:07:58,340
+But we have to remember that we can't just
+assume that because we're taking a
+
+125
+00:07:58,340 --> 00:08:00,440
+photo or we're taking some other type of
+
+126
+00:08:00,440 --> 00:08:03,840
+data that it's necessarily appropriate for
+external storage.
+
+127
+00:08:05,390 --> 00:08:08,376
+So, for example, although we might have an
+
+128
+00:08:08,376 --> 00:08:12,577
+application where we're actually storing
+something that is
+
+129
+00:08:12,577 --> 00:08:15,645
+benign, maybe it really is a innocuous
+photo
+
+130
+00:08:15,645 --> 00:08:19,190
+that we're storing on the actual SD card.
+
+131
+00:08:19,190 --> 00:08:21,240
+It's not going to be the case that it
+always
+
+132
+00:08:21,240 --> 00:08:24,000
+make sense to store photos on the SD card.
+
+133
+00:08:24,000 --> 00:08:28,780
+So if you're building Snapchat you don't
+want to store photos on the SD card.
+
+134
+00:08:28,780 --> 00:08:33,460
+Because the whole purpose is, is that
+photos are private and can't be seen.
+
+135
+00:08:33,460 --> 00:08:37,676
+So, you need to be very careful and
+evaluate whether or not it makes
+
+136
+00:08:37,676 --> 00:08:41,990
+sense to store data on the external
+storage or SD card of the device.
+

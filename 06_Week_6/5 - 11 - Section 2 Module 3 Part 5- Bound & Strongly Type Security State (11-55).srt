@@ -1,0 +1,882 @@
+1
+00:00:00,000 --> 00:00:08,776
+[MUSIC]
+
+2
+00:00:08,776 --> 00:00:11,063
+Now some of you may think, why are we
+
+3
+00:00:11,063 --> 00:00:13,814
+going to all of this trouble to use an
+enum?
+
+4
+00:00:13,814 --> 00:00:18,978
+Why don't we use something simpler like a
+series of integer
+
+5
+00:00:18,978 --> 00:00:24,258
+flags to represent the security levels in
+the application?
+
+6
+00:00:24,258 --> 00:00:28,029
+Well, is this really the right thing?
+
+7
+00:00:28,029 --> 00:00:31,431
+Can anybody see a potential issue if we
+take this
+
+8
+00:00:31,431 --> 00:00:37,670
+approach to using simple integer flags to
+representing our security levels?
+
+9
+00:00:37,670 --> 00:00:39,740
+What could be the problems with this
+approach?
+
+10
+00:00:45,700 --> 00:00:51,035
+Well, one of the first things we realize
+is that we are expanding the
+
+11
+00:00:51,035 --> 00:00:57,730
+bounds of the possible values that our
+security level variable can take.
+
+12
+00:00:57,730 --> 00:01:02,752
+So suddenly, rather than having security
+levels that are really
+
+13
+00:01:02,752 --> 00:01:06,871
+discrete and from a finite set of values
+from an enum.
+
+14
+00:01:06,871 --> 00:01:11,470
+We have an unbounded, essentially, series
+of values that are
+
+15
+00:01:11,470 --> 00:01:16,660
+only bounded by the minimum, maximum
+integer values in Java.
+
+16
+00:01:16,660 --> 00:01:18,730
+And that's a huge number of different
+values.
+
+17
+00:01:19,850 --> 00:01:24,200
+So, that immediately adds complexity to
+our code.
+
+18
+00:01:24,200 --> 00:01:26,770
+Particularly from a testing standpoint.
+
+19
+00:01:26,770 --> 00:01:31,275
+If we want to know that this code does the
+correct thing at all times,
+
+20
+00:01:31,275 --> 00:01:36,757
+we have to build code that suddenly tests
+all of these different integer values.
+
+21
+00:01:36,757 --> 00:01:40,621
+Maybe not every single one of them, but
+important boundary
+
+22
+00:01:40,621 --> 00:01:46,140
+conditions for sure, and ensure that our
+code is operating properly.
+
+23
+00:01:46,140 --> 00:01:49,500
+Now, do we really need all of those
+different integer values
+
+24
+00:01:49,500 --> 00:01:53,970
+to represent all of the different levels
+of security in our application?
+
+25
+00:01:53,970 --> 00:01:55,010
+Probably not.
+
+26
+00:01:55,010 --> 00:02:00,610
+It's really unlikely that we actually need
+the full range of integers, and that we
+
+27
+00:02:00,610 --> 00:02:03,090
+really have that fine of a grain, you
+
+28
+00:02:03,090 --> 00:02:06,860
+know, set of security levels in our
+application.
+
+29
+00:02:07,990 --> 00:02:11,525
+So you can image this adds significant
+testing complexity.
+
+30
+00:02:11,525 --> 00:02:16,400
+A simple code it doesn't really matter if
+I use this integer value.
+
+31
+00:02:16,400 --> 00:02:20,780
+It's not really going to affect my testing
+that much.
+
+32
+00:02:20,780 --> 00:02:22,770
+I can look at this code and I can
+
+33
+00:02:22,770 --> 00:02:27,040
+very easily decide which are the important
+boundaries to test.
+
+34
+00:02:27,040 --> 00:02:28,804
+And therefore, it's not a big deal if
+
+35
+00:02:28,804 --> 00:02:31,240
+we used an integer to represent our
+security level.
+
+36
+00:02:32,860 --> 00:02:36,340
+Now, in this specific case, if this code
+never changed and if you
+
+37
+00:02:36,340 --> 00:02:40,030
+were the only developer working on it,
+maybe that would be the case.
+
+38
+00:02:41,250 --> 00:02:45,680
+But the reality of the software
+engineering world is, we work in teams.
+
+39
+00:02:45,680 --> 00:02:52,900
+We work with other developers, and it's
+almost impossible to avoid the situation
+
+40
+00:02:52,900 --> 00:02:56,820
+that developers end up stepping on each
+other's toes or using each other's code.
+
+41
+00:02:56,820 --> 00:03:01,343
+Are modifying each others code in ways
+that the other developers didn't expect.
+
+42
+00:03:01,343 --> 00:03:05,151
+And so we have to be able to guard against
+that by effective testing
+
+43
+00:03:05,151 --> 00:03:07,159
+and by effective testing so that we
+
+44
+00:03:07,159 --> 00:03:10,160
+can refactor our code and continually
+improve it.
+
+45
+00:03:10,160 --> 00:03:14,761
+And, what would happen if a developer
+comes along and decides that
+
+46
+00:03:14,761 --> 00:03:18,881
+they want to refactor our code and add a
+new security level?
+
+47
+00:03:18,881 --> 00:03:23,071
+Or suddenly change the conditional logic
+so that it checks if
+
+48
+00:03:23,071 --> 00:03:27,190
+the security level is high enough to add
+encryption or not?
+
+49
+00:03:28,200 --> 00:03:30,960
+And suddenly we might introduce a subtle
+bug
+
+50
+00:03:30,960 --> 00:03:36,420
+where we're incorrectly checking the
+condition on that integer.
+
+51
+00:03:36,420 --> 00:03:39,610
+And suddenly our security level is not
+causing the data
+
+52
+00:03:39,610 --> 00:03:43,900
+to be stored securely anymore, even though
+it was before.
+
+53
+00:03:43,900 --> 00:03:47,039
+So without effective testing of a range of
+values, and
+
+54
+00:03:47,039 --> 00:03:50,658
+continually updating our test cases to
+account for all of these
+
+55
+00:03:50,658 --> 00:03:54,755
+different integer value ranges, and each
+time we add some significant
+
+56
+00:03:54,755 --> 00:03:58,900
+value we have to test around the
+boundaries of that integer.
+
+57
+00:03:58,900 --> 00:04:02,880
+So it, it, it adds significant complexity
+to our code if we have
+
+58
+00:04:02,880 --> 00:04:09,120
+these unbounded integers that we are
+trying to use for a security level.
+
+59
+00:04:09,120 --> 00:04:11,930
+So we want to try to have representations
+of our
+
+60
+00:04:11,930 --> 00:04:14,920
+security state that are bounded and easier
+to reason about.
+
+61
+00:04:15,920 --> 00:04:20,867
+Another issue that we have to think about
+is what happens when
+
+62
+00:04:20,867 --> 00:04:26,396
+somebody misinterprets the usage of an
+integer for a security level
+
+63
+00:04:26,396 --> 00:04:32,820
+and provides a value that we haven't
+defined a security level for?
+
+64
+00:04:32,820 --> 00:04:38,110
+In this code, all we've got is a max
+security level and then no security.
+
+65
+00:04:38,110 --> 00:04:43,060
+But, the actual security variable itself
+could be any integer.
+
+66
+00:04:43,060 --> 00:04:46,330
+So what happens if somebody provides us a
+random integer?
+
+67
+00:04:46,330 --> 00:04:48,320
+What if they provide us 43 or 17?
+
+68
+00:04:48,320 --> 00:04:50,860
+What does that mean?
+
+69
+00:04:50,860 --> 00:04:54,740
+Or in this particular case, what if the
+person thinks
+
+70
+00:04:54,740 --> 00:04:58,450
+that, well, I'm going to write even more
+secure code.
+
+71
+00:04:58,450 --> 00:05:01,950
+So, I'm going to take the most secure,
+highest security
+
+72
+00:05:01,950 --> 00:05:04,800
+level that you've currently got, and I'm
+going to increment it.
+
+73
+00:05:04,800 --> 00:05:07,120
+I'm going to make it one level greater of
+security.
+
+74
+00:05:07,120 --> 00:05:09,170
+Well, what does that mean to us?
+
+75
+00:05:10,210 --> 00:05:14,790
+And we've, all of a sudden introduced,
+complexity, the
+
+76
+00:05:14,790 --> 00:05:18,780
+potential for people to misunderstand how
+our system works.
+
+77
+00:05:18,780 --> 00:05:22,870
+And the possibility of dealing with values
+that we didn't
+
+78
+00:05:22,870 --> 00:05:26,850
+intend to be provided to us from a
+security level perspective.
+
+79
+00:05:26,850 --> 00:05:30,061
+So we want to be careful that we bound our
+security
+
+80
+00:05:30,061 --> 00:05:33,444
+level state and be able to reason about it
+easily.
+
+81
+00:05:33,444 --> 00:05:36,296
+And also, by bounding it we make it easier
+
+82
+00:05:36,296 --> 00:05:39,883
+for other users to comprehend the
+appropriate way to
+
+83
+00:05:39,883 --> 00:05:42,735
+use that state and how to express what
+they
+
+84
+00:05:42,735 --> 00:05:46,710
+want done and how securely they want it
+done.
+
+85
+00:05:46,710 --> 00:05:51,390
+The other issue with this integer approach
+is it doesn't enforce any
+
+86
+00:05:51,390 --> 00:05:56,630
+type of type constraint, and that causes a
+couple of problems for us.
+
+87
+00:05:57,730 --> 00:05:59,460
+One of them is.
+
+88
+00:05:59,460 --> 00:06:03,430
+Secondly, we would like to enforce some
+level of
+
+89
+00:06:03,430 --> 00:06:07,140
+separation between the security state and
+the data state.
+
+90
+00:06:07,140 --> 00:06:10,520
+We would like to make it hard to mix the
+two together
+
+91
+00:06:10,520 --> 00:06:14,719
+and to set security state from some
+computation on the data state.
+
+92
+00:06:15,860 --> 00:06:21,488
+But, with the current approach in this
+code, I can do something odd like, I can
+
+93
+00:06:21,488 --> 00:06:28,280
+assign the security level to the number of
+groups, or the size of the private groups.
+
+94
+00:06:28,280 --> 00:06:30,966
+So, maybe my thought process if I'm
+another
+
+95
+00:06:30,966 --> 00:06:34,007
+developer is, well, the bigger the group
+the more
+
+96
+00:06:34,007 --> 00:06:36,057
+I need to secure it because the more
+
+97
+00:06:36,057 --> 00:06:38,694
+damage could be done if those names got
+out.
+
+98
+00:06:38,694 --> 00:06:42,860
+And if there's absolutely no one in the
+group well, then that's fine.
+
+99
+00:06:42,860 --> 00:06:45,835
+That means that we have a security level
+of zero because there's no point
+
+100
+00:06:45,835 --> 00:06:49,275
+in securing it because who cares if that
+gets out, because there's no data there.
+
+101
+00:06:49,275 --> 00:06:51,005
+And the more people in the group, the more
+
+102
+00:06:51,005 --> 00:06:53,980
+data is been exposed to the higher the
+security level.
+
+103
+00:06:53,980 --> 00:06:58,890
+So somebody could simply take what you're
+doing and misinterpret it, and then
+
+104
+00:06:58,890 --> 00:07:04,530
+begin calculating some security level
+based on their data state.
+
+105
+00:07:04,530 --> 00:07:06,550
+And that's not really what we want them to
+do.
+
+106
+00:07:06,550 --> 00:07:10,324
+So, in this example down here, suddenly
+they're setting the
+
+107
+00:07:10,324 --> 00:07:14,120
+security level equal to the size of the
+private groups.
+
+108
+00:07:14,120 --> 00:07:20,620
+Which is clearly not something that you
+intended for user of your interface to do.
+
+109
+00:07:20,620 --> 00:07:23,178
+So if we were smarter about how we
+designed
+
+110
+00:07:23,178 --> 00:07:26,760
+our abstraction, we could add some typing
+to our security
+
+111
+00:07:26,760 --> 00:07:29,830
+levels, to insure that we can enforce some
+levels
+
+112
+00:07:29,830 --> 00:07:33,656
+of separation between the security state
+and the data state.
+
+113
+00:07:33,656 --> 00:07:37,530
+Or at least make it harder to mix and
+match the two directly.
+
+114
+00:07:39,690 --> 00:07:42,540
+So, if we go back and look at our enum
+approach
+
+115
+00:07:42,540 --> 00:07:46,750
+again, we get a number of important
+benefits from this approach.
+
+116
+00:07:47,930 --> 00:07:53,960
+The first benefit is that our, our
+security state is clearly bounded.
+
+117
+00:07:53,960 --> 00:07:57,980
+We only have two specific values that we
+have to worry about.
+
+118
+00:07:57,980 --> 00:08:00,400
+Security level max and none.
+
+119
+00:08:00,400 --> 00:08:02,440
+There is no in between and there's no
+
+120
+00:08:02,440 --> 00:08:05,320
+possibility to assign a value that's in
+between.
+
+121
+00:08:05,320 --> 00:08:10,316
+And this is really important because it
+helps us to prevent the
+
+122
+00:08:10,316 --> 00:08:16,390
+errors that we saw of people misusing our
+interface to security.
+
+123
+00:08:16,390 --> 00:08:20,150
+And it also is very important from a
+testability standpoint.
+
+124
+00:08:20,150 --> 00:08:23,667
+It's much easier with this enum approach
+to figure
+
+125
+00:08:23,667 --> 00:08:26,864
+out what are all the important values to
+test.
+
+126
+00:08:26,864 --> 00:08:29,160
+And then to go and build test cases
+
+127
+00:08:29,160 --> 00:08:32,850
+that ensure that those test cases
+guarantee that
+
+128
+00:08:32,850 --> 00:08:38,110
+the security is upheld for each of the
+values that we care about in that enum.
+
+129
+00:08:39,140 --> 00:08:44,245
+Another important aspect of this enum
+approach is that it takes
+
+130
+00:08:44,245 --> 00:08:49,251
+many of these errors that we saw, that
+resulted from misuse or
+
+131
+00:08:49,251 --> 00:08:54,263
+misinterpretation of our security level
+and how we interpret
+
+132
+00:08:54,263 --> 00:08:59,500
+that, that, that type and push them into
+compile time errors.
+
+133
+00:09:00,720 --> 00:09:05,995
+So if another developer is misusing our
+interface, as many of the common ways
+
+134
+00:09:05,995 --> 00:09:11,449
+that it might be misused could be caught
+at compile time as compile time errors.
+
+135
+00:09:12,550 --> 00:09:13,890
+So, for example, if we look at the
+
+136
+00:09:13,890 --> 00:09:18,190
+first line, they're trying to assign an
+arbitrary
+
+137
+00:09:18,190 --> 00:09:20,660
+value, for which we don't have a
+definition
+
+138
+00:09:20,660 --> 00:09:22,830
+of what that means in our security model.
+
+139
+00:09:22,830 --> 00:09:23,160
+Three.
+
+140
+00:09:23,160 --> 00:09:24,740
+What does three mean?
+
+141
+00:09:24,740 --> 00:09:27,760
+We haven't defined that value.
+
+142
+00:09:27,760 --> 00:09:30,310
+Well now, it's a compile error.
+
+143
+00:09:30,310 --> 00:09:34,310
+Because if they assign three, three is an
+integer and our
+
+144
+00:09:34,310 --> 00:09:39,050
+security level is an enum, and you can't,
+those things aren't compatible.
+
+145
+00:09:39,050 --> 00:09:45,840
+So that would be flagged at compile time
+as a misuse of that particular interface.
+
+146
+00:09:45,840 --> 00:09:48,343
+So we've taken something that would have
+been a
+
+147
+00:09:48,343 --> 00:09:51,630
+run time error and caused sort of
+undefined behavior.
+
+148
+00:09:51,630 --> 00:09:56,570
+And we pushed it to the compile time error
+to prevent a security problem.
+
+149
+00:09:57,790 --> 00:09:59,966
+If we look at the second line, there were
+
+150
+00:09:59,966 --> 00:10:02,980
+mixing our security state and our data
+state together.
+
+151
+00:10:02,980 --> 00:10:05,500
+They were trying to assign a security
+level
+
+152
+00:10:05,500 --> 00:10:07,716
+based on the size of the private groups.
+
+153
+00:10:07,716 --> 00:10:12,100
+So, suddenly, we can push this to a
+compile time error as well.
+
+154
+00:10:12,100 --> 00:10:15,752
+Because directly assigning the security
+level from
+
+155
+00:10:15,752 --> 00:10:18,242
+the groups and the size of the groups
+
+156
+00:10:18,242 --> 00:10:21,313
+is not possible because private groups
+that
+
+157
+00:10:21,313 --> 00:10:24,139
+size does not give you a security level.
+
+158
+00:10:24,139 --> 00:10:25,827
+It gives you an integer.
+
+159
+00:10:25,827 --> 00:10:31,710
+Again a compile error because it can't be
+assigned to the security level.
+
+160
+00:10:31,710 --> 00:10:35,865
+So we can help prevent people from mixing
+security and data state.
+
+161
+00:10:35,865 --> 00:10:38,567
+Unless security state is somehow that
+type,
+
+162
+00:10:38,567 --> 00:10:41,270
+security level is somehow represented in
+the
+
+163
+00:10:41,270 --> 00:10:46,770
+data state, it's unlikely that they'll be
+able to easily mix and match the two.
+
+164
+00:10:46,770 --> 00:10:49,810
+Of if the do, they'll be very aware of
+what they're doing.
+
+165
+00:10:51,000 --> 00:10:53,070
+If we look at the third line, we
+
+166
+00:10:53,070 --> 00:10:56,990
+can deal with the misinterpretation of the
+paranoid user
+
+167
+00:10:56,990 --> 00:11:00,140
+who tries to increment the security level
+above our
+
+168
+00:11:00,140 --> 00:11:03,310
+maximum, because they're even more secure
+than everybody else.
+
+169
+00:11:04,380 --> 00:11:06,160
+And again, this is being caught and
+
+170
+00:11:06,160 --> 00:11:09,560
+flagged and turned into a compile time
+error.
+
+171
+00:11:09,560 --> 00:11:12,979
+So, by changing the design of our
+interface and
+
+172
+00:11:12,979 --> 00:11:17,170
+using this enum, rather than an integer,
+we're getting
+
+173
+00:11:17,170 --> 00:11:20,419
+a number of benefits from the ability to
+catch
+
+174
+00:11:20,419 --> 00:11:24,880
+errors and how other developers are using
+our code.
+
+175
+00:11:24,880 --> 00:11:27,620
+And also from a testability standpoint in
+our ability
+
+176
+00:11:27,620 --> 00:11:31,450
+to maintain that code and ensure that it
+stays secure.
+
+177
+00:11:31,450 --> 00:11:34,370
+Particularly in a group software
+engineering environment where
+
+178
+00:11:34,370 --> 00:11:36,600
+other developers are modifying the code as
+well.
+
+179
+00:11:37,770 --> 00:11:40,760
+So, is this as good as we can get this
+interface?
+
+180
+00:11:42,370 --> 00:11:45,390
+Can we make these abstractions any better
+than they already are?
+
+181
+00:11:45,390 --> 00:11:47,600
+Well, I think that we can.
+
+182
+00:11:47,600 --> 00:11:50,238
+There's still more that we can do to
+improve
+
+183
+00:11:50,238 --> 00:11:54,030
+these abstractions that we've built to
+store data securely.
+

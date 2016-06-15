@@ -1,0 +1,697 @@
+1
+00:00:00,136 --> 00:00:08,681
+[MUSIC]
+
+2
+00:00:08,681 --> 00:00:13,439
+We've done a lot to improve the security
+of this code, and to improve the
+
+3
+00:00:13,439 --> 00:00:16,793
+readability of our abstraction so that
+developers
+
+4
+00:00:16,793 --> 00:00:19,060
+can use it in a way that's secure.
+
+5
+00:00:20,430 --> 00:00:23,300
+But there's still more that we could do
+
+6
+00:00:23,300 --> 00:00:26,510
+to make our abstraction a little better
+designed.
+
+7
+00:00:27,560 --> 00:00:31,030
+And this is actually an important issue
+that we want to address.
+
+8
+00:00:32,500 --> 00:00:37,962
+One of the problems that we have is that
+our current state of our
+
+9
+00:00:37,962 --> 00:00:43,120
+code is set such that its behavior is
+insecure by default.
+
+10
+00:00:44,250 --> 00:00:45,380
+Now what do I mean by that?
+
+11
+00:00:46,490 --> 00:00:49,885
+Well, this, Boolean that we are passing
+in,
+
+12
+00:00:49,885 --> 00:00:55,260
+to determine if something is stored
+securely or insecurely.
+
+13
+00:00:55,260 --> 00:00:58,750
+Well, by default, it's going to be
+insecure.
+
+14
+00:00:59,810 --> 00:01:02,452
+Now the reason for this is, is let's say
+
+15
+00:01:02,452 --> 00:01:06,200
+that we have a class that defines our
+security settings.
+
+16
+00:01:08,010 --> 00:01:10,140
+And we'll just call this settings.
+
+17
+00:01:13,330 --> 00:01:18,920
+And then, we create a Boolean variable
+within this class.
+
+18
+00:01:18,920 --> 00:01:22,440
+It's a member variable and we call it,
+secure.
+
+19
+00:01:25,370 --> 00:01:30,363
+The problem is, is that by default, if we
+do nothing, and if we don't
+
+20
+00:01:30,363 --> 00:01:36,140
+initialize a value for secure when we
+declare it, it's going to be false.
+
+21
+00:01:36,140 --> 00:01:39,110
+And, and this is not what we want in our
+code.
+
+22
+00:01:39,110 --> 00:01:44,470
+We want the default state for our code to
+be secure.
+
+23
+00:01:44,470 --> 00:01:47,955
+So, what we need to do when we design our
+code
+
+24
+00:01:47,955 --> 00:01:51,913
+is try to ensure that if the developer or
+the user or
+
+25
+00:01:51,913 --> 00:01:57,285
+caller or whoever it is of our code does
+absolutely nothing to change
+
+26
+00:01:57,285 --> 00:02:02,299
+its behavior, then by default it will do
+something securely.
+
+27
+00:02:03,400 --> 00:02:08,913
+If the person, or the caller or the
+interface user uses our code and
+
+28
+00:02:08,913 --> 00:02:14,730
+wants to use it insecurely, they have to
+go out of their way to do that.
+
+29
+00:02:15,790 --> 00:02:18,410
+We want to build abstractions and
+interfaces that
+
+30
+00:02:18,410 --> 00:02:20,970
+are hard to do the wrong thing with.
+
+31
+00:02:20,970 --> 00:02:24,290
+And that's not what we have right now with
+our current setup.
+
+32
+00:02:25,470 --> 00:02:29,519
+If somebody is using our code and they
+call stored
+
+33
+00:02:29,519 --> 00:02:33,386
+data by default is secure is going to be
+false.
+
+34
+00:02:33,386 --> 00:02:37,583
+Because Java Booleans, by default if
+nothing else, is provided
+
+35
+00:02:37,583 --> 00:02:42,710
+when they are initialized, they're
+going to be initialized to false.
+
+36
+00:02:42,710 --> 00:02:46,498
+So by default this code is going to
+execute the ELSE branch.
+
+37
+00:02:46,498 --> 00:02:49,921
+Unless someone tells us that the code, the
+data needs to be stored
+
+38
+00:02:49,921 --> 00:02:52,348
+securely, we're going to assume it
+doesn't,
+
+39
+00:02:52,348 --> 00:02:54,480
+and we're not going to store it securely.
+
+40
+00:02:54,480 --> 00:02:58,430
+And this is not how we wannna build our
+abstractions.
+
+41
+00:02:58,430 --> 00:03:00,835
+What we want to do is we want to build our
+
+42
+00:03:00,835 --> 00:03:05,330
+abstractions so that it's hard to use them
+incorrectly.
+
+43
+00:03:05,330 --> 00:03:07,870
+That the low energy, low effort way of
+using
+
+44
+00:03:07,870 --> 00:03:10,890
+our code, is to use it correctly and
+securely.
+
+45
+00:03:10,890 --> 00:03:15,750
+The high effort, high energy way of using
+our code, is to use it insecurely.
+
+46
+00:03:15,750 --> 00:03:17,920
+And what that does, is it makes it so
+that,
+
+47
+00:03:17,920 --> 00:03:21,510
+we can rely on the fact that developers
+are lazy.
+
+48
+00:03:21,510 --> 00:03:26,220
+That, code typically does not try to be
+more complex than it needs to be.
+
+49
+00:03:26,220 --> 00:03:27,640
+Well, not necessarily, at least.
+
+50
+00:03:28,940 --> 00:03:34,411
+To ensure that our interface, normally,
+when it's used, is going to be easier to
+
+51
+00:03:34,411 --> 00:03:36,754
+use in a secure way, and less likely
+
+52
+00:03:36,754 --> 00:03:41,200
+to have errors introduced from a security
+perspective.
+
+53
+00:03:41,200 --> 00:03:45,708
+So how could we improve the security of
+our code in this case?
+
+54
+00:03:45,708 --> 00:03:51,110
+Well, a better design for our abstraction
+would be to change the Boolean variable
+
+55
+00:03:51,110 --> 00:03:56,970
+so that the Boolean variable indicates if
+the user wants the data to be public.
+
+56
+00:03:56,970 --> 00:04:01,450
+So that by default, this conditional logic
+is predicated
+
+57
+00:04:01,450 --> 00:04:04,320
+on whether or not the div, data should be
+public.
+
+58
+00:04:04,320 --> 00:04:07,194
+And if the data is not explicitly flagged
+to be
+
+59
+00:04:07,194 --> 00:04:12,880
+public, then it's stored privately, using
+encryption or other means.
+
+60
+00:04:12,880 --> 00:04:16,786
+And if we take this approach suddenly our
+conditional
+
+61
+00:04:16,786 --> 00:04:20,082
+logic is a lot more robust, and our
+interface
+
+62
+00:04:20,082 --> 00:04:23,030
+is a lot more robust, it's going to be
+hard
+
+63
+00:04:23,030 --> 00:04:26,179
+for developers to take this and mess it
+up.
+
+64
+00:04:26,179 --> 00:04:29,680
+Or, at least, harder than it was before.
+
+65
+00:04:29,680 --> 00:04:35,160
+Because, now, the default state is to be
+secure unless somebody tells us not to be.
+
+66
+00:04:36,620 --> 00:04:43,290
+But, although this code is good, is this
+as good as we can get it?
+
+67
+00:04:43,290 --> 00:04:44,520
+Can we make it any better?
+
+68
+00:04:46,450 --> 00:04:49,710
+Hopefully you can see some ways that we
+could possibly improve
+
+69
+00:04:49,710 --> 00:04:53,250
+on this code from the state that we've
+already got in it.
+
+70
+00:04:53,250 --> 00:04:55,520
+What could we refactor to improve it even
+more?
+
+71
+00:04:58,970 --> 00:05:04,190
+Well, one issue with this approach to
+passing the Boolean value in,
+
+72
+00:05:04,190 --> 00:05:09,410
+is that it doesn't make it immediately
+obvious to a reader of our code
+
+73
+00:05:09,410 --> 00:05:14,640
+whether or not a particular statement to
+store data is secure or not.
+
+74
+00:05:15,660 --> 00:05:20,887
+If somebody looks at this code they have
+to actually understand how that Boolean
+
+75
+00:05:20,887 --> 00:05:26,980
+value is used in order to determine if the
+data is being stored securely or not.
+
+76
+00:05:26,980 --> 00:05:32,230
+And if that person that's looking at that
+code has never encountered our interface
+
+77
+00:05:32,230 --> 00:05:37,105
+or our method calls before, the only way
+that they're going to be able to know if
+
+78
+00:05:37,105 --> 00:05:41,830
+this is a secure way of using this data
+storage system is by actually digging
+
+79
+00:05:41,830 --> 00:05:44,905
+into the data storage system's code and
+looking
+
+80
+00:05:44,905 --> 00:05:47,840
+at how the different Boolean values are
+used.
+
+81
+00:05:48,930 --> 00:05:53,860
+And you can imagine also sometimes in
+compiled code, the actual
+
+82
+00:05:53,860 --> 00:05:56,190
+naming of the variables through
+obfuscation
+
+83
+00:05:56,190 --> 00:05:58,380
+or other things, can be changed.
+
+84
+00:05:58,380 --> 00:06:02,750
+So we want to make it really obvious to
+people reading the code.
+
+85
+00:06:02,750 --> 00:06:05,540
+Even if they don't have the code available
+
+86
+00:06:05,540 --> 00:06:09,183
+to them, on how the actual implementation
+works, that
+
+87
+00:06:09,183 --> 00:06:14,474
+what they are seeing is a secure storage
+of data, or secure use of that code base.
+
+88
+00:06:14,474 --> 00:06:17,290
+And right now we've simply got Boolean
+values.
+
+89
+00:06:18,930 --> 00:06:21,870
+The other thing is, because there are
+Boolean values and
+
+90
+00:06:21,870 --> 00:06:24,883
+the way they are being used, it could be
+misinterpreted.
+
+91
+00:06:24,883 --> 00:06:27,940
+And you could look at this code and say,
+you know what?
+
+92
+00:06:27,940 --> 00:06:29,290
+They're passing in false.
+
+93
+00:06:29,290 --> 00:06:32,360
+That means they are not storing the data
+securely.
+
+94
+00:06:32,360 --> 00:06:35,680
+Because someone could assume that a true
+value is
+
+95
+00:06:35,680 --> 00:06:39,360
+what you use to indicate something secure
+versus insecure.
+
+96
+00:06:39,360 --> 00:06:43,472
+So our naming, here, of our interface
+isn't very helpful to
+
+97
+00:06:43,472 --> 00:06:48,970
+users who are trying to audit this code or
+understand its security.
+
+98
+00:06:48,970 --> 00:06:50,440
+So, how can we fix this?
+
+99
+00:06:51,720 --> 00:06:58,336
+Well, one simple approach to improving the
+readability of our code and the clarity
+
+100
+00:06:58,336 --> 00:07:05,200
+of our interface is to incorporate a enum
+to represent the security level.
+
+101
+00:07:05,200 --> 00:07:07,170
+Now you could do all kinds of things for
+this enum.
+
+102
+00:07:07,170 --> 00:07:09,800
+We're going to come up with a very simple
+example of
+
+103
+00:07:09,800 --> 00:07:14,320
+having two security levels, of either no
+security or max security.
+
+104
+00:07:14,320 --> 00:07:16,978
+In reality you would probably maybe want
+something
+
+105
+00:07:16,978 --> 00:07:20,269
+like encrypted and private, or
+non-encrypted and private.
+
+106
+00:07:20,269 --> 00:07:23,724
+But, the key point here is is that
+introducing
+
+107
+00:07:23,724 --> 00:07:27,630
+this enum allows us to have much more
+readable code.
+
+108
+00:07:28,670 --> 00:07:32,564
+If we see down below, where we're
+originally passing in a Boolean
+
+109
+00:07:32,564 --> 00:07:36,400
+that just said true or false, which didn't
+really tell us much.
+
+110
+00:07:36,400 --> 00:07:39,192
+You know, is this code secure, is it not
+secure?
+
+111
+00:07:39,192 --> 00:07:43,030
+I can't tell from true or false, or it's
+not immediately apparent.
+
+112
+00:07:43,030 --> 00:07:45,710
+I have to dig down into the code.
+
+113
+00:07:45,710 --> 00:07:49,020
+If we look at this code, we see store
+data.
+
+114
+00:07:49,020 --> 00:07:50,424
+We see some data in a key that's
+
+115
+00:07:50,424 --> 00:07:52,750
+being stored, and then we see security
+level max.
+
+116
+00:07:54,030 --> 00:07:57,470
+It's much more apparent what the intent of
+this code is.
+
+117
+00:07:57,470 --> 00:08:02,560
+It's much more apparent that the developer
+is intending to store this data securely.
+
+118
+00:08:02,560 --> 00:08:06,423
+And for people who are reading our code,
+other developers who are part of
+
+119
+00:08:06,423 --> 00:08:08,766
+our software engineering team, it makes it
+
+120
+00:08:08,766 --> 00:08:11,730
+more readily apparent what your code is
+doing.
+
+121
+00:08:11,730 --> 00:08:16,443
+They don't have to worry as much about
+digging deep into the details.
+
+122
+00:08:16,443 --> 00:08:21,871
+And also from the standpoint of code and
+security auditing, we always want to put
+
+123
+00:08:21,871 --> 00:08:24,868
+less mental effort on our security
+auditors
+
+124
+00:08:24,868 --> 00:08:27,800
+to make sure we're doing the right thing.
+
+125
+00:08:27,800 --> 00:08:30,830
+We want to make sure that our other
+developers don't have
+
+126
+00:08:30,830 --> 00:08:33,750
+to think too hard about whether or not
+something is secure.
+
+127
+00:08:33,750 --> 00:08:36,160
+They can look at it and tell immediately.
+
+128
+00:08:36,160 --> 00:08:40,093
+So if somebody's looking at this code,
+they can very easily see,
+
+129
+00:08:40,093 --> 00:08:44,930
+I have some data and it's clearly being
+intended to be stored securely.
+
+130
+00:08:44,930 --> 00:08:46,770
+And then they can make the decision on
+whether or
+
+131
+00:08:46,770 --> 00:08:50,040
+not that data should or should not be
+stored securely.
+
+132
+00:08:50,040 --> 00:08:54,345
+Similarly, the data that's being stored
+publicly, they can look and that
+
+133
+00:08:54,345 --> 00:08:57,718
+data and they can see that the security
+level is set to none.
+
+134
+00:08:57,718 --> 00:09:00,752
+And they can then say, am I okay that
+there
+
+135
+00:09:00,752 --> 00:09:05,885
+is no security associated with this other
+data that's being stored?
+
+136
+00:09:05,885 --> 00:09:11,284
+One other important property of this code,
+is although we have switched to
+
+137
+00:09:11,284 --> 00:09:16,683
+this enum approach to representing the
+security level, we still haven't
+
+138
+00:09:16,683 --> 00:09:21,840
+changed our code, so that it, it still
+defaults to a secure behavior.
+
+139
+00:09:23,000 --> 00:09:26,220
+So no matter what, the default branch of
+
+140
+00:09:26,220 --> 00:09:29,670
+this conditional logic is to store things
+securely.
+
+141
+00:09:29,670 --> 00:09:34,310
+Unless somebody explicitly tells us that
+they want to store something
+
+142
+00:09:34,310 --> 00:09:39,450
+insecurely or publicly, we try to default
+to storing things securely.
+
+143
+00:09:39,450 --> 00:09:43,863
+So we're maintaining that ability to have
+a default of securing
+
+144
+00:09:43,863 --> 00:09:48,290
+our data, or a default of secure behavior
+for our application.
+

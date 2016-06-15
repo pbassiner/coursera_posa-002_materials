@@ -1,0 +1,177 @@
+1
+00:00:00,214 --> 00:00:08,321
+[MUSIC]
+
+2
+00:00:08,321 --> 00:00:13,452
+So, how do we avoid situations like the
+one we just saw where the complexity
+
+3
+00:00:13,452 --> 00:00:19,620
+of the code base made it difficult for us
+to see that a mistake was being made.
+
+4
+00:00:19,620 --> 00:00:23,671
+Well there are a couple properties that we
+want to make sure that when we write
+
+5
+00:00:23,671 --> 00:00:26,757
+abstractions that they, that our
+abstractions possess
+
+6
+00:00:26,757 --> 00:00:29,540
+to ensure that we use those extractions
+properly.
+
+7
+00:00:29,540 --> 00:00:32,150
+And we don't create security issues.
+
+8
+00:00:32,150 --> 00:00:37,850
+So if we think of our application as
+relying on a layered set of abstractions.
+
+9
+00:00:37,850 --> 00:00:41,860
+There are a number of principles that we
+want those abstractions to have.
+
+10
+00:00:41,860 --> 00:00:46,800
+One of them is, we want to have clarity
+with respect to security.
+
+11
+00:00:49,120 --> 00:00:52,110
+We don't want to be able to look at our
+abstractions and
+
+12
+00:00:52,110 --> 00:00:57,398
+not be able to obviously see how that
+abstraction is impacting security.
+
+13
+00:00:57,398 --> 00:01:02,640
+We want to make security and our security
+
+14
+00:01:02,640 --> 00:01:08,470
+decisions as much as possible a compile
+time decision, so if
+
+15
+00:01:08,470 --> 00:01:12,370
+somebody's making a mistake with their
+security, we want to
+
+16
+00:01:12,370 --> 00:01:14,890
+be able to catch that as a compile error.
+
+17
+00:01:14,890 --> 00:01:17,980
+So we want to catch flaws.
+
+18
+00:01:19,240 --> 00:01:21,230
+As secure at compile time.
+
+19
+00:01:24,860 --> 00:01:26,900
+So if somebody makes a security flaw in
+the
+
+20
+00:01:26,900 --> 00:01:29,510
+code, we would like that to show up at
+compile
+
+21
+00:01:29,510 --> 00:01:31,960
+time, not when the app is deployed and
+people
+
+22
+00:01:31,960 --> 00:01:34,630
+are using it and it's causing data to be
+exposed.
+
+23
+00:01:35,720 --> 00:01:40,215
+We also want to make sure that when other
+people use
+
+24
+00:01:40,215 --> 00:01:46,190
+our code, that it's obvious how to
+properly use our code.
+
+25
+00:01:46,190 --> 00:01:49,208
+So we want the proper usage to be obvious.
+
+26
+00:01:49,208 --> 00:01:54,228
+[BLANK_AUDIO]
+
+27
+00:01:54,228 --> 00:01:59,191
+And then, finally, one other important
+property that we
+
+28
+00:01:59,191 --> 00:02:04,353
+want is we want to be able to audit our
+code, and ensure that we
+
+29
+00:02:04,353 --> 00:02:09,520
+don't mix our data and our security model
+together, in a way
+
+30
+00:02:09,520 --> 00:02:14,510
+that exposes our security model to attacks
+from outside.
+
+31
+00:02:14,510 --> 00:02:17,940
+So, we don't want to make sure, that we
+don't build abstractions where it's
+
+32
+00:02:17,940 --> 00:02:23,350
+easy for people to go and inject data that
+changes our security's decisions.
+
+33
+00:02:23,350 --> 00:02:28,180
+Or changes our security state so that they
+can get us to do something insecure.
+
+34
+00:02:28,180 --> 00:02:35,940
+So we want to separate and protect, our
+security state.
+
+35
+00:02:38,960 --> 00:02:44,044
+And what we'll see is that on Android,
+there's a lot of things that we can
+
+36
+00:02:44,044 --> 00:02:48,064
+do that really make building abstractions
+and interfaces
+
+37
+00:02:48,064 --> 00:02:51,440
+that have these properties, much easier to
+do.
+
