@@ -1,0 +1,554 @@
+1
+00:00:00,000 --> 00:00:08,282
+[MUSIC]
+
+2
+00:00:08,282 --> 00:00:11,546
+As we saw, the problem that we ran into
+was
+
+3
+00:00:11,546 --> 00:00:15,960
+that our app was acting like a naive bank
+manager.
+
+4
+00:00:15,960 --> 00:00:19,570
+It was giving out access to anybody that
+asked for it.
+
+5
+00:00:19,570 --> 00:00:22,890
+Without actually vetting that they should
+have access.
+
+6
+00:00:22,890 --> 00:00:25,876
+So we were going and getting from the
+Internet
+
+7
+00:00:25,876 --> 00:00:28,949
+any resource that we asked to go and
+retrieve.
+
+8
+00:00:28,949 --> 00:00:32,161
+Without really thinking about does the app
+that's
+
+9
+00:00:32,161 --> 00:00:36,300
+calling us have permission to access that
+resource.
+
+10
+00:00:36,300 --> 00:00:41,110
+We were blindly taking it, information out
+of the intent that was a set to us.
+
+11
+00:00:41,110 --> 00:00:42,964
+And assuming that it was okay to go
+
+12
+00:00:42,964 --> 00:00:46,218
+and get whatever information that caller
+was asking for.
+
+13
+00:00:46,218 --> 00:00:50,160
+Without vetting that information or the
+intent, or the sender of that intel.
+
+14
+00:00:51,470 --> 00:00:53,070
+But, in the Android, there's a way we
+
+15
+00:00:53,070 --> 00:00:56,990
+can avoid these issues, these privilege
+escalation problems.
+
+16
+00:00:56,990 --> 00:01:01,669
+And that's by insuring that whoever calls
+our code has a specific permission.
+
+17
+00:01:02,750 --> 00:01:05,980
+So for example, if your app is using the
+internet or
+
+18
+00:01:05,980 --> 00:01:10,956
+if a particular activity like our download
+activity, is using the internet.
+
+19
+00:01:10,956 --> 00:01:13,224
+We can also require that anybody that
+
+20
+00:01:13,224 --> 00:01:17,680
+launches, the download activity also have
+that permission.
+
+21
+00:01:17,680 --> 00:01:19,190
+So let's take a look at how we do that.
+
+22
+00:01:20,860 --> 00:01:26,910
+So here's the manifest file for the
+download activity that we just looked at.
+
+23
+00:01:26,910 --> 00:01:29,000
+And it's a standard Android manifest.
+
+24
+00:01:29,000 --> 00:01:34,180
+We've got an application and then we've
+got our download activity here.
+
+25
+00:01:34,180 --> 00:01:38,139
+Now, ordinarily, if you just add an
+activity and that
+
+26
+00:01:38,139 --> 00:01:43,149
+activity is exported and visible to other
+activities on the device.
+
+27
+00:01:44,240 --> 00:01:48,320
+Then anybody can send an intent, and
+launch it.
+
+28
+00:01:48,320 --> 00:01:50,700
+And since we're not betting the data in
+anyway in our download
+
+29
+00:01:50,700 --> 00:01:53,556
+activity, we're assuming that the caller
+was a, allowed to launch us.
+
+30
+00:01:53,556 --> 00:01:56,605
+We're just going to go and blindly, use
+whatever permissions or
+
+31
+00:01:56,605 --> 00:02:00,010
+capabilities have been given, to complete
+the actions that we need.
+
+32
+00:02:00,010 --> 00:02:02,644
+But in this case we're doing something
+special,
+
+33
+00:02:02,644 --> 00:02:06,104
+to protect that activity, and prevent a
+privilege escalation.
+
+34
+00:02:07,640 --> 00:02:14,370
+What you'll see is with interactivity we
+have this line requiring
+
+35
+00:02:14,370 --> 00:02:18,750
+that whoever calls this particular
+activity have the Internet permission.
+
+36
+00:02:19,940 --> 00:02:26,223
+And what this means is, is that at
+runtime, if another activity or some
+
+37
+00:02:26,223 --> 00:02:32,524
+other app sends us an intent and it is
+sent to this particular activity.
+
+38
+00:02:32,524 --> 00:02:34,933
+If the caller does not have the internet
+
+39
+00:02:34,933 --> 00:02:38,300
+permission, it will cause an exception to
+be thrown.
+
+40
+00:02:39,360 --> 00:02:43,650
+So this is a really important way that you
+can protect activities
+
+41
+00:02:43,650 --> 00:02:49,590
+that are accessing resources that they've
+gained access to through a permission.
+
+42
+00:02:49,590 --> 00:02:53,451
+So, in this case, we're accessing the
+internet, which is a
+
+43
+00:02:53,451 --> 00:02:57,551
+resource that we got access to by using
+the internet permission.
+
+44
+00:02:57,551 --> 00:03:00,101
+But we want to make sure that callers of
+us also have
+
+45
+00:03:00,101 --> 00:03:03,890
+that internet permission, since we're
+going to use it on their behalf.
+
+46
+00:03:04,920 --> 00:03:07,410
+So this is a way of making the download
+activity safe.
+
+47
+00:03:08,520 --> 00:03:12,680
+Now in some cases you may have a situation
+where your activity
+
+48
+00:03:12,680 --> 00:03:17,460
+relies on multiple permissions or relies
+on some new type of permission.
+
+49
+00:03:17,460 --> 00:03:20,842
+And in those cases you can declare
+somewhere up in your
+
+50
+00:03:20,842 --> 00:03:25,520
+manifest file a new particular permission
+that you want callers to have.
+
+51
+00:03:26,550 --> 00:03:30,168
+So, for example, let's say that you have a
+custom
+
+52
+00:03:30,168 --> 00:03:34,305
+service that allows people to buy things
+on the internet.
+
+53
+00:03:34,305 --> 00:03:37,549
+And you want to be able to accept intents
+that
+
+54
+00:03:37,549 --> 00:03:42,450
+allow callers to add things to your buyer
+shopping cart.
+
+55
+00:03:42,450 --> 00:03:45,778
+Well in that case, you're about to do
+something, you're going to expose a
+
+56
+00:03:45,778 --> 00:03:49,372
+service that could potentially cause the
+owner of the device to be charged money.
+
+57
+00:03:49,372 --> 00:03:51,472
+So you'd want to create a new permission
+for that.
+
+58
+00:03:51,472 --> 00:03:54,022
+And then in the activity, where you
+actually added things to
+
+59
+00:03:54,022 --> 00:03:56,580
+the cart, or the service where you added
+things to the cart.
+
+60
+00:03:56,580 --> 00:04:00,486
+You'd want to add that permission in to
+make sure that anyone
+
+61
+00:04:00,486 --> 00:04:04,960
+that called you and asked you to add
+something to the cart.
+
+62
+00:04:04,960 --> 00:04:07,260
+They had told that user that they were
+going to do that
+
+63
+00:04:07,260 --> 00:04:11,890
+and they had gotten sig off, and approval
+to have those permissions.
+
+64
+00:04:11,890 --> 00:04:17,250
+So it's really, really important that
+whenever you build, activities, services,
+
+65
+00:04:17,250 --> 00:04:24,000
+broadcast receivers, content providers,
+that you safeguard the resources.
+
+66
+00:04:24,000 --> 00:04:27,971
+The permissions that you've been given and
+don't leak them to other applications.
+
+67
+00:04:27,971 --> 00:04:30,782
+And there's all kinds of different ways
+you can do it.
+
+68
+00:04:30,782 --> 00:04:33,348
+But the way that you can protect yourself
+is
+
+69
+00:04:33,348 --> 00:04:37,418
+by ensuring anyone that calls you has the
+appropriate permission.
+
+70
+00:04:37,418 --> 00:04:40,715
+And that they have at least as many
+permissions
+
+71
+00:04:40,715 --> 00:04:45,290
+as your activity requires to perform that
+particular service.
+
+72
+00:04:47,370 --> 00:04:49,590
+Any of our application components.
+
+73
+00:04:49,590 --> 00:04:54,090
+Ranging from activities to services to
+broadcast receivers to content
+
+74
+00:04:54,090 --> 00:04:59,450
+providers could potentially be the source
+of a privilege escalation.
+
+75
+00:04:59,450 --> 00:05:02,617
+So although we've looked at protecting
+activities.
+
+76
+00:05:02,617 --> 00:05:05,583
+You should also be cognizant that all of
+the same
+
+77
+00:05:05,583 --> 00:05:09,900
+techniques apply to you, the other
+component in your application.
+
+78
+00:05:09,900 --> 00:05:12,460
+The broadcast receivers, the services,
+whether they
+
+79
+00:05:12,460 --> 00:05:15,700
+are unbound or bound, the content
+providers.
+
+80
+00:05:16,760 --> 00:05:19,709
+And just like we did with the activities,
+we can
+
+81
+00:05:19,709 --> 00:05:24,860
+still protect each of these individual
+components of our application.
+
+82
+00:05:24,860 --> 00:05:28,276
+We simply need to go and look at each
+individual component.
+
+83
+00:05:28,276 --> 00:05:33,443
+See what the permissions are that is needs
+to carry out the services
+
+84
+00:05:33,443 --> 00:05:38,344
+that it's performing or see the
+sensitivity of the services.
+
+85
+00:05:38,344 --> 00:05:42,070
+And the information that that application
+component is working with.
+
+86
+00:05:43,110 --> 00:05:45,060
+And then make a decision about what
+
+87
+00:05:45,060 --> 00:05:49,300
+permission should be used to protect that
+service.
+
+88
+00:05:49,300 --> 00:05:52,304
+And then, whatever permission we decide
+on, we
+
+89
+00:05:52,304 --> 00:05:54,734
+can, just as we did with the activity.
+
+90
+00:05:54,734 --> 00:05:57,449
+Add that permission to that particular
+component
+
+91
+00:05:57,449 --> 00:06:00,580
+or application in order to protect it.
+
+92
+00:06:00,580 --> 00:06:03,080
+So, just because we create a component in
+our
+
+93
+00:06:03,080 --> 00:06:06,730
+application doesn't mean that we have to
+leave it unprotected.
+
+94
+00:06:06,730 --> 00:06:09,580
+Anything we can create can then later be
+
+95
+00:06:09,580 --> 00:06:12,120
+protected with a permission in the
+manifest file.
+
+96
+00:06:13,290 --> 00:06:15,380
+Similarly, if, for example, you
+
+97
+00:06:15,380 --> 00:06:18,315
+programmatically create a broadcast
+receiver.
+
+98
+00:06:18,315 --> 00:06:20,906
+There is code that can be used to actually
+
+99
+00:06:20,906 --> 00:06:25,494
+add that permission to the broadcast
+receiver when it's registered.
+
+100
+00:06:25,494 --> 00:06:28,591
+To ensure that that broadcast receiver
+only gets
+
+101
+00:06:28,591 --> 00:06:33,100
+invoked if the caller has the appropriate
+permission.
+
+102
+00:06:33,100 --> 00:06:35,744
+So whenever you're building your different
+application components.
+
+103
+00:06:35,744 --> 00:06:39,338
+Particularly application components that
+are designed
+
+104
+00:06:39,338 --> 00:06:42,900
+to interact with other apps and services.
+
+105
+00:06:42,900 --> 00:06:47,355
+It's very important that we protect them
+with the appropriate permissions.
+
+106
+00:06:47,355 --> 00:06:50,557
+So that our app doesn't become the
+equivalent of that
+
+107
+00:06:50,557 --> 00:06:54,339
+naive bank manager who starts handing out
+access to the vault.
+
+108
+00:06:54,339 --> 00:06:57,007
+And all of the money and other secrets
+stored
+
+109
+00:06:57,007 --> 00:07:01,130
+inside that that bank manager has been
+giving access to.
+
+110
+00:07:01,130 --> 00:07:05,063
+We want to protect and ensure that whoever
+gets access to that vault.
+
+111
+00:07:05,063 --> 00:07:07,397
+Whoever gets access to the information or
+
+112
+00:07:07,397 --> 00:07:10,874
+services that we've gained access to
+through permissions.
+
+113
+00:07:10,874 --> 00:07:14,571
+Also has the appropriate permissions to
+operate on that data or
+
+114
+00:07:14,571 --> 00:07:18,210
+to take the actions that are being exposed
+by those services.
+

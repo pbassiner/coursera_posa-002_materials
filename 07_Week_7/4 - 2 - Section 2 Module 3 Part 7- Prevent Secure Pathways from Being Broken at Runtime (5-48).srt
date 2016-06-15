@@ -1,0 +1,408 @@
+1
+00:00:00,086 --> 00:00:08,267
+[MUSIC]
+
+2
+00:00:08,267 --> 00:00:14,203
+One of the challenges that we've
+introduced is our current implementation
+
+3
+00:00:14,203 --> 00:00:21,260
+relies on secure pathways, such as the
+store privately and encrypted pathway uuu.
+
+4
+00:00:21,260 --> 00:00:26,124
+If the developers call in that pathway,
+they are assuming that it's intact
+
+5
+00:00:26,124 --> 00:00:31,950
+and that the data that they saved there
+will be correctly stored and encrypted.
+
+6
+00:00:31,950 --> 00:00:35,610
+But the problem is that with our current
+implementation, there's
+
+7
+00:00:35,610 --> 00:00:40,310
+no guarantee that the data will actually
+be stored correctly.
+
+8
+00:00:40,310 --> 00:00:45,805
+And the reason is is that this secure
+pathway relies on the underlying
+
+9
+00:00:45,805 --> 00:00:51,880
+handler mapping being correctly configured
+in order to operate properly.
+
+10
+00:00:53,060 --> 00:00:59,060
+So, if unfortunately we set up these init
+handler methods incorrectly, if we set up
+
+11
+00:00:59,060 --> 00:01:02,947
+these individual mappings inside the
+handler mapping
+
+12
+00:01:02,947 --> 00:01:05,311
+and we map the wrong handler to the
+
+13
+00:01:05,311 --> 00:01:07,675
+wrong key, we're going to end up in
+
+14
+00:01:07,675 --> 00:01:11,223
+a situation where, for example, the stored
+data
+
+15
+00:01:11,223 --> 00:01:14,181
+of privately and encrypted method ends up
+
+16
+00:01:14,181 --> 00:01:17,930
+using a handler that's actually a public
+handler.
+
+17
+00:01:17,930 --> 00:01:21,520
+And this is a simple mistake that can be
+made.
+
+18
+00:01:21,520 --> 00:01:24,823
+It's a configuration mistake, but it can
+actually
+
+19
+00:01:24,823 --> 00:01:29,490
+break the underlying implementation of
+that secure pathway.
+
+20
+00:01:29,490 --> 00:01:36,007
+Another challenge that we faced here is
+that our handler mapping isn't immutable.
+
+21
+00:01:36,007 --> 00:01:41,800
+That is, it isn't actually a, a data
+structure that can be changed at run time.
+
+22
+00:01:41,800 --> 00:01:45,611
+And whatever we have a secure pathway that
+relies on some
+
+23
+00:01:45,611 --> 00:01:50,071
+data structure that can be changed at run
+time, we open ourselves
+
+24
+00:01:50,071 --> 00:01:55,017
+up for the possibility of attack or the
+possibility that due to some bug,
+
+25
+00:01:55,017 --> 00:02:00,240
+that secure pathway might be compromised
+in certain execution scenarios.
+
+26
+00:02:01,310 --> 00:02:07,442
+So we, whenever possible, want to make our
+secure pathways invariant and we want
+
+27
+00:02:07,442 --> 00:02:13,573
+them to be fixed at run time, so that
+configuration errors, either on files that
+
+28
+00:02:13,573 --> 00:02:18,980
+we use to load our application and
+bootstrap our state, or errors in the
+
+29
+00:02:18,980 --> 00:02:21,954
+actual configuration of the API and its
+
+30
+00:02:21,954 --> 00:02:26,650
+usage don't cause our secured pathways to
+break.
+
+31
+00:02:26,650 --> 00:02:29,608
+This is particularly important because
+we've take
+
+32
+00:02:29,608 --> 00:02:32,430
+so much effort to make our abstractions
+obvious,
+
+33
+00:02:32,430 --> 00:02:35,252
+so we've made our abstractions and which
+methods
+
+34
+00:02:35,252 --> 00:02:38,530
+should be called to be secure really
+obvious.
+
+35
+00:02:38,530 --> 00:02:42,809
+But if suddenly the underlying
+implementation is compromised
+
+36
+00:02:42,809 --> 00:02:46,117
+due to configuration errors, it can lead
+to very
+
+37
+00:02:46,117 --> 00:02:49,102
+hard to detect bugs because on the
+surface,
+
+38
+00:02:49,102 --> 00:02:53,080
+it looks like the API is being exercised
+correctly.
+
+39
+00:02:53,080 --> 00:02:55,870
+But underneath the surface, the
+configuration
+
+40
+00:02:55,870 --> 00:02:57,639
+of it is actually not enforcing
+
+41
+00:02:57,639 --> 00:03:02,550
+the rules correctly, and so, what looks
+like correctly secured code is not.
+
+42
+00:03:02,550 --> 00:03:05,562
+So the way that we can improve this is by
+trying
+
+43
+00:03:05,562 --> 00:03:11,170
+to make our secure pathways something that
+is decided at compile time.
+
+44
+00:03:11,170 --> 00:03:14,692
+We don't want run time errors or
+configuration
+
+45
+00:03:14,692 --> 00:03:18,840
+decisions that are made to affect that
+secure pathway.
+
+46
+00:03:18,840 --> 00:03:24,565
+The simple way to do it in this case is to
+change our get private encrypted storage
+
+47
+00:03:24,565 --> 00:03:27,982
+handler method to not use the handler
+mapping at
+
+48
+00:03:27,982 --> 00:03:33,330
+all, but instead to directly instantiate
+the appropriate handler.
+
+49
+00:03:33,330 --> 00:03:36,200
+In this case, the private storage adapter,
+in
+
+50
+00:03:36,200 --> 00:03:41,240
+order to make sure that it's always
+returned correctly.
+
+51
+00:03:41,240 --> 00:03:44,229
+We don't want to end up in a situation
+where the handling
+
+52
+00:03:44,229 --> 00:03:47,792
+mapping either changes at run time due to
+some circumstance that we
+
+53
+00:03:47,792 --> 00:03:51,672
+didn't anticipate, or where we have a
+configuration file or some other
+
+54
+00:03:51,672 --> 00:03:57,170
+information that used to initialize this
+handler mapping that is done incorrectly.
+
+55
+00:03:57,170 --> 00:04:00,854
+We want to have pathways that are secure
+and they are secured
+
+56
+00:04:00,854 --> 00:04:04,313
+at compile time and that have unit tests
+and other tests
+
+57
+00:04:04,313 --> 00:04:08,826
+supplied to them to make sure that they're
+always exercised correctly
+
+58
+00:04:08,826 --> 00:04:13,960
+and that they always provide the security
+guarantees that we want.
+
+59
+00:04:13,960 --> 00:04:16,991
+So, by using this implementation and this
+design
+
+60
+00:04:16,991 --> 00:04:21,105
+change where we're going to directly
+instantiate the appropriate
+
+61
+00:04:21,105 --> 00:04:24,063
+handler, it greatly improves our trust in
+these
+
+62
+00:04:24,063 --> 00:04:29,330
+security pathways since they're not
+exposed to configuration errors.
+
+63
+00:04:29,330 --> 00:04:34,691
+Now, some of you may say, but yes, aren't
+we going back though?
+
+64
+00:04:34,691 --> 00:04:37,911
+Why aren't we tightly coupling our code
+and removing some
+
+65
+00:04:37,911 --> 00:04:42,061
+of these wonderful patterns and
+abstractions that we've learned to use?
+
+66
+00:04:42,061 --> 00:04:45,320
+Well, in this case I don't think that's
+actually the case.
+
+67
+00:04:45,320 --> 00:04:48,183
+What we're doing is we're still using the
+
+68
+00:04:48,183 --> 00:04:52,160
+storage handler interface to decouple the
+different parts
+
+69
+00:04:52,160 --> 00:04:54,943
+of our code, but we're being smart about
+
+70
+00:04:54,943 --> 00:05:00,490
+where we apply that decoupling, and
+configurability, and modularity.
+
+71
+00:05:00,490 --> 00:05:04,120
+We don't want that decoupling and, and
+configurability
+
+72
+00:05:04,120 --> 00:05:06,250
+to be present in our secure pathway in
+
+73
+00:05:06,250 --> 00:05:08,810
+a way that makes it possible that our
+
+74
+00:05:08,810 --> 00:05:12,220
+secure pathway could be compromised to an
+error.
+
+75
+00:05:12,220 --> 00:05:14,869
+We want that decoupling to be present to
+allow
+
+76
+00:05:14,869 --> 00:05:18,145
+us to plug in different implementations,
+but we want to
+
+77
+00:05:18,145 --> 00:05:21,562
+be able to check those implementations and
+test them, and
+
+78
+00:05:21,562 --> 00:05:26,330
+we don't want to expose that pathway to
+configuration errors.
+
+79
+00:05:26,330 --> 00:05:30,266
+So, it's not that we are building
+tightly-coupled code, it's that
+
+80
+00:05:30,266 --> 00:05:34,800
+we are building code that's modular, but
+modular in the right places.
+
+81
+00:05:34,800 --> 00:05:37,726
+And we don't want modularity in a,
+introduced
+
+82
+00:05:37,726 --> 00:05:40,141
+into those secure pathways in a way that
+
+83
+00:05:40,141 --> 00:05:42,775
+could compromise them at run time, or lead
+
+84
+00:05:42,775 --> 00:05:46,450
+to very subtle and difficult to detect
+security problems.
+

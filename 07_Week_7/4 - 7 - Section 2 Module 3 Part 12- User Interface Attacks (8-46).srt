@@ -1,0 +1,576 @@
+1
+00:00:00,000 --> 00:00:08,306
+[MUSIC]
+
+2
+00:00:08,306 --> 00:00:13,170
+Now, as we've talked about, malware is
+trying to manipulate the state of your
+
+3
+00:00:13,170 --> 00:00:18,190
+application in order to cause it to do
+something that it wouldn't ordinarily do.
+
+4
+00:00:19,320 --> 00:00:22,885
+So, malware has the problem though, that
+the process
+
+5
+00:00:22,885 --> 00:00:27,924
+boundaries are, preventing, the alware
+from directly going and modifying
+
+6
+00:00:27,924 --> 00:00:32,730
+your stated memory, or the filesystem
+permissions are, preventing the
+
+7
+00:00:32,730 --> 00:00:37,250
+malware from directly accessing state that
+you've stored on disk.
+
+8
+00:00:38,340 --> 00:00:41,621
+So, one of the things that malware does
+often to
+
+9
+00:00:41,621 --> 00:00:45,559
+try to manipulate the state of your
+application, and get
+
+10
+00:00:45,559 --> 00:00:48,511
+access to it, is it relies on an entity
+that
+
+11
+00:00:48,511 --> 00:00:53,310
+always has access to your application, and
+most of its state.
+
+12
+00:00:53,310 --> 00:00:54,190
+And that's the user.
+
+13
+00:00:55,330 --> 00:01:02,417
+And so, what a common attack that malware
+will use is to try to trick the
+
+14
+00:01:02,417 --> 00:01:09,520
+user into doing something that will
+manipulate the state of your app.
+
+15
+00:01:09,520 --> 00:01:15,740
+And this can take a variety of different
+forms, but the most common way that
+
+16
+00:01:15,740 --> 00:01:21,470
+malware will try to trick the user is by
+displaying some type of fake message.
+
+17
+00:01:21,470 --> 00:01:26,260
+Or fake user interface, to the user that
+is provided by
+
+18
+00:01:26,260 --> 00:01:29,390
+the malware, so that the user doesn't know
+what they're looking at.
+
+19
+00:01:29,390 --> 00:01:33,213
+They think that they're interacting with
+something legitimate, but
+
+20
+00:01:33,213 --> 00:01:35,632
+in reality it's a user interface or a
+message
+
+21
+00:01:35,632 --> 00:01:38,243
+that the malware has created to try to
+manipulate
+
+22
+00:01:38,243 --> 00:01:41,780
+the user into changing the state of your
+application.
+
+23
+00:01:41,780 --> 00:01:47,500
+Or into taking some state from that
+application and giving it to the malware.
+
+24
+00:01:47,500 --> 00:01:51,010
+And so we're going to talk in detail,
+about what are the
+
+25
+00:01:51,010 --> 00:01:55,456
+different types of manipulations that
+malware can use to try to gain
+
+26
+00:01:55,456 --> 00:01:59,824
+access to the state of your application,
+and manipulate it in some
+
+27
+00:01:59,824 --> 00:02:03,260
+way, or read from it, in order to gain
+access to it.
+
+28
+00:02:05,580 --> 00:02:11,187
+One of the other attacks that malware can
+employ against your app or another
+
+29
+00:02:11,187 --> 00:02:16,527
+app on Android, and it's related to the
+user interface constraints on
+
+30
+00:02:16,527 --> 00:02:21,333
+a mobile device, is to try to trick the
+user into completing some
+
+31
+00:02:21,333 --> 00:02:26,330
+action because they can't tell what the
+real state of your app is.
+
+32
+00:02:27,350 --> 00:02:32,030
+So, very commonly we rely on different
+indicators of the state of
+
+33
+00:02:32,030 --> 00:02:36,300
+an app to know whether or not it's safe to
+perform an action.
+
+34
+00:02:36,300 --> 00:02:41,340
+So, for example, when you're using a web
+browser and you're going to log
+
+35
+00:02:41,340 --> 00:02:46,620
+in, often people will look for the little
+lock icon which indicates that the,
+
+36
+00:02:46,620 --> 00:02:52,140
+the connection and communication with the
+server are protected by TLS or https and
+
+37
+00:02:52,140 --> 00:02:54,780
+so it's an encrypted connection and we
+
+38
+00:02:54,780 --> 00:02:58,750
+feel safe sending our data across the
+network.
+
+39
+00:02:58,750 --> 00:03:05,182
+So our ability to see that little lock
+icon is very important for knowing whether
+
+40
+00:03:05,182 --> 00:03:10,950
+or not we should use the web browser to
+enter our username and password.
+
+41
+00:03:12,020 --> 00:03:18,067
+So, the ability for the user to assess the
+state of your app, and the security of
+
+42
+00:03:18,067 --> 00:03:24,040
+that state is a very important aspect of
+developing good apps that are secure.
+
+43
+00:03:25,060 --> 00:03:28,903
+So, one of the types of attacks that
+malware will employ is to rely on the
+
+44
+00:03:28,903 --> 00:03:31,081
+fact that, on a mobile device, you have
+
+45
+00:03:31,081 --> 00:03:34,780
+very little space available for the user
+interface.
+
+46
+00:03:34,780 --> 00:03:40,444
+So it's very easy for the user to not see
+important indicators of state
+
+47
+00:03:40,444 --> 00:03:46,400
+that they need to make a decision about
+the security of the state of an app.
+
+48
+00:03:47,520 --> 00:03:51,183
+So, for example, let's say that we have an
+app,
+
+49
+00:03:51,183 --> 00:03:56,120
+and it's going to display the login screen
+for Coursera.
+
+50
+00:03:56,120 --> 00:03:59,550
+And in order to display that login screen,
+it's going to use a
+
+51
+00:03:59,550 --> 00:04:05,220
+web view to directly display the web page
+that's normally the Coursera login screen.
+
+52
+00:04:06,270 --> 00:04:12,166
+Well, if you have a web view, typically
+you'll have an address bar here, that
+
+53
+00:04:12,166 --> 00:04:19,380
+displays the full address of the website
+that's currently loaded into the web view.
+
+54
+00:04:19,380 --> 00:04:25,327
+Now, because there's a limited amount of
+space here to
+
+55
+00:04:25,327 --> 00:04:31,741
+display the URL the true URL is going to
+be something much longer,
+
+56
+00:04:31,741 --> 00:04:37,590
+but what we see in here, may be a
+truncated version of that.
+
+57
+00:04:37,590 --> 00:04:41,309
+So, in this case we only get up to
+Coursera, so if I'm the
+
+58
+00:04:41,309 --> 00:04:45,420
+user I may go and look at this and say oh,
+okay, this is secure.
+
+59
+00:04:45,420 --> 00:04:48,380
+I should go and log into it because it's
+the Coursera website.
+
+60
+00:04:48,380 --> 00:04:49,660
+I see Coursera there.
+
+61
+00:04:50,800 --> 00:04:55,758
+Now the attack that malware can play is if
+there's a way to
+
+62
+00:04:55,758 --> 00:05:00,616
+trick your app into loading another
+website into its web
+
+63
+00:05:00,616 --> 00:05:05,883
+view, it could, for example, redirect you
+to, a slightly
+
+64
+00:05:05,883 --> 00:05:10,535
+different version of that website that
+would display
+
+65
+00:05:10,535 --> 00:05:15,905
+exactly the same URL bar, so in this case,
+rather than taking
+
+66
+00:05:15,905 --> 00:05:20,930
+it to coursera.com, it takes you to
+corseratac.com.
+
+67
+00:05:20,930 --> 00:05:26,436
+And because the URL is truncated right
+here, both of these two URLs
+
+68
+00:05:26,436 --> 00:05:32,790
+display exactly the same way in your
+address bar of your web view.
+
+69
+00:05:32,790 --> 00:05:36,494
+And unless the user takes the time to
+actually click on
+
+70
+00:05:36,494 --> 00:05:40,528
+that address bar and try to scroll through
+and look at every
+
+71
+00:05:40,528 --> 00:05:45,386
+character of that URL, they may
+accidentally feed their username and
+
+72
+00:05:45,386 --> 00:05:51,100
+password into Courseratac.com, which may
+be a website owned by the attacker.
+
+73
+00:05:51,100 --> 00:05:55,890
+So in this case, the fact that our user
+interface is limited and we can't see
+
+74
+00:05:55,890 --> 00:05:58,460
+the full domain name allows the malware to
+
+75
+00:05:58,460 --> 00:06:02,100
+go and manipulate the user with this
+particular app.
+
+76
+00:06:04,150 --> 00:06:07,520
+Often because there's not a lot of screen
+real estate
+
+77
+00:06:07,520 --> 00:06:10,290
+for our apps to use on a mobile device we
+
+78
+00:06:10,290 --> 00:06:14,200
+try to help the user out by hiding
+different parts
+
+79
+00:06:14,200 --> 00:06:17,780
+of the user interface that we consider to
+be superfluous.
+
+80
+00:06:17,780 --> 00:06:23,580
+Things that we think aren't immediately
+relevant to what the user's trying to do.
+
+81
+00:06:23,580 --> 00:06:28,680
+So unfortunately, a common way that we
+might try to add screen real estate
+
+82
+00:06:28,680 --> 00:06:34,440
+with a web view is to just remove
+completely the address bar.
+
+83
+00:06:34,440 --> 00:06:37,060
+So that the user just gets a full screen
+experience
+
+84
+00:06:37,060 --> 00:06:42,080
+with that one web page that we're
+expecting to be displayed.
+
+85
+00:06:42,080 --> 00:06:47,391
+Now the problem with this is, if malware
+is able to go and change or inject a URL
+
+86
+00:06:47,391 --> 00:06:50,660
+into our web view, for example, let's say
+our
+
+87
+00:06:50,660 --> 00:06:54,668
+app accepts intents that can cause it to
+perform different
+
+88
+00:06:54,668 --> 00:06:57,938
+actions, and one of those happens to be
+loading
+
+89
+00:06:57,938 --> 00:07:01,454
+something into a web view, it's possible
+that the
+
+90
+00:07:01,454 --> 00:07:04,397
+malware can manipulate the URL that we go
+to
+
+91
+00:07:04,397 --> 00:07:07,503
+and because we go to a different URL and
+we've
+
+92
+00:07:07,503 --> 00:07:13,225
+hidden the address bar, there's no way for
+our app to realize that the user is going
+
+93
+00:07:13,225 --> 00:07:18,293
+to be fooled because the user is going to
+go and look at this and they're going to
+
+94
+00:07:18,293 --> 00:07:21,069
+say, hey, I'm at the user name and
+
+95
+00:07:21,069 --> 00:07:24,259
+password login page that I'm normally see
+for
+
+96
+00:07:24,259 --> 00:07:26,875
+Coursera because they can fake the look
+and
+
+97
+00:07:26,875 --> 00:07:30,170
+feel of the website that they redirect you
+to.
+
+98
+00:07:30,170 --> 00:07:32,880
+But because they can't see this address
+bar up
+
+99
+00:07:32,880 --> 00:07:35,350
+here, they don't know that they've
+actually gone somewhere else.
+
+100
+00:07:36,370 --> 00:07:39,766
+So it's really important when we're
+designing user
+
+101
+00:07:39,766 --> 00:07:43,692
+interfaces to realize that although we
+have constraints, on
+
+102
+00:07:43,692 --> 00:07:46,635
+the screen real estate that's available to
+us
+
+103
+00:07:46,635 --> 00:07:49,275
+in a mobile device and other aspects of
+our
+
+104
+00:07:49,275 --> 00:07:52,746
+interface with the user, it's really
+important that
+
+105
+00:07:52,746 --> 00:07:55,914
+we think through our decisions about what
+state we
+
+106
+00:07:55,914 --> 00:07:58,631
+show the user, so we don't hide state that
+
+107
+00:07:58,631 --> 00:08:02,285
+they need in order to make relevant
+security decisions.
+
+108
+00:08:02,285 --> 00:08:06,743
+So, for example, if we're hiding the
+address of a webview that we're
+
+109
+00:08:06,743 --> 00:08:11,724
+displaying, and there is the potential
+that the URL being fed into that webview
+
+110
+00:08:11,724 --> 00:08:16,927
+could be changed, it's really important
+that we have some other way of indicating
+
+111
+00:08:16,927 --> 00:08:21,610
+the user, if they are at the webpage that
+they think they are at.
+
+112
+00:08:21,610 --> 00:08:25,160
+Either we have to show them the URL or we
+have to display
+
+113
+00:08:25,160 --> 00:08:29,470
+an error of some type if that web view
+goes to another page.
+
+114
+00:08:29,470 --> 00:08:33,150
+It's very important to display state
+relevant
+
+115
+00:08:33,150 --> 00:08:35,910
+to security decisions that the user might
+make.
+
+116
+00:08:35,910 --> 00:08:40,100
+And even though we have a limited real
+estate, not to hide things that
+
+117
+00:08:40,100 --> 00:08:43,980
+are important for the user to make those
+security decisions that they need to make.
+

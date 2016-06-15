@@ -1,0 +1,426 @@
+1
+00:00:00,000 --> 00:00:07,277
+[MUSIC]
+
+2
+00:00:07,277 --> 00:00:09,819
+One thing that we should try to avoid in
+our
+
+3
+00:00:09,819 --> 00:00:14,610
+code, if possible, is to reduce the amount
+of conditional logic.
+
+4
+00:00:14,610 --> 00:00:19,657
+We love to use if, else, switch statements
+and all these other things in
+
+5
+00:00:19,657 --> 00:00:24,705
+our code to write methods and to write
+logic, but all of this conditional
+
+6
+00:00:24,705 --> 00:00:28,183
+logic, even from a general software
+engineering
+
+7
+00:00:28,183 --> 00:00:30,582
+sense, makes it harder to read our
+
+8
+00:00:30,582 --> 00:00:32,982
+code and harder to guarantee that a
+
+9
+00:00:32,982 --> 00:00:37,060
+particular state that we expect will be
+reached.
+
+10
+00:00:37,060 --> 00:00:41,860
+It's also easier to go and introduce
+errors when there's conditional logic.
+
+11
+00:00:41,860 --> 00:00:45,710
+Now, in a security point of view, suddenly
+errors that we
+
+12
+00:00:45,710 --> 00:00:50,207
+introduced might not be our app crashing,
+but they might be worse.
+
+13
+00:00:50,207 --> 00:00:54,085
+If we have conditional logic that's
+incorrect, it might
+
+14
+00:00:54,085 --> 00:00:58,990
+be someone's very private data being
+stolen by an attacker.
+
+15
+00:00:58,990 --> 00:01:02,383
+So, we really don't want to have
+conditional logic that makes
+
+16
+00:01:02,383 --> 00:01:07,540
+it harder to secure applications and more
+likely that we'll make mistakes.
+
+17
+00:01:07,540 --> 00:01:11,382
+The other thing is if other developers
+come and read our
+
+18
+00:01:11,382 --> 00:01:16,390
+code, it's not as apparent which security
+level should be chosen.
+
+19
+00:01:16,390 --> 00:01:20,920
+This example is pretty simple, so probably
+Nobody is going to make a mistake.
+
+20
+00:01:20,920 --> 00:01:23,656
+But in many cases, there might be complex
+
+21
+00:01:23,656 --> 00:01:27,802
+conditional logic and the more complex
+this conditional logic
+
+22
+00:01:27,802 --> 00:01:30,381
+gets, the more likely the users of this
+
+23
+00:01:30,381 --> 00:01:33,950
+interface are to make a mistake in its
+usage.
+
+24
+00:01:33,950 --> 00:01:38,003
+So we'd like to simplify the conditional
+logic to also avoid the chance that
+
+25
+00:01:38,003 --> 00:01:42,520
+somebody else will look at our code and
+misinterpret how it's intended to operate.
+
+26
+00:01:44,360 --> 00:01:47,258
+It's also very important from a clarity
+point
+
+27
+00:01:47,258 --> 00:01:49,856
+of view because when we audit our code, we
+
+28
+00:01:49,856 --> 00:01:52,232
+would really like to be able to prove or
+
+29
+00:01:52,232 --> 00:01:55,920
+know very certainly that our code is
+actually secure.
+
+30
+00:01:55,920 --> 00:01:59,009
+If we have conditional logic, it makes it
+hard to make
+
+31
+00:01:59,009 --> 00:02:04,060
+that argument that yes, this code is
+always going to operate properly.
+
+32
+00:02:04,060 --> 00:02:09,607
+The final issue that we can see with this
+security level approach is that
+
+33
+00:02:09,607 --> 00:02:12,750
+the semantics of what security level max
+
+34
+00:02:12,750 --> 00:02:17,700
+means versus security level none aren't
+really clear.
+
+35
+00:02:17,700 --> 00:02:22,187
+It's not 100% obvious what it means to
+have maximum security and whether
+
+36
+00:02:22,187 --> 00:02:27,370
+or not maximum security is good enough to
+store a particular piece of data.
+
+37
+00:02:27,370 --> 00:02:29,478
+Or maybe it's not good enough, and maybe
+
+38
+00:02:29,478 --> 00:02:32,090
+you need to store that server side
+somewhere else.
+
+39
+00:02:32,090 --> 00:02:35,320
+And so, because there's not a clear
+meaning to
+
+40
+00:02:35,320 --> 00:02:39,683
+these security levels, somebody who is
+using our interface may
+
+41
+00:02:39,683 --> 00:02:43,480
+not be able to make an appropriate and
+reasoned decision
+
+42
+00:02:43,480 --> 00:02:48,040
+about how to securely code the storage of
+their data.
+
+43
+00:02:48,040 --> 00:02:50,901
+So we would really like to have an
+interface
+
+44
+00:02:50,901 --> 00:02:54,078
+that makes it clear what the semantics are
+of the
+
+45
+00:02:54,078 --> 00:02:57,575
+calls that they're making, so there's no
+way that
+
+46
+00:02:57,575 --> 00:03:01,720
+they could misinterpret what the security
+is intended to do.
+
+47
+00:03:03,170 --> 00:03:06,170
+So how can we make this interface even
+
+48
+00:03:06,170 --> 00:03:11,390
+cleaner and more straightforward from a
+security perspective?
+
+49
+00:03:11,390 --> 00:03:15,809
+Well, if we could remove the conditional
+logic and refactor our code to look
+
+50
+00:03:15,809 --> 00:03:18,087
+more like this, where we actually have
+
+51
+00:03:18,087 --> 00:03:22,140
+two different methods that have very clear
+intentions.
+
+52
+00:03:22,140 --> 00:03:26,560
+So by removing that conditional logic,
+we're going to do two things here.
+
+53
+00:03:27,630 --> 00:03:31,700
+One, we're going to make our code a lot
+easier to test.
+
+54
+00:03:31,700 --> 00:03:34,985
+It's pretty straightforward to test these
+methods and to ensure
+
+55
+00:03:34,985 --> 00:03:37,493
+that we are exercising them in a way that
+will check
+
+56
+00:03:37,493 --> 00:03:40,898
+the different conditions that those
+methods can go through because
+
+57
+00:03:40,898 --> 00:03:44,620
+they're going to do the same thing
+regardless of the input data.
+
+58
+00:03:44,620 --> 00:03:46,430
+So it's much easier to test these methods.
+
+59
+00:03:47,650 --> 00:03:52,133
+The second thing is we're going to make
+the semantics and the intention of
+
+60
+00:03:52,133 --> 00:03:55,048
+these methods much more obvious because
+store
+
+61
+00:03:55,048 --> 00:03:58,910
+data privately and encrypted is pretty
+clear.
+
+62
+00:03:58,910 --> 00:04:03,920
+Store data with security level max is less
+obvious as to what that means.
+
+63
+00:04:03,920 --> 00:04:09,051
+So we are making it harder for users of
+our code to make mistakes
+
+64
+00:04:09,051 --> 00:04:14,720
+when they are building around our security
+abstractions.
+
+65
+00:04:14,720 --> 00:04:18,153
+Another very important point is if we go
+look at
+
+66
+00:04:18,153 --> 00:04:23,258
+places where our API, our abstractions are
+being used, suddenly it
+
+67
+00:04:23,258 --> 00:04:28,010
+becomes very obvious what's going on, at
+an even greater level
+
+68
+00:04:28,010 --> 00:04:33,830
+of clarity than we had before, with our
+security level approach.
+
+69
+00:04:33,830 --> 00:04:36,800
+Suddenly we can look and we can see the
+private groups
+
+70
+00:04:36,800 --> 00:04:40,480
+are being stored in way that is both
+private and encrypted.
+
+71
+00:04:40,480 --> 00:04:45,220
+And that gives us more information for
+reasoning about whether
+
+72
+00:04:45,220 --> 00:04:48,400
+or not that is an okay security decision
+to make.
+
+73
+00:04:48,400 --> 00:04:53,040
+Similarly, we can go and look and see that
+the profile photo
+
+74
+00:04:53,040 --> 00:04:58,250
+and the homepage URL are both being stored
+publicly on the SD card.
+
+75
+00:04:58,250 --> 00:05:02,250
+And then we can reason about, is that okay
+or not?
+
+76
+00:05:02,250 --> 00:05:06,108
+So, we have taken something that was
+helping us
+
+77
+00:05:06,108 --> 00:05:10,840
+to name our security and we've increased
+the semantics.
+
+78
+00:05:10,840 --> 00:05:14,155
+We've increased the richness of the
+information that's being
+
+79
+00:05:14,155 --> 00:05:17,037
+expressed by the interface, so that when
+somebody else
+
+80
+00:05:17,037 --> 00:05:19,674
+comes along and reads this code, they know
+exactly
+
+81
+00:05:19,674 --> 00:05:22,090
+what's going on, or what should be going
+on.
+
+82
+00:05:23,120 --> 00:05:25,960
+We've done a lot to improve the clarity of
+
+83
+00:05:25,960 --> 00:05:30,250
+our interfaces and abstractions that we're
+providing in our application.
+
+84
+00:05:30,250 --> 00:05:34,640
+And we've also helped to eliminate some of
+the testing complexity and some of
+
+85
+00:05:34,640 --> 00:05:37,040
+the conditional logic that was there that
+
+86
+00:05:37,040 --> 00:05:40,369
+opened us up to mistakes and security
+vulnerabilities.
+
+87
+00:05:41,400 --> 00:05:45,740
+But there's still some more that we can do
+to improve the security
+
+88
+00:05:45,740 --> 00:05:49,870
+of these abstractions and interfaces that
+we're using in our implementation of them.
+

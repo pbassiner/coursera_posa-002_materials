@@ -1,0 +1,286 @@
+1
+00:00:00,000 --> 00:00:08,392
+[MUSIC]
+
+2
+00:00:08,392 --> 00:00:11,918
+Let's look at another way that an open
+service,
+
+3
+00:00:11,918 --> 00:00:15,789
+that can be invoked by an intent, might
+accidentally
+
+4
+00:00:15,789 --> 00:00:19,230
+leak a capability that an, another app
+does not
+
+5
+00:00:19,230 --> 00:00:25,620
+currently have permission to access,
+through that intent-based service.
+
+6
+00:00:25,620 --> 00:00:30,990
+So let's assume that we have a service
+that allows an app
+
+7
+00:00:30,990 --> 00:00:35,280
+to download an arbitrary file by simply
+sending our app an intent.
+
+8
+00:00:35,280 --> 00:00:41,310
+And you tell our app what is the URL of
+the file that you want to download.
+
+9
+00:00:41,310 --> 00:00:46,557
+Our app will automatically go and download
+that file, store it to disk, and then
+
+10
+00:00:46,557 --> 00:00:49,488
+return via intent to whatever app called
+us,
+
+11
+00:00:49,488 --> 00:00:52,440
+the location of the file that we
+downloaded.
+
+12
+00:00:52,440 --> 00:00:56,266
+So we're creating a generic download
+service that we want
+
+13
+00:00:56,266 --> 00:00:59,630
+to expose to other apps on the device via
+an intent.
+
+14
+00:01:00,940 --> 00:01:02,900
+Well, let's say that you're malware and
+you
+
+15
+00:01:02,900 --> 00:01:05,850
+want to download a malicious payload to
+the device.
+
+16
+00:01:05,850 --> 00:01:08,440
+So, for example, you want to download some
+extra
+
+17
+00:01:08,440 --> 00:01:12,030
+code that's going to be used to attack the
+device.
+
+18
+00:01:12,030 --> 00:01:15,164
+Well, if you're malware and you have no
+permissions, you
+
+19
+00:01:15,164 --> 00:01:17,680
+look a less, a lot less suspicious to the
+user.
+
+20
+00:01:17,680 --> 00:01:19,650
+So you can have no permissions.
+
+21
+00:01:19,650 --> 00:01:23,084
+And essentially the user is going to
+think, well it's unlikely this
+
+22
+00:01:23,084 --> 00:01:27,890
+app is going to do anything very
+malicious, because it has no permissions.
+
+23
+00:01:27,890 --> 00:01:31,418
+But in reality, because you've created
+this app that
+
+24
+00:01:31,418 --> 00:01:35,490
+allows another app to send an intent, to
+download something.
+
+25
+00:01:35,490 --> 00:01:38,288
+So we're going to send an intent,
+
+26
+00:01:38,288 --> 00:01:43,360
+and we're going to say download, attack
+payload.
+
+27
+00:01:43,360 --> 00:01:48,919
+So we'll go and tell it, this malicious
+payload that we want
+
+28
+00:01:48,919 --> 00:01:54,151
+to get downloaded, it'll go off to the
+internet, and,
+
+29
+00:01:54,151 --> 00:01:59,390
+get that payload for us, and return the
+attack payload.
+
+30
+00:01:59,390 --> 00:02:04,069
+[BLANK_AUDIO]
+
+31
+00:02:04,069 --> 00:02:12,633
+And then it will return to this piece of
+malware in its on, result.
+
+32
+00:02:12,633 --> 00:02:17,051
+[BLANK_AUDIO]
+
+33
+00:02:17,051 --> 00:02:24,486
+The file where the attack payload is
+stored.
+
+34
+00:02:24,486 --> 00:02:30,883
+[BLANK_AUDIO]
+
+35
+00:02:30,883 --> 00:02:34,495
+So in this case, what we've got, is we've
+got an app that's
+
+36
+00:02:34,495 --> 00:02:39,090
+creating a service that's intended to be
+helpful to other apps in the device.
+
+37
+00:02:40,180 --> 00:02:44,103
+But, because it allows any app to send in
+an intent saying,
+
+38
+00:02:44,103 --> 00:02:48,653
+go and download something for me and then
+it blindly goes and accesses
+
+39
+00:02:48,653 --> 00:02:53,281
+the internet which is a capability that it
+has, downloads the payload
+
+40
+00:02:53,281 --> 00:02:58,080
+for it and then returns the payload to
+whoever sent it that intent.
+
+41
+00:02:58,080 --> 00:03:02,655
+Again, we're bypassing Android's built-in
+permissions mechanism by having
+
+42
+00:03:02,655 --> 00:03:06,566
+a piece of malware that's essentially
+manipulating another app into
+
+43
+00:03:06,566 --> 00:03:09,547
+getting access to a capability on the
+device, in this
+
+44
+00:03:09,547 --> 00:03:14,210
+case, access to the Internet, that it
+doesn't currently have.
+
+45
+00:03:14,210 --> 00:03:18,451
+So one of the things that you have to be
+cognizant of, is that, although
+
+46
+00:03:18,451 --> 00:03:22,482
+you can create apps that can talk to other
+apps, that when you talk to
+
+47
+00:03:22,482 --> 00:03:26,300
+those other apps that you talk to them in
+a way and take commands or
+
+48
+00:03:26,300 --> 00:03:28,068
+other things from them in a way
+
+49
+00:03:28,068 --> 00:03:32,000
+that doesn't break the permission model on
+Android.
+
+50
+00:03:32,000 --> 00:03:37,264
+That if you're going to use something like
+internet an, or the camera, that you make
+
+51
+00:03:37,264 --> 00:03:39,552
+sure that the way that you're using and
+
+52
+00:03:39,552 --> 00:03:42,741
+accessing that thing and the data you're
+returning to
+
+53
+00:03:42,741 --> 00:03:47,729
+the dev, to the application that's asking
+for access to it, isn't done in such a way
+
+54
+00:03:47,729 --> 00:03:51,611
+that, you're breaking the permissions or
+circumventing, what
+
+55
+00:03:51,611 --> 00:03:54,850
+the user intended that app to have access
+to.
+
+56
+00:03:54,850 --> 00:03:56,720
+If the user didn't give a piece of malware
+
+57
+00:03:56,720 --> 00:04:00,100
+any permissions, your app shouldn't be
+exposing additional capabilities
+
+58
+00:04:00,100 --> 00:04:04,140
+or permissions to that malware by not
+checking the
+
+59
+00:04:04,140 --> 00:04:06,630
+capabilities that it has when it begins
+interacting with it.
+

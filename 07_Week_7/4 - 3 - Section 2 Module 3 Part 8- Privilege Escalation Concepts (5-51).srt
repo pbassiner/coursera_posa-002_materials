@@ -1,0 +1,408 @@
+1
+00:00:00,000 --> 00:00:08,956
+[MUSIC]
+
+2
+00:00:08,956 --> 00:00:14,297
+Let's talk about some news stories that
+have been out on the Internet about
+
+3
+00:00:14,297 --> 00:00:20,400
+different security issues that we've seen
+with some production apps.
+
+4
+00:00:20,400 --> 00:00:23,570
+These are some pretty big name apps that
+have had security
+
+5
+00:00:23,570 --> 00:00:28,270
+issues and we don't want to write apps
+that have these same flaws.
+
+6
+00:00:29,480 --> 00:00:31,830
+Now the specific type of flaw that we're
+going to
+
+7
+00:00:31,830 --> 00:00:35,640
+look at in this case is called a privilege
+escalation.
+
+8
+00:00:35,640 --> 00:00:37,880
+Now you may say well, I would never
+
+9
+00:00:37,880 --> 00:00:41,640
+write an app that would accidentally have
+this flaw.
+
+10
+00:00:41,640 --> 00:00:46,150
+But the reality is these are very subtle
+mistakes that developers make.
+
+11
+00:00:46,150 --> 00:00:49,004
+Where they don't realize the ramifications
+of
+
+12
+00:00:49,004 --> 00:00:52,428
+the decisions they're making, particularly
+when they
+
+13
+00:00:52,428 --> 00:00:57,780
+let other apps talk to their app in order
+to access services within their app.
+
+14
+00:00:57,780 --> 00:01:00,130
+It's very easy to make mistakes.
+
+15
+00:01:00,130 --> 00:01:04,390
+To accidentally break things like the
+permissions model in Android.
+
+16
+00:01:04,390 --> 00:01:07,150
+Now you may say, I'll never do that.
+
+17
+00:01:07,150 --> 00:01:09,740
+Let's show you how you could accidentally
+and
+
+18
+00:01:09,740 --> 00:01:13,990
+inadvertently do something like this with
+the iRemember app.
+
+19
+00:01:16,370 --> 00:01:19,958
+Let's talk about two services that we
+could extend the
+
+20
+00:01:19,958 --> 00:01:23,936
+iRemember app with, that might seem benign
+and very helpful
+
+21
+00:01:23,936 --> 00:01:26,744
+to other apps on the device, but that we
+can
+
+22
+00:01:26,744 --> 00:01:31,190
+actually show will create a security issue
+on the device.
+
+23
+00:01:31,190 --> 00:01:34,660
+So let's talk about these two services
+that we're going to extend
+
+24
+00:01:34,660 --> 00:01:39,120
+the iRemember app with and then use as an
+example of poor security.
+
+25
+00:01:40,200 --> 00:01:45,429
+So the first one is we decide that we'd
+like to be able to share stories via
+
+26
+00:01:45,429 --> 00:01:50,402
+an intent so that other apps that allow
+you to compose a story and maybe
+
+27
+00:01:50,402 --> 00:01:55,810
+attach a photo to a story can simply send
+an intent to this service.
+
+28
+00:01:55,810 --> 00:02:01,610
+So they'll send and intent and that intent
+will have a story plus a photo.
+
+29
+00:02:03,530 --> 00:02:07,790
+And then the service will go off and share
+that
+
+30
+00:02:07,790 --> 00:02:10,150
+story and that photo that the other app
+sent to us.
+
+31
+00:02:11,200 --> 00:02:13,916
+Now, let's further assume that, you know,
+to
+
+32
+00:02:13,916 --> 00:02:16,764
+be really flexible, we decide that we
+want to create
+
+33
+00:02:16,764 --> 00:02:19,216
+a version of the iRemember app that can
+share
+
+34
+00:02:19,216 --> 00:02:23,130
+stories and photos to different servers on
+the Internet.
+
+35
+00:02:23,130 --> 00:02:25,860
+So we don't want to control all of the
+iRemember servers.
+
+36
+00:02:25,860 --> 00:02:29,444
+We want to have, maybe, iRemember servers
+that are for Vanderbilt
+
+37
+00:02:29,444 --> 00:02:32,452
+University or a set of iRemember servers
+that are for the
+
+38
+00:02:32,452 --> 00:02:35,332
+University of Maryland, because we want to
+be able to
+
+39
+00:02:35,332 --> 00:02:39,670
+have different sets of stories and
+photographs, depending on the location.
+
+40
+00:02:39,670 --> 00:02:43,370
+And we decide we don't want to centrally
+manage all of that information.
+
+41
+00:02:43,370 --> 00:02:46,870
+So one of the things that we could do on
+this intent is we could allow it to
+
+42
+00:02:46,870 --> 00:02:50,680
+also include the URL of the server that we
+
+43
+00:02:50,680 --> 00:02:53,850
+want to share that story and that photo
+with.
+
+44
+00:02:53,850 --> 00:02:57,960
+And then what we would do is actually when
+this intent gets sent to the
+
+45
+00:02:57,960 --> 00:03:00,460
+service to share the story and photo, it
+
+46
+00:03:00,460 --> 00:03:04,280
+would go off and would access the
+Internet.
+
+47
+00:03:04,280 --> 00:03:10,520
+And do the actual share force by sending
+it to that server.
+
+48
+00:03:13,680 --> 00:03:17,352
+Now this seems like a very benign thing,
+but as we'll show in
+
+49
+00:03:17,352 --> 00:03:19,656
+a second here, this actually opens up
+
+50
+00:03:19,656 --> 00:03:22,760
+a security hole in Android's permissions
+model.
+
+51
+00:03:23,940 --> 00:03:27,390
+Now, let's look at our second service that
+we're going to add.
+
+52
+00:03:27,390 --> 00:03:31,944
+So, let's say, for example, that we decide
+that we want to be able to attach
+
+53
+00:03:31,944 --> 00:03:34,890
+photos to these stories in iRemember, but
+attach
+
+54
+00:03:34,890 --> 00:03:39,280
+photos that aren't necessarily locally
+stored in the device.
+
+55
+00:03:39,280 --> 00:03:44,228
+So, we want the user to be able to type in
+a URL of a photo to share, maybe it's a
+
+56
+00:03:44,228 --> 00:03:50,600
+photo that's stored on Facebook's servers
+or Google Plus' servers or somewhere else.
+
+57
+00:03:50,600 --> 00:03:52,841
+So we want to give the ability for a user
+
+58
+00:03:52,841 --> 00:03:55,951
+to specify an arbitrary URL and then we
+want to create
+
+59
+00:03:55,951 --> 00:03:59,424
+a service that will automatically go and
+fetch that photo
+
+60
+00:03:59,424 --> 00:04:03,380
+from the Internet and download it to the
+local desk.
+
+61
+00:04:03,380 --> 00:04:06,118
+And then return a file descriptor or
+
+62
+00:04:06,118 --> 00:04:11,070
+URI specifying where that photo was
+downloaded to.
+
+63
+00:04:11,070 --> 00:04:14,503
+But since we're already going in and
+creating a capability
+
+64
+00:04:14,503 --> 00:04:17,935
+to allow other apps to share stories and
+photos, why don't
+
+65
+00:04:17,935 --> 00:04:20,819
+we go ahead and just expose the service to
+download
+
+66
+00:04:20,819 --> 00:04:24,620
+arbitrary photos from the Internet as an
+intent service as well.
+
+67
+00:04:25,690 --> 00:04:32,902
+So similarly, we'll allow apps to send to
+this service an intent, and in that intent
+
+68
+00:04:32,902 --> 00:04:40,310
+we will have the URL of the photo that we
+want to go and collect from the Internet.
+
+69
+00:04:40,310 --> 00:04:44,957
+And so the service will go and access the
+Internet, it'll download that file.
+
+70
+00:04:44,957 --> 00:04:49,046
+[BLANK_AUDIO]
+
+71
+00:04:49,046 --> 00:04:54,132
+And then it will return to this original
+service the file that was
+
+72
+00:04:54,132 --> 00:04:59,230
+downloaded, or the location of that file
+that was downloaded.
+
+73
+00:05:00,270 --> 00:05:03,750
+Again, this seems like a, a helpful
+service to, we can have
+
+74
+00:05:03,750 --> 00:05:07,850
+our app, the iRemeber app exposed to other
+apps on the device.
+
+75
+00:05:07,850 --> 00:05:11,030
+So that it makes it easier for them to
+share photos and stories.
+
+76
+00:05:12,040 --> 00:05:14,675
+But, in both cases, we'll actually see,
+that
+
+77
+00:05:14,675 --> 00:05:16,928
+we're doing something inadvertently,
+
+78
+00:05:16,928 --> 00:05:19,710
+that's breaking Android's permissions
+model.
+
+79
+00:05:20,980 --> 00:05:24,245
+One of the things to remember is that, for
+both of these to
+
+80
+00:05:24,245 --> 00:05:28,819
+work, we're going to have to add the uses
+permission to iRemember for Internet.
+
+81
+00:05:28,819 --> 00:05:31,325
+Now we've already probably got it there
+for
+
+82
+00:05:31,325 --> 00:05:34,645
+the capabilities that we're exposing in
+iRemember, but
+
+83
+00:05:34,645 --> 00:05:36,947
+we have to remember that we have Internet
+
+84
+00:05:36,947 --> 00:05:39,540
+permissions in order for all of this to
+work.
+
