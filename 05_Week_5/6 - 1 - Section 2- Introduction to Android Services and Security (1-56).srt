@@ -1,0 +1,148 @@
+1
+00:00:00,000 --> 00:00:08,748
+[MUSIC].
+
+2
+00:00:08,748 --> 00:00:12,686
+Welcome to the section on Android Services
+and applications security.
+
+3
+00:00:12,686 --> 00:00:15,336
+Which explores the pattern oriented
+frameworks and
+
+4
+00:00:15,336 --> 00:00:18,469
+mechanisms that Android provides, to
+perform computations
+
+5
+00:00:18,469 --> 00:00:20,878
+in the background and communicate between
+user
+
+6
+00:00:20,878 --> 00:00:25,050
+phasing components and background
+components, concurrently, and securely.
+
+7
+00:00:26,130 --> 00:00:29,383
+Although the activity components, covered
+in Professor Porter's Mooc,
+
+8
+00:00:29,383 --> 00:00:33,230
+provide a flexible visual interface for
+interacting with the user.
+
+9
+00:00:33,230 --> 00:00:36,583
+Android also defines service components,
+which run in the separate
+
+10
+00:00:36,583 --> 00:00:40,360
+background thread or process, and don't
+interact with the user directly.
+
+11
+00:00:41,390 --> 00:00:44,960
+Instead, activities use services to
+perform long duration
+
+12
+00:00:44,960 --> 00:00:48,980
+operations or access remote resources on
+behalf of users.
+
+13
+00:00:48,980 --> 00:00:51,990
+Such as downloading files from a remote
+server.
+
+14
+00:00:51,990 --> 00:00:55,660
+Or synchronizing data stored on a mobile
+device, with a database in the cloud.
+
+15
+00:00:56,940 --> 00:00:59,789
+Activities and services can interact via
+several interprocess
+
+16
+00:00:59,789 --> 00:01:02,700
+communication mechanisms, that we'll cover
+in this section.
+
+17
+00:01:04,230 --> 00:01:06,093
+This section also focuses on Android
+
+18
+00:01:06,093 --> 00:01:08,619
+application security, which is an
+important and
+
+19
+00:01:08,619 --> 00:01:10,483
+timely topic, due to the increasing
+
+20
+00:01:10,483 --> 00:01:13,990
+number of Android application
+vulnerabilities being discovered.
+
+21
+00:01:15,050 --> 00:01:17,347
+We first describe Android security model
+and
+
+22
+00:01:17,347 --> 00:01:19,590
+explain some of its risks and limitations.
+
+23
+00:01:20,610 --> 00:01:22,870
+We then discuss various techniques, tools
+and
+
+24
+00:01:22,870 --> 00:01:26,000
+methods for building more secure Android
+applications.
+
+25
+00:01:26,000 --> 00:01:27,834
+We explain the most common types of
+
+26
+00:01:27,834 --> 00:01:30,554
+security flaws in Android applications,
+show how
+
+27
+00:01:30,554 --> 00:01:34,680
+to spot them in code, and describe methods
+and means for fixing these flaws.
+
+28
+00:01:36,080 --> 00:01:40,528
+This section also explains how to design
+and implement services, activities and
+
+29
+00:01:40,528 --> 00:01:42,784
+other Android components to protect your
+
+30
+00:01:42,784 --> 00:01:45,634
+applications against security flaws and
+attacks.
+
+31
+00:01:45,634 --> 00:01:54,749
+[MUSIC]
+

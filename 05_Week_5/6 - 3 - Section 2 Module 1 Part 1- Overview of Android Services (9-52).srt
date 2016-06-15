@@ -1,0 +1,801 @@
+1
+00:00:00,000 --> 00:00:08,075
+[MUSIC]
+
+2
+00:00:08,075 --> 00:00:09,987
+Welcome to the first part of the module
+
+3
+00:00:09,987 --> 00:00:13,703
+on Android Services and local interprocess
+communication mechanisms.
+
+4
+00:00:13,703 --> 00:00:17,450
+Which provides an overview of Started and
+Bound Services.
+
+5
+00:00:17,450 --> 00:00:19,430
+In this part, we discuss what a Service
+
+6
+00:00:19,430 --> 00:00:22,010
+is, summarize the two types of Services
+supported
+
+7
+00:00:22,010 --> 00:00:24,710
+by Android, and outline steps for
+implementing both
+
+8
+00:00:24,710 --> 00:00:28,940
+types of Services and configuring Services
+into applications.
+
+9
+00:00:28,940 --> 00:00:30,865
+A Service is an Android component that can
+
+10
+00:00:30,865 --> 00:00:34,810
+perform long-duration operations in a
+background thread or process.
+
+11
+00:00:34,810 --> 00:00:36,950
+Potentially communicating with other
+components during
+
+12
+00:00:36,950 --> 00:00:40,010
+it's life cycle, as described here.
+
+13
+00:00:40,010 --> 00:00:43,483
+For example, a Service might perform
+secure transactions with
+
+14
+00:00:43,483 --> 00:00:46,761
+an e-commerce website, playing music or
+videos on a mobile
+
+15
+00:00:46,761 --> 00:00:50,105
+device, synchronize the contents of an
+SQLite database with
+
+16
+00:00:50,105 --> 00:00:53,740
+the cloud, or download a file from a
+remote server.
+
+17
+00:00:53,740 --> 00:00:57,280
+Which is an application use case we'll
+explore further throughout this module.
+
+18
+00:00:58,490 --> 00:01:02,320
+Other android components can start a
+Service automatically on demand.
+
+19
+00:01:02,320 --> 00:01:05,420
+Services are most commonly started by
+activity components.
+
+20
+00:01:05,420 --> 00:01:07,940
+A Service can continue to run on behalf of
+the activity
+
+21
+00:01:07,940 --> 00:01:11,830
+that started it even if the user switches
+to another activity.
+
+22
+00:01:11,830 --> 00:01:13,530
+Since a Service runs in the background
+
+23
+00:01:13,530 --> 00:01:16,450
+it shouldn't direct the access the user
+interface.
+
+24
+00:01:16,450 --> 00:01:19,841
+In particular, code running in a Service
+should not make calls on
+
+25
+00:01:19,841 --> 00:01:22,186
+user interface toolkit components, such as
+
+26
+00:01:22,186 --> 00:01:26,180
+structured layered objects, controls,
+dialogs and menus.
+
+27
+00:01:26,180 --> 00:01:28,868
+This restriction is similar to the
+constraints on background
+
+28
+00:01:28,868 --> 00:01:32,520
+threads discussed in the module on Android
+concurrency frameworks.
+
+29
+00:01:32,520 --> 00:01:35,540
+Although a Service may or may not actually
+run in a background thread.
+
+30
+00:01:36,960 --> 00:01:39,830
+Android supports two different types of
+Services.
+
+31
+00:01:39,830 --> 00:01:41,735
+A Started Service is launched when
+
+32
+00:01:41,735 --> 00:01:45,380
+a client calls startService, as discussed
+here.
+
+33
+00:01:45,380 --> 00:01:48,830
+It usually performs a single operation on
+behalf of the client that
+
+34
+00:01:48,830 --> 00:01:51,919
+started it, and often does not return a
+result to the client.
+
+35
+00:01:53,030 --> 00:01:55,698
+A Started Service needs to shut itself
+down explicitly
+
+36
+00:01:55,698 --> 00:01:59,460
+after completing the operation the client
+directed it to perform.
+
+37
+00:01:59,460 --> 00:02:02,800
+Since it's life cycle is independent to
+the client that started it.
+
+38
+00:02:02,800 --> 00:02:04,690
+So it can run in the background
+indefinitely.
+
+39
+00:02:05,980 --> 00:02:09,205
+A Bound Service is launched when a client,
+again,
+
+40
+00:02:09,205 --> 00:02:13,940
+typically an activity component calls
+bindService, as discussed here.
+
+41
+00:02:15,160 --> 00:02:18,952
+A Bound Service offers a client-service
+interface that allows extended
+
+42
+00:02:18,952 --> 00:02:22,570
+two-way conversations between one or more
+clients and the Service.
+
+43
+00:02:23,810 --> 00:02:28,480
+A Bound Service runs only as long as at
+least one client remains bound to it.
+
+44
+00:02:28,480 --> 00:02:31,390
+It's automatically destroyed when all
+clients unbind.
+
+45
+00:02:32,600 --> 00:02:35,904
+Both Started and Bound Services can run in
+the same or different
+
+46
+00:02:35,904 --> 00:02:37,899
+processes as their clients, based on
+
+47
+00:02:37,899 --> 00:02:42,270
+the configuration setting in the
+AndroidManifest.xml file.
+
+48
+00:02:42,270 --> 00:02:44,444
+If they run in different processes, then
+some former
+
+49
+00:02:44,444 --> 00:02:48,300
+inter process communication mechanism is
+needed to exchange messages.
+
+50
+00:02:48,300 --> 00:02:50,787
+To implement Started and Bound Services
+flexibly
+
+51
+00:02:50,787 --> 00:02:52,621
+and extensively, as well as to guide
+
+52
+00:02:52,621 --> 00:02:55,999
+their inter process communication
+efficiently, Android applies
+
+53
+00:02:55,999 --> 00:02:58,300
+many POSA and Gang of Four patterns.
+
+54
+00:02:58,300 --> 00:03:01,130
+Including activator, command processor,
+active
+
+55
+00:03:01,130 --> 00:03:05,480
+object, proxy, broker, and publisher
+subscriber.
+
+56
+00:03:05,480 --> 00:03:06,937
+As we'll discuss later in this MOOC.
+
+57
+00:03:06,937 --> 00:03:14,545
+[MUSIC]
+
+58
+00:03:14,545 --> 00:03:18,272
+Now that we've presented an overview of
+Started and Bound Services.
+
+59
+00:03:18,272 --> 00:03:20,245
+We'll summarize the steps needed to
+
+60
+00:03:20,245 --> 00:03:23,900
+implement them using Andriod's Services
+framework.
+
+61
+00:03:23,900 --> 00:03:25,790
+Which is part of the Android's activity
+
+62
+00:03:25,790 --> 00:03:29,350
+manager service middleware, shown at this
+path name.
+
+63
+00:03:29,350 --> 00:03:31,831
+The steps used to implement a Service are
+similar
+
+64
+00:03:31,831 --> 00:03:34,495
+to the steps used to implement an
+activity, as shown
+
+65
+00:03:34,495 --> 00:03:37,461
+in the week 2 lecture in professor
+Porter's MOOC, since
+
+66
+00:03:37,461 --> 00:03:41,900
+both support canonical framework
+techniques such as inversion of control.
+
+67
+00:03:41,900 --> 00:03:44,796
+The main specific structure and
+functionality and some I
+
+68
+00:03:44,796 --> 00:03:48,180
+complete portions of applications, as
+discussed in this video.
+
+69
+00:03:49,440 --> 00:03:51,950
+The first step in programming a Service
+involves
+
+70
+00:03:51,950 --> 00:03:55,133
+extending the Android Service class, which
+defines a number
+
+71
+00:03:55,133 --> 00:03:58,195
+of Service-specific lifecycle hook methods
+that play the
+
+72
+00:03:58,195 --> 00:04:01,460
+role of primitive operations in the
+template method pattern.
+
+73
+00:04:02,850 --> 00:04:05,395
+These hook methods are dispatched
+automatically by
+
+74
+00:04:05,395 --> 00:04:07,997
+Android Service framework by inversion of
+control,
+
+75
+00:04:07,997 --> 00:04:10,657
+in response to infrastructure and
+application events
+
+76
+00:04:10,657 --> 00:04:13,450
+associated with changes to a services
+lifecycle state.
+
+77
+00:04:14,700 --> 00:04:17,478
+Depending on whether the Service is
+intended to be Started
+
+78
+00:04:17,478 --> 00:04:21,550
+or Bound, different subsets of these hook
+methods must be overridden.
+
+79
+00:04:21,550 --> 00:04:25,659
+Which illustrates how Android's Service
+framework defines reusable structure
+
+80
+00:04:25,659 --> 00:04:29,180
+and functionality that's specific to
+different types of Services.
+
+81
+00:04:30,410 --> 00:04:33,920
+Certain hook methods are common to both
+types of Services.
+
+82
+00:04:33,920 --> 00:04:36,838
+For example, the onCreate hook method is
+dispatched by
+
+83
+00:04:36,838 --> 00:04:41,150
+Android Service framework when the Service
+is first launched.
+
+84
+00:04:41,150 --> 00:04:43,490
+It's typically used to initialize the
+Service.
+
+85
+00:04:44,680 --> 00:04:48,750
+Other hook methods are specific to one
+type of Service or another.
+
+86
+00:04:48,750 --> 00:04:51,386
+For example, the onStartCommand hook
+method is
+
+87
+00:04:51,386 --> 00:04:54,407
+dispatched by Android's Service framework
+every time
+
+88
+00:04:54,407 --> 00:04:59,880
+the startService method is invoked to send
+an intent command to a Started Service.
+
+89
+00:04:59,880 --> 00:05:04,005
+It receives the intent parameter past the
+startService, which can be used
+
+90
+00:05:04,005 --> 00:05:06,363
+in conjunction with the concurrency model
+
+91
+00:05:06,363 --> 00:05:09,060
+the Service applies to perform its
+processing.
+
+92
+00:05:10,300 --> 00:05:12,571
+The onBind and onUnbind hook methods are
+
+93
+00:05:12,571 --> 00:05:16,112
+caught automatically by the Android
+Service framework, when
+
+94
+00:05:16,112 --> 00:05:17,847
+the client binds or unbinds to a
+
+95
+00:05:17,847 --> 00:05:21,540
+Bound Service by a bindService or
+unBindService respectively.
+
+96
+00:05:22,630 --> 00:05:25,840
+OnBind receives the intent passed
+bindService.
+
+97
+00:05:25,840 --> 00:05:28,782
+It's a factory method that returns the
+interprocess communication
+
+98
+00:05:28,782 --> 00:05:31,910
+channel used by a client to communicate
+with the service.
+
+99
+00:05:31,910 --> 00:05:34,250
+This IPC channel is typically an object
+
+100
+00:05:34,250 --> 00:05:37,670
+described using the Android interface
+definition language.
+
+101
+00:05:37,670 --> 00:05:40,930
+OnUnbind is a disposal method called when
+all clients
+
+102
+00:05:40,930 --> 00:05:44,390
+have disconnected from an interface
+published by the service.
+
+103
+00:05:44,390 --> 00:05:47,900
+Finally, the Android Service framework
+dispatches the onDestroy hook
+
+104
+00:05:47,900 --> 00:05:51,130
+method to notify a Service that it's being
+removed.
+
+105
+00:05:51,130 --> 00:05:55,087
+And should therefore clean up any
+resources it holds.
+
+106
+00:05:55,087 --> 00:06:00,715
+[MUSIC]
+
+107
+00:06:00,715 --> 00:06:06,119
+The Android Service framework provides a
+semi-complete portion of an application.
+
+108
+00:06:06,119 --> 00:06:10,250
+So after the Service is extended, and its
+hook method is implemented.
+
+109
+00:06:10,250 --> 00:06:13,900
+A description of it must be included in
+the Android manifest file.
+
+110
+00:06:13,900 --> 00:06:15,764
+Together with other components to help
+
+111
+00:06:15,764 --> 00:06:17,970
+complete the application as discussed
+here.
+
+112
+00:06:19,060 --> 00:06:22,123
+This XML file contains information that
+Android needs to
+
+113
+00:06:22,123 --> 00:06:26,669
+plug-in various activity and Service
+components, and execute the application.
+
+114
+00:06:27,870 --> 00:06:30,750
+Integrating a Service into an application
+is straightforward.
+
+115
+00:06:30,750 --> 00:06:34,308
+And involves including the Service in the
+AndroidManifest file and defining
+
+116
+00:06:34,308 --> 00:06:36,443
+various XML elements that control
+properties
+
+117
+00:06:36,443 --> 00:06:39,190
+of the Service, that's covered here.
+
+118
+00:06:39,190 --> 00:06:41,773
+For example, a Service element is first
+added as
+
+119
+00:06:41,773 --> 00:06:45,770
+a child of the application element in the
+AndroidManifest file.
+
+120
+00:06:45,770 --> 00:06:48,590
+And a name is then provided to reference
+the Service class.
+
+121
+00:06:49,690 --> 00:06:53,080
+Services don't automatically run in
+separate processes or threads.
+
+122
+00:06:53,080 --> 00:06:56,655
+However, making the Service run in a
+separate process, just involves
+
+123
+00:06:56,655 --> 00:07:00,600
+adding the process element to the
+AndroidManifest file, as discussed here.
+
+124
+00:07:01,680 --> 00:07:06,611
+We'll show how to multithread a service
+later in this module.
+
+125
+00:07:06,611 --> 00:07:11,789
+[MUSIC]
+
+126
+00:07:11,789 --> 00:07:14,851
+In summary, Android applications use
+Services to
+
+127
+00:07:14,851 --> 00:07:18,277
+implement long duration operations in the
+background.
+
+128
+00:07:18,277 --> 00:07:23,150
+This module focuses primarily on Services
+written by application developers.
+
+129
+00:07:23,150 --> 00:07:25,871
+For example, we examine several variants
+of Started and
+
+130
+00:07:25,871 --> 00:07:29,810
+Bound Services that can download images
+from a remote server.
+
+131
+00:07:29,810 --> 00:07:34,029
+However, Android also provides many
+predefined system services such as
+
+132
+00:07:34,029 --> 00:07:38,940
+the activity manager service, location
+manager servic,e and telephony service.
+
+133
+00:07:39,980 --> 00:07:42,425
+Every Android application can use these
+Services
+
+134
+00:07:42,425 --> 00:07:44,470
+as long as it has the proper permissions.
+
+135
+00:07:45,600 --> 00:07:47,520
+By default, a Service runs in the same
+
+136
+00:07:47,520 --> 00:07:50,640
+process as the application that it's a
+part of.
+
+137
+00:07:50,640 --> 00:07:53,028
+Although it can easily be configured to
+run in a
+
+138
+00:07:53,028 --> 00:07:56,590
+separate process by adding an element to
+the AndroidManifest file.
+
+139
+00:07:57,720 --> 00:08:01,297
+Regardless of whether a Service is
+configured to run in the same
+
+140
+00:08:01,297 --> 00:08:05,484
+process or in a different process however,
+it continues to execute until
+
+141
+00:08:05,484 --> 00:08:08,656
+it stops itself, is stopped by a user or
+is terminated by
+
+142
+00:08:08,656 --> 00:08:12,929
+the Android runtime system when it runs
+low on memory, as discussed here.
+
+143
+00:08:14,380 --> 00:08:17,006
+Many properties of Services can be
+configured
+
+144
+00:08:17,006 --> 00:08:20,880
+in an AndroidManifest.xml file, as shown
+here.
+
+145
+00:08:20,880 --> 00:08:23,760
+Since Started and Bound Services are
+implemented as part
+
+146
+00:08:23,760 --> 00:08:28,380
+of Android's Service framework, they
+support inversion of control.
+
+147
+00:08:28,380 --> 00:08:32,387
+For example, Android's middleware
+dispatches hook methods to manage
+
+148
+00:08:32,387 --> 00:08:36,800
+the service lifecycle in response to
+infrastructure and application events.
+
+149
+00:08:38,140 --> 00:08:41,588
+The design of Android Service framework is
+based on software product
+
+150
+00:08:41,588 --> 00:08:46,000
+line techniques guided by commonality and
+variability analysis, as discussed here.
+
+151
+00:08:47,100 --> 00:08:49,875
+For example, Android's Service framework
+enhances
+
+152
+00:08:49,875 --> 00:08:52,167
+commonality by defining a uniform
+interface
+
+153
+00:08:52,167 --> 00:08:55,004
+for performing long-duration operations
+that don't
+
+154
+00:08:55,004 --> 00:08:58,260
+interact directly with the user interface.
+
+155
+00:08:58,260 --> 00:09:01,588
+Likewise, this framework handles
+variability by providing
+
+156
+00:09:01,588 --> 00:09:03,892
+a uniform means for subclasses to override
+
+157
+00:09:03,892 --> 00:09:06,068
+life cycle hook methods that perform the
+
+158
+00:09:06,068 --> 00:09:09,210
+desired initialization for Started and
+Bound Services.
+
+159
+00:09:10,510 --> 00:09:14,518
+Android's packaged application contains
+many Services, such as the
+
+160
+00:09:14,518 --> 00:09:18,658
+SMS, MMS service that manages messaging
+operations, the Alert service
+
+161
+00:09:18,658 --> 00:09:22,733
+that handles calendar event reminders, the
+Bluetooth Headset service
+
+162
+00:09:22,733 --> 00:09:28,190
+that provides Headset and Handsfree
+capabilities for the phone application.
+
+163
+00:09:28,190 --> 00:09:32,256
+The Media Playback service that streams
+audio files in the background.
+
+164
+00:09:32,256 --> 00:09:36,380
+And the Exchange service that sends email
+messages to exchange servers.
+
+165
+00:09:37,400 --> 00:09:42,957
+Additional information on Android Services
+appears at this link.
+
+166
+00:09:42,957 --> 00:09:51,129
+[MUSIC]
+

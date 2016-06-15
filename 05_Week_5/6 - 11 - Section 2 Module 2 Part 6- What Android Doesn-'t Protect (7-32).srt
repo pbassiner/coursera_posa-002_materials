@@ -1,0 +1,542 @@
+1
+00:00:00,083 --> 00:00:08,720
+[MUSIC]
+
+2
+00:00:08,720 --> 00:00:12,586
+Now if all of our apps, were, wrapped up
+and protected
+
+3
+00:00:12,586 --> 00:00:18,030
+by Android, to where they could never
+interact and exchange data.
+
+4
+00:00:18,030 --> 00:00:21,291
+If they could never read each other's
+saved state,
+
+5
+00:00:21,291 --> 00:00:25,750
+ever, we'd have much less interesting
+applications on our devices.
+
+6
+00:00:26,780 --> 00:00:32,790
+Almost all of the really interesting
+Android applications involve some type of
+
+7
+00:00:32,790 --> 00:00:38,725
+interaction between that app and another
+app or set of services on the device.
+
+8
+00:00:38,725 --> 00:00:43,300
+Or with the data that they're storing
+underneath their apps.
+
+9
+00:00:43,300 --> 00:00:44,960
+So for example, the Contacts app.
+
+10
+00:00:46,240 --> 00:00:51,669
+The Contacts app that's on Android by
+default, stores its data and persists it.
+
+11
+00:00:51,669 --> 00:00:55,380
+And Android protects that save state of
+your contacts.
+
+12
+00:00:56,420 --> 00:00:58,233
+But at the same time we want to be able to
+
+13
+00:00:58,233 --> 00:01:01,110
+get access to the contact list sometimes
+from other apps.
+
+14
+00:01:02,180 --> 00:01:06,439
+So Android does provide mechanisms to
+allow apps to share
+
+15
+00:01:06,439 --> 00:01:12,590
+data outside of the protected sandboxes
+that Android provides for them.
+
+16
+00:01:12,590 --> 00:01:14,957
+So apps can both, share data outside of
+
+17
+00:01:14,957 --> 00:01:17,756
+the processes that they're running in, so
+at
+
+18
+00:01:17,756 --> 00:01:20,268
+run time they can share data that they've
+
+19
+00:01:20,268 --> 00:01:23,027
+loaded and is running outside to other
+apps.
+
+20
+00:01:23,027 --> 00:01:26,652
+And the Android apps can also, if they
+want to, share
+
+21
+00:01:26,652 --> 00:01:30,610
+data that they persisted in the file
+system to other apps.
+
+22
+00:01:31,810 --> 00:01:34,889
+Now, by default Android tries to protect
+you.
+
+23
+00:01:34,889 --> 00:01:39,359
+It tries to keep your app within its own
+little sandbox with its own
+
+24
+00:01:39,359 --> 00:01:42,528
+process, protecting the memory of that
+app,
+
+25
+00:01:42,528 --> 00:01:45,630
+protecting the data its storing on the
+disk.
+
+26
+00:01:46,720 --> 00:01:49,054
+But, it gives you the option to build
+
+27
+00:01:49,054 --> 00:01:52,300
+richer apps that do talk outside of their
+sandbox.
+
+28
+00:01:53,310 --> 00:01:56,958
+But it's in these interactions where we
+begin talking to
+
+29
+00:01:56,958 --> 00:02:01,062
+other apps and services on the device,
+when we begin persisting
+
+30
+00:02:01,062 --> 00:02:04,178
+data in ways that other apps can read and
+interact
+
+31
+00:02:04,178 --> 00:02:07,830
+with, that we run the danger of writing an
+insecure app.
+
+32
+00:02:08,890 --> 00:02:15,150
+So, the two big areas that we have to be
+careful of are, one,
+
+33
+00:02:15,150 --> 00:02:19,710
+that run time when we begin interacting
+with and talking with other apps.
+
+34
+00:02:20,830 --> 00:02:23,320
+And typically the way that you do this on
+
+35
+00:02:23,320 --> 00:02:28,540
+Android is through, as you've seen,
+inter-process communication, or IPC.
+
+36
+00:02:29,940 --> 00:02:33,628
+And IPC can take a number of forms, as
+we've seen.
+
+37
+00:02:33,628 --> 00:02:39,750
+This can be the exchange of intents
+between applications and services.
+
+38
+00:02:39,750 --> 00:02:44,749
+This can be binding, interacting with a
+service, and
+
+39
+00:02:44,749 --> 00:02:51,190
+invoking a service that's running in
+another app or process.
+
+40
+00:02:51,190 --> 00:02:53,971
+So, something like getting access to the
+GPS.
+
+41
+00:02:53,971 --> 00:02:58,040
+That's not going to be running in your
+apps process.
+
+42
+00:02:58,040 --> 00:03:03,239
+So all of these interactions through IPC,
+whenever we decide to have those
+
+43
+00:03:03,239 --> 00:03:09,620
+interactions, we need to be cognizant that
+we're exposing our app to another app.
+
+44
+00:03:09,620 --> 00:03:15,120
+We're opening up the sandbox that we live
+in by default, and we're allowing our app
+
+45
+00:03:15,120 --> 00:03:18,470
+to interact with the memory of other apps,
+
+46
+00:03:18,470 --> 00:03:22,610
+and to interact with the memory of our
+app.
+
+47
+00:03:22,610 --> 00:03:25,934
+So, whenever we begin doing interactions
+through
+
+48
+00:03:25,934 --> 00:03:30,417
+intents, through services, or through
+other mechanisms, we're
+
+49
+00:03:30,417 --> 00:03:36,400
+beginning to open up our app at run time
+and open up those memory protections.
+
+50
+00:03:36,400 --> 00:03:39,054
+The other thing that we can do, is we can
+
+51
+00:03:39,054 --> 00:03:43,000
+save data to sort of communal areas on the
+disc.
+
+52
+00:03:43,000 --> 00:03:45,530
+So we can do things like save data to the
+SD card.
+
+53
+00:03:46,620 --> 00:03:50,230
+And in many cases, you want to save things
+to the SD card.
+
+54
+00:03:50,230 --> 00:03:52,749
+So for example, if you have a custom
+camera app
+
+55
+00:03:52,749 --> 00:03:56,366
+that you're writing, you probably want to
+store those pictures on
+
+56
+00:03:56,366 --> 00:03:58,562
+the SD card so that the user can remove
+the
+
+57
+00:03:58,562 --> 00:04:01,780
+SD card, put a new one in to store more
+pictures.
+
+58
+00:04:01,780 --> 00:04:04,006
+And also so that other applications like
+
+59
+00:04:04,006 --> 00:04:07,890
+the Photo Gallery application can read
+those photos.
+
+60
+00:04:07,890 --> 00:04:11,480
+So there are certain places, like the SD
+card, when we store
+
+61
+00:04:11,480 --> 00:04:17,810
+data that we're opening our apps persisted
+state up to other apps.
+
+62
+00:04:17,810 --> 00:04:20,750
+You can also store data with different
+permissions.
+
+63
+00:04:21,880 --> 00:04:27,271
+So we can change the default permissions
+when we store data.
+
+64
+00:04:27,271 --> 00:04:29,929
+Even they we're storing it in our apps'
+
+65
+00:04:29,929 --> 00:04:32,822
+own a little private data storage area on
+the
+
+66
+00:04:32,822 --> 00:04:35,557
+device, we can still open up that data and
+
+67
+00:04:35,557 --> 00:04:38,626
+store it with things like, read from any
+app.
+
+68
+00:04:38,626 --> 00:04:40,650
+And we can change those permissions.
+
+69
+00:04:40,650 --> 00:04:44,694
+So whenever we do those type of things, or
+we store data in a
+
+70
+00:04:44,694 --> 00:04:48,736
+way that other apps can get access to it,
+we have to be aware
+
+71
+00:04:48,736 --> 00:04:54,266
+of the possibility of another app coming
+and either reading that information in
+
+72
+00:04:54,266 --> 00:04:59,657
+order to corrupt it, or to use that
+information to attack our app in some way.
+
+73
+00:04:59,657 --> 00:05:01,795
+Or to trick it in some way.
+
+74
+00:05:01,795 --> 00:05:05,114
+The other area the Android can't protect
+us
+
+75
+00:05:05,114 --> 00:05:09,770
+again, is if we have a graphical user
+interface.
+
+76
+00:05:09,770 --> 00:05:12,790
+So we have a GUI that is a part of our
+app.
+
+77
+00:05:13,940 --> 00:05:15,590
+Now, GUIs are great.
+
+78
+00:05:15,590 --> 00:05:17,999
+We can use a GUI to get information from
+
+79
+00:05:17,999 --> 00:05:21,699
+the user that we need, like their username
+and password.
+
+80
+00:05:23,010 --> 00:05:28,000
+But GUIs are also areas where other apps
+can try to attack our app.
+
+81
+00:05:28,000 --> 00:05:31,790
+Because a GUI is way of inputting data
+into our app.
+
+82
+00:05:31,790 --> 00:05:34,129
+So although we have a process that's
+
+83
+00:05:34,129 --> 00:05:37,147
+protecting the memory around our app, any
+type
+
+84
+00:05:37,147 --> 00:05:42,470
+of GUI is an area where we're allowing
+data to be placed into our process.
+
+85
+00:05:42,470 --> 00:05:47,273
+Either through fields like username and
+password that the user
+
+86
+00:05:47,273 --> 00:05:51,451
+is going to provide data, or by going in
+adding buttons.
+
+87
+00:05:51,451 --> 00:05:56,756
+Which when they're clicked, they turn into
+events that are injected into
+
+88
+00:05:56,756 --> 00:06:02,900
+the memory of our application and give
+another app the chance to attack us.
+
+89
+00:06:02,900 --> 00:06:04,760
+Now, a GUI, another piece of
+
+90
+00:06:04,760 --> 00:06:07,800
+malware probably can't directly manipulate
+your GUI.
+
+91
+00:06:08,900 --> 00:06:11,810
+But what it can do is, it can trick the
+
+92
+00:06:11,810 --> 00:06:18,310
+user into manipulating your GUI into a
+state that it wants.
+
+93
+00:06:18,310 --> 00:06:20,550
+So it can trick the user and make it
+
+94
+00:06:20,550 --> 00:06:24,003
+think that it's doing something other than
+it is.
+
+95
+00:06:24,003 --> 00:06:29,210
+So, it manipulates the user to convince
+them that, it's logging into your
+
+96
+00:06:29,210 --> 00:06:34,670
+banking app when in reality it's providing
+a fake GUI to do something else.
+
+97
+00:06:34,670 --> 00:06:37,000
+So the GUI is another area that we have to
+protect.
+
+98
+00:06:37,000 --> 00:06:40,814
+We either have to protect it from taking
+data that's
+
+99
+00:06:40,814 --> 00:06:44,985
+going into our memory and corrupting it in
+some way.
+
+100
+00:06:44,985 --> 00:06:49,302
+Or getting knowledge of that data in some
+way, such as user name and password.
+
+101
+00:06:49,302 --> 00:06:52,211
+Or, protect it from taking a GUI that's
+supposed
+
+102
+00:06:52,211 --> 00:06:54,635
+to be putting data into our process and
+our
+
+103
+00:06:54,635 --> 00:06:58,656
+memory space where it's protected, and
+instead, extracting that
+
+104
+00:06:58,656 --> 00:07:01,239
+data and putting it into a piece of
+malware.
+
+105
+00:07:02,750 --> 00:07:06,378
+So these are three really important areas
+that we have to understand
+
+106
+00:07:06,378 --> 00:07:10,403
+what Android protects us against and what
+it doesn't protect us against.
+
+107
+00:07:10,403 --> 00:07:15,210
+And what we as developers have to do to
+make sure that we write more secure apps.
+
+108
+00:07:15,210 --> 00:07:17,400
+We want to make sure we protect our GUIs.
+
+109
+00:07:17,400 --> 00:07:19,703
+We want to make sure we protect the things
+that
+
+110
+00:07:19,703 --> 00:07:22,350
+we store, in terms of state on the disk.
+
+111
+00:07:22,350 --> 00:07:24,492
+And we want to make sure that we protect
+our
+
+112
+00:07:24,492 --> 00:07:26,508
+interactions with other apps through
+
+113
+00:07:26,508 --> 00:07:29,410
+inter-process communication or other
+mechanisms.
+

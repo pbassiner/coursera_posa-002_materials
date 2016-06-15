@@ -1,0 +1,228 @@
+1
+00:00:00,384 --> 00:00:08,419
+[MUSIC]
+
+2
+00:00:08,419 --> 00:00:11,331
+So, one of the important things to
+understand, when
+
+3
+00:00:11,331 --> 00:00:16,650
+building Android applications, is how to
+write secure Android applications.
+
+4
+00:00:16,650 --> 00:00:21,682
+We've all seen stories in the news about
+apps that didn't properly secure their
+
+5
+00:00:21,682 --> 00:00:24,198
+user's data, and allowed other apps to
+
+6
+00:00:24,198 --> 00:00:27,462
+read and write their private messages or
+contacts.
+
+7
+00:00:27,462 --> 00:00:32,632
+And so what this series of lectures is
+going to cover is, what are sort of the
+
+8
+00:00:32,632 --> 00:00:37,907
+basic things that you need to understand
+about how Android security works?
+
+9
+00:00:37,907 --> 00:00:42,953
+And then based on your understanding of
+what Android provides you from a
+
+10
+00:00:42,953 --> 00:00:48,352
+security perspective, how you can write
+your app to improve its security.
+
+11
+00:00:48,352 --> 00:00:51,629
+So one of the first things to understand,
+when
+
+12
+00:00:51,629 --> 00:00:56,418
+we're talking about Android security, is
+how Android's version
+
+13
+00:00:56,418 --> 00:01:00,535
+of how applications, or apps operate, is
+different than
+
+14
+00:01:00,535 --> 00:01:05,258
+from what we see on a traditional desktop
+computing environment.
+
+15
+00:01:05,258 --> 00:01:08,389
+So in a traditional desktop and computing
+environment, if
+
+16
+00:01:08,389 --> 00:01:11,593
+we launch an application, let's say it's a
+photo editor.
+
+17
+00:01:11,593 --> 00:01:17,978
+And we'll say this is our first app that
+we're launching, so this is app one.
+
+18
+00:01:17,978 --> 00:01:22,610
+And let's say that, that photo editor goes
+and we open it and we decide that we
+
+19
+00:01:22,610 --> 00:01:25,677
+want to access the internet maybe to
+download, send
+
+20
+00:01:25,677 --> 00:01:29,130
+images that we have stored, on Facebook or
+Flickr.
+
+21
+00:01:30,160 --> 00:01:33,686
+And then after getting those images we go
+and we edit
+
+22
+00:01:33,686 --> 00:01:37,380
+the images, and we save them to a storage
+on the disk.
+
+23
+00:01:38,560 --> 00:01:41,173
+Now one of the important things about
+
+24
+00:01:41,173 --> 00:01:44,628
+the way that desktop environments work, is
+that
+
+25
+00:01:44,628 --> 00:01:47,747
+they associate each app that you launch
+with
+
+26
+00:01:47,747 --> 00:01:51,650
+a single person, that is your user
+account.
+
+27
+00:01:51,650 --> 00:01:56,800
+If you launch an app, that app is
+associated with your user account, and has
+
+28
+00:01:56,800 --> 00:01:59,540
+all of the permissions and capabilities
+that
+
+29
+00:01:59,540 --> 00:02:01,850
+are part of whatever's in your user
+account.
+
+30
+00:02:01,850 --> 00:02:06,320
+So, this app will be part of your user
+account.
+
+31
+00:02:08,760 --> 00:02:13,420
+And when you go and launch a second
+application, this is where
+
+32
+00:02:13,420 --> 00:02:19,400
+this concept of each app running within
+your user account becomes important.
+
+33
+00:02:19,400 --> 00:02:23,803
+So if we go and we launch a second
+application, let's say that this is your
+
+34
+00:02:23,803 --> 00:02:26,004
+browser and you're going to view in a
+
+35
+00:02:26,004 --> 00:02:29,700
+web browser, exactly what that image looks
+like.
+
+36
+00:02:29,700 --> 00:02:31,120
+So we'll launch our web browser.
+
+37
+00:02:31,120 --> 00:02:33,380
+This is our sec, second application.
+
+38
+00:02:33,380 --> 00:02:37,080
+One of the important things is, is that
+
+39
+00:02:37,080 --> 00:02:42,300
+this will also be running in our user
+account.
+
+40
+00:02:42,300 --> 00:02:47,774
+And what that means is, is that this
+application can go and directly
+
+41
+00:02:47,774 --> 00:02:53,071
+access those same areas of storage that
+the first app can access.
+
+42
+00:02:53,071 --> 00:02:56,502
+And the reason is, that the privileges and
+permissions
+
+43
+00:02:56,502 --> 00:03:00,006
+that are governing the web browser, which
+is another app
+
+44
+00:03:00,006 --> 00:03:03,145
+that I, the user, have launched, are
+exactly the
+
+45
+00:03:03,145 --> 00:03:07,370
+same as the privileges and permissions of
+the first app.
+
+46
+00:03:07,370 --> 00:03:10,314
+And that's because I as the user launched
+both of these
+
+47
+00:03:10,314 --> 00:03:14,670
+applications, and therefore both of them
+are associated with my user account.
+

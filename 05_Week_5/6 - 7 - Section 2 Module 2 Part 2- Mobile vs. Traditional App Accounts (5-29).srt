@@ -1,0 +1,372 @@
+1
+00:00:00,163 --> 00:00:09,022
+[MUSIC]
+
+2
+00:00:09,022 --> 00:00:13,565
+Let's contrast the way the Android works
+from security perspective,
+
+3
+00:00:13,565 --> 00:00:18,310
+from the way that a traditional desktop
+operating system works.
+
+4
+00:00:18,310 --> 00:00:20,610
+So what is fundamentally different?
+
+5
+00:00:20,610 --> 00:00:22,784
+Well, if you have to sum it up in
+
+6
+00:00:22,784 --> 00:00:26,650
+one phrase, it's that apps are people, on
+Android.
+
+7
+00:00:26,650 --> 00:00:30,780
+And this is a really profound thing from a
+security point of view that
+
+8
+00:00:30,780 --> 00:00:34,850
+makes Android behave from a security
+perspective
+
+9
+00:00:34,850 --> 00:00:37,750
+very differently from a traditional
+desktop environment.
+
+10
+00:00:37,750 --> 00:00:39,689
+So let's take a look at how this affects
+things.
+
+11
+00:00:41,010 --> 00:00:43,883
+On Android, if I go and launch an app, and
+let's
+
+12
+00:00:43,883 --> 00:00:47,244
+say it's, you know, it, we, we take a
+photograph with
+
+13
+00:00:47,244 --> 00:00:50,046
+the camera, and we touch it up in a photo
+editing
+
+14
+00:00:50,046 --> 00:00:54,134
+program, similar to what we were doing in
+our desktop user example.
+
+15
+00:00:54,134 --> 00:00:58,380
+So, we launch our first app, which is a
+photo editor, to touch up a photo.
+
+16
+00:00:58,380 --> 00:01:02,216
+And this is going to be our first app,
+
+17
+00:01:02,216 --> 00:01:08,750
+and it's going to access information on
+the device.
+
+18
+00:01:08,750 --> 00:01:12,020
+Now, one of the immediate things that's
+different is that this
+
+19
+00:01:12,020 --> 00:01:17,300
+app is going to be launched with its own
+user account.
+
+20
+00:01:17,300 --> 00:01:22,892
+So the photo editor is going to have a
+photo editor user.
+
+21
+00:01:22,892 --> 00:01:29,050
+It's a separate account that's associated
+with it.
+
+22
+00:01:29,050 --> 00:01:31,465
+And what this means it that the photo
+editor
+
+23
+00:01:31,465 --> 00:01:34,283
+has its own set of privileges and
+permissions that
+
+24
+00:01:34,283 --> 00:01:37,167
+have been assigned to it, that aren't the
+default
+
+25
+00:01:37,167 --> 00:01:39,850
+ones that are assigned to me as a user.
+
+26
+00:01:39,850 --> 00:01:41,690
+Because, even though I've launched that
+app,
+
+27
+00:01:42,890 --> 00:01:45,790
+because I've launched it, under my user
+
+28
+00:01:45,790 --> 00:01:47,960
+account doesn't mean that, that photo
+editor
+
+29
+00:01:47,960 --> 00:01:51,250
+automatically gets all of my permissions
+and capabilities.
+
+30
+00:01:51,250 --> 00:01:54,364
+We want to restrict what that photo editor
+is able to do, to
+
+31
+00:01:54,364 --> 00:01:58,030
+only things that I, as the user, want it
+to be able to do.
+
+32
+00:01:58,030 --> 00:02:02,344
+So it has its own photo editor user
+account that has been created when
+
+33
+00:02:02,344 --> 00:02:07,930
+I installed that app, and when I agreed to
+let it have certain permissions.
+
+34
+00:02:07,930 --> 00:02:11,040
+So what this means is the photo editor can
+access
+
+35
+00:02:11,040 --> 00:02:15,255
+parts of the storage that are associated
+with the photo editor.
+
+36
+00:02:15,255 --> 00:02:18,262
+So that we can think of our storage as
+being divided up.
+
+37
+00:02:18,262 --> 00:02:23,573
+And so there's a region of that storage
+that's assigned to that photo editor.
+
+38
+00:02:23,573 --> 00:02:28,708
+And it can read and write files to that
+region of the storage that's part of its
+
+39
+00:02:28,708 --> 00:02:34,790
+private data, or the area within the
+storage that's been sliced off for it.
+
+40
+00:02:34,790 --> 00:02:39,827
+Similarly, if when I installed this photo
+editor, I gave it permission to access
+
+41
+00:02:39,827 --> 00:02:45,380
+the internet, then its user account has a
+special permission associated with it.
+
+42
+00:02:45,380 --> 00:02:47,611
+It allows it to go and access the internet
+
+43
+00:02:47,611 --> 00:02:51,230
+through the Wi-Fi or cellular network
+connected to the device.
+
+44
+00:02:52,710 --> 00:02:55,969
+Where the model of security that has apps
+as people
+
+45
+00:02:55,969 --> 00:03:00,400
+gets really interesting, is when we launch
+a second application.
+
+46
+00:03:01,420 --> 00:03:06,861
+So, let's say on the Android we launch a
+second application, which is a web browser
+
+47
+00:03:06,861 --> 00:03:11,630
+that we're going to view our edited image
+in just like we did on the desktop.
+
+48
+00:03:12,990 --> 00:03:17,233
+Now, where there's an immediate difference
+in how Android operates,
+
+49
+00:03:17,233 --> 00:03:21,620
+is what this web browser can access on the
+storage system.
+
+50
+00:03:21,620 --> 00:03:24,459
+The web browser, if this was on the
+desktop,
+
+51
+00:03:24,459 --> 00:03:27,299
+would be able to just directly go and read
+this
+
+52
+00:03:27,299 --> 00:03:30,438
+file that I had saved in the photo editor,
+because
+
+53
+00:03:30,438 --> 00:03:34,818
+both applications would have been
+associated with my user account.
+
+54
+00:03:34,818 --> 00:03:39,280
+And thus they both have access to the same
+areas in the storage system.
+
+55
+00:03:40,310 --> 00:03:45,733
+But, on Android, because this web browser
+is going to run
+
+56
+00:03:45,733 --> 00:03:51,489
+underneath its own user account, its web
+browser, user, it
+
+57
+00:03:51,489 --> 00:03:57,374
+can't directly access the files created by
+the photo editor.
+
+58
+00:03:57,374 --> 00:04:02,220
+Because, the photo editor stuff is
+private, so this is not allowed.
+
+59
+00:04:02,220 --> 00:04:05,690
+Because this is private access.
+
+60
+00:04:05,690 --> 00:04:11,560
+This is something that exists only for
+this photo editor user account.
+
+61
+00:04:12,570 --> 00:04:18,467
+So one of the immediate differences is,
+that each app that I launch as a user does
+
+62
+00:04:18,467 --> 00:04:24,270
+not automatically get the same permissions
+and capabilities as other apps.
+
+63
+00:04:24,270 --> 00:04:28,078
+So I can't just launch a photo editor,
+save some data to the
+
+64
+00:04:28,078 --> 00:04:32,798
+storage system of that, in the private
+storage of that photo editor, and
+
+65
+00:04:32,798 --> 00:04:37,826
+then access it with the web browser,
+because they have separate user accounts
+
+66
+00:04:37,826 --> 00:04:42,038
+and they have access to separate sets of
+files on the file system.
+
+67
+00:04:42,038 --> 00:04:45,305
+Now there are ways to get around this that
+we'll talk about.
+
+68
+00:04:45,305 --> 00:04:50,100
+And one of them for example, is saving
+images to the SD card on your device.
+
+69
+00:04:51,130 --> 00:04:54,574
+But, when we begin doing things like
+saving data
+
+70
+00:04:54,574 --> 00:04:57,682
+to the SD card, or to other places that
+other
+
+71
+00:04:57,682 --> 00:05:00,959
+apps can access, we have to be conscious
+from a
+
+72
+00:05:00,959 --> 00:05:05,180
+security point of view what the
+ramifications are of that.
+
+73
+00:05:06,200 --> 00:05:11,633
+Now the important thing to remember is, by
+default, Android wants each
+
+74
+00:05:11,633 --> 00:05:17,660
+app to be its own user and to save data in
+its own private data store system.
+
+75
+00:05:17,660 --> 00:05:22,125
+By default, Android is segregating your
+app from other apps on the system
+
+76
+00:05:22,125 --> 00:05:27,180
+to prevent them from stealing data from
+your apps or doing other malicious things.
+

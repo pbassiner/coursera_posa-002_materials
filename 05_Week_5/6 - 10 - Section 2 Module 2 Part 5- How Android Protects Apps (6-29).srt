@@ -1,0 +1,487 @@
+1
+00:00:00,005 --> 00:00:08,909
+[MUSIC]
+
+2
+00:00:08,909 --> 00:00:13,393
+So to help improve the security of how we
+write apps, let's
+
+3
+00:00:13,393 --> 00:00:19,050
+talk a little bit about how Android
+protects our apps from other apps.
+
+4
+00:00:19,050 --> 00:00:21,780
+And then once we understand how it
+protects our
+
+5
+00:00:21,780 --> 00:00:24,860
+apps, we can also understand what it
+doesn't do for
+
+6
+00:00:24,860 --> 00:00:27,380
+us, and what it expects us as developers
+to
+
+7
+00:00:27,380 --> 00:00:30,970
+do to ensure that our apps stay safe and
+secure.
+
+8
+00:00:30,970 --> 00:00:34,010
+So the first thing that Android does, is
+whenever
+
+9
+00:00:34,010 --> 00:00:36,150
+you go and launch an app, as we've seen
+
+10
+00:00:36,150 --> 00:00:39,200
+before, that app has its own user account
+associated
+
+11
+00:00:39,200 --> 00:00:42,770
+with it that determines what it can and
+can't do.
+
+12
+00:00:42,770 --> 00:00:45,560
+But it also is launched in its own
+process.
+
+13
+00:00:46,750 --> 00:00:50,539
+So, your app is launched in its own
+process,
+
+14
+00:00:50,539 --> 00:00:54,230
+and what a process does is it's an
+operating
+
+15
+00:00:54,230 --> 00:00:59,419
+system construct that protects the memory
+of your app, while
+
+16
+00:00:59,419 --> 00:01:04,800
+it's running, from the memory of other
+applications.
+
+17
+00:01:04,800 --> 00:01:08,328
+So your app will run in a process, and if
+there's some malware that
+
+18
+00:01:08,328 --> 00:01:13,390
+might be trying to attack your app, it'll
+be running in its own separate process.
+
+19
+00:01:13,390 --> 00:01:18,710
+So we'll have another process, and we'll
+have your original process.
+
+20
+00:01:19,750 --> 00:01:23,685
+Now what this means is, if your app's
+memory is protected,
+
+21
+00:01:23,685 --> 00:01:26,847
+let's say that this is the I Remember app,
+and we
+
+22
+00:01:26,847 --> 00:01:31,015
+have a variable that, for example, maybe
+it's the server that
+
+23
+00:01:31,015 --> 00:01:34,610
+we're going to save data to or try to
+login to.
+
+24
+00:01:34,610 --> 00:01:41,300
+So maybe we have a server variable defined
+in one of our Java classes.
+
+25
+00:01:41,300 --> 00:01:46,010
+Well, what the processed memory
+protections means is that the
+
+26
+00:01:46,010 --> 00:01:50,960
+second process can't go and directly write
+to this variable.
+
+27
+00:01:50,960 --> 00:01:52,490
+So this is not allowed.
+
+28
+00:01:52,490 --> 00:01:56,720
+That would be a violation of the security
+that
+
+29
+00:01:56,720 --> 00:02:02,730
+processes provide to separate the memory
+from each other.
+
+30
+00:02:02,730 --> 00:02:05,010
+Now, you can see why this is so important.
+
+31
+00:02:05,010 --> 00:02:07,754
+If this malware could go and directly
+change
+
+32
+00:02:07,754 --> 00:02:10,424
+a variable in your code, for instance, if
+
+33
+00:02:10,424 --> 00:02:13,168
+it could go and change some variable
+telling
+
+34
+00:02:13,168 --> 00:02:15,628
+where the I Remember app should log in.
+
+35
+00:02:15,628 --> 00:02:19,698
+And tell it to go and log in to another
+server, for example, if you
+
+36
+00:02:19,698 --> 00:02:22,436
+go and capture your username and password,
+
+37
+00:02:22,436 --> 00:02:25,190
+and do all kinds of other malicious
+things.
+
+38
+00:02:26,270 --> 00:02:32,570
+So, the memory protections that a process
+provides are very important.
+
+39
+00:02:32,570 --> 00:02:36,371
+So, we get memory protection on our apps
+from
+
+40
+00:02:36,371 --> 00:02:40,380
+other apps running on Android at the same
+time.
+
+41
+00:02:42,460 --> 00:02:46,024
+Another very important thing that Android
+provides
+
+42
+00:02:46,024 --> 00:02:48,778
+is it provides a guarantee on the storage
+
+43
+00:02:48,778 --> 00:02:54,890
+of the things that your app will decides
+or persists to the storage on the device.
+
+44
+00:02:54,890 --> 00:02:57,480
+So, what do we care about in this case?
+
+45
+00:02:57,480 --> 00:03:00,190
+Well, we care about that we can save state
+for
+
+46
+00:03:00,190 --> 00:03:03,790
+our app because our app may not always be
+running and
+
+47
+00:03:03,790 --> 00:03:07,350
+that when we go and relaunch that
+application, we know that
+
+48
+00:03:07,350 --> 00:03:11,320
+that state will still be intact and in its
+original condition.
+
+49
+00:03:12,340 --> 00:03:14,904
+So you can think about, for example, if
+
+50
+00:03:14,904 --> 00:03:17,921
+you were storing important data about the
+state
+
+51
+00:03:17,921 --> 00:03:20,033
+of your app to disk and another app
+
+52
+00:03:20,033 --> 00:03:24,260
+could come in, overwrite that state, and
+change it.
+
+53
+00:03:24,260 --> 00:03:28,250
+Then you could do a lot of very malicious
+things from another app.
+
+54
+00:03:28,250 --> 00:03:31,290
+So it's very important that Android
+protects whatever state
+
+55
+00:03:31,290 --> 00:03:34,659
+or information we save to the underlying
+storage system.
+
+56
+00:03:35,800 --> 00:03:42,110
+So, what types of state can we save that
+are, get protected by Android?
+
+57
+00:03:42,110 --> 00:03:45,330
+Well the very first and important piece of
+state that
+
+58
+00:03:45,330 --> 00:03:49,420
+we might save, for example, is the APK for
+our app.
+
+59
+00:03:49,420 --> 00:03:52,148
+So, when we go and actually create an
+
+60
+00:03:52,148 --> 00:03:55,932
+app, we're creating a package that's going
+to be
+
+61
+00:03:55,932 --> 00:03:59,100
+stored on the underlying file system on
+the
+
+62
+00:03:59,100 --> 00:04:02,130
+device, that has all of our code in it.
+
+63
+00:04:02,130 --> 00:04:06,120
+So if another app could go and directly
+manipulate our APK, it
+
+64
+00:04:06,120 --> 00:04:10,190
+could change the behavior of our app in
+whatever way it wanted.
+
+65
+00:04:10,190 --> 00:04:11,860
+So it's very important that we protect
+
+66
+00:04:11,860 --> 00:04:14,650
+these APKs for our apps when they're
+installed.
+
+67
+00:04:14,650 --> 00:04:15,980
+And Android does that for us.
+
+68
+00:04:15,980 --> 00:04:19,800
+It provides protections over the APKs of
+each app.
+
+69
+00:04:19,800 --> 00:04:22,990
+So your app can't go and over write or
+change another
+
+70
+00:04:22,990 --> 00:04:26,680
+app APK and those apps can't go and change
+your app's APK.
+
+71
+00:04:27,740 --> 00:04:31,140
+What are other types of things that we
+might want to store and protect?
+
+72
+00:04:31,140 --> 00:04:32,940
+Things like the database.
+
+73
+00:04:32,940 --> 00:04:39,500
+So if your app wants to store data in the
+SQLite database on our device.
+
+74
+00:04:39,500 --> 00:04:44,860
+You can store that database, and Android,
+depending on
+
+75
+00:04:44,860 --> 00:04:47,150
+how you store that data, and we'll talk
+about
+
+76
+00:04:47,150 --> 00:04:50,880
+this, will protect that data so that only
+your
+
+77
+00:04:50,880 --> 00:04:54,260
+app can read data in the database that
+you're writing.
+
+78
+00:04:55,840 --> 00:04:59,253
+Other things that you might want to
+persist are
+
+79
+00:04:59,253 --> 00:05:03,550
+settings for your app, and those can also
+be persistent.
+
+80
+00:05:04,550 --> 00:05:08,530
+So how does Android go about actually
+protecting these things under the hood?
+
+81
+00:05:08,530 --> 00:05:12,138
+Well the way that Android does it, as
+we've seen
+
+82
+00:05:12,138 --> 00:05:16,200
+before is that each app has its own user
+account.
+
+83
+00:05:16,200 --> 00:05:19,410
+And that essentially defines an area of
+the
+
+84
+00:05:19,410 --> 00:05:23,440
+storage on the device that's assigned to
+that app.
+
+85
+00:05:23,440 --> 00:05:28,210
+So if another app goes and tries to write
+to this area of storage, it can't.
+
+86
+00:05:28,210 --> 00:05:31,790
+Because that's owned by that other app's
+user account.
+
+87
+00:05:32,900 --> 00:05:37,040
+So by default, Android gives us two really
+important things.
+
+88
+00:05:37,040 --> 00:05:41,347
+It gives us the ability to protect our
+application's memory from other
+
+89
+00:05:41,347 --> 00:05:45,670
+apps running so they can't change our
+variables or our run time state.
+
+90
+00:05:46,770 --> 00:05:51,293
+And then also it gives us the protect,
+ability to protect the
+
+91
+00:05:51,293 --> 00:05:55,210
+data that we save to disc or to storage on
+our device.
+
+92
+00:05:55,210 --> 00:05:59,840
+And that's protecting our state that's
+persistent between launches.
+
+93
+00:05:59,840 --> 00:06:02,371
+So what Android's giving us is the ability
+
+94
+00:06:02,371 --> 00:06:05,113
+to protect our app, both when it's
+running,
+
+95
+00:06:05,113 --> 00:06:07,786
+by protecting state that's in the process
+of
+
+96
+00:06:07,786 --> 00:06:10,597
+that app, and then secondly, any state
+that we
+
+97
+00:06:10,597 --> 00:06:12,775
+need to store, because it is a mobile
+
+98
+00:06:12,775 --> 00:06:15,304
+device, and apps get shut down from time
+to
+
+99
+00:06:15,304 --> 00:06:20,990
+time, the, the battery on the phone dies,
+and we need to be able to save state.
+
+100
+00:06:20,990 --> 00:06:23,658
+It protects all of that state that we
+saved on the
+
+101
+00:06:23,658 --> 00:06:27,810
+underlying storage system in a special
+area that's assigned to our app.
+

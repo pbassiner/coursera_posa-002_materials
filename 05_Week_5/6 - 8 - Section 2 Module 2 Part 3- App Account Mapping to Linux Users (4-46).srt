@@ -1,0 +1,303 @@
+1
+00:00:00,076 --> 00:00:08,782
+[MUSIC]
+
+2
+00:00:08,782 --> 00:00:12,511
+When your app gets installed, that's when
+the system creates the
+
+3
+00:00:12,511 --> 00:00:17,180
+identity of the account that's going to be
+associated with your app.
+
+4
+00:00:17,180 --> 00:00:20,091
+So let's dive a little deeper into what
+that actually
+
+5
+00:00:20,091 --> 00:00:23,360
+means an app for Android when you install
+an app.
+
+6
+00:00:23,360 --> 00:00:28,080
+And what happens under the hood to create
+that user account.
+
+7
+00:00:29,250 --> 00:00:33,157
+Well, when you create an Android app, one
+of the things
+
+8
+00:00:33,157 --> 00:00:37,165
+you have to specify is an Android manifest
+that XML file.
+
+9
+00:00:37,165 --> 00:00:39,991
+And this is a file, that all of you should
+
+10
+00:00:39,991 --> 00:00:44,660
+be very well familiar with if you've been
+building Android apps.
+
+11
+00:00:44,660 --> 00:00:47,349
+And what this does is it tells Android
+
+12
+00:00:47,349 --> 00:00:50,385
+things that it needs to know about your
+app
+
+13
+00:00:50,385 --> 00:00:53,073
+in order to install it on the system,
+
+14
+00:00:53,073 --> 00:00:57,606
+in order to understand what it's different
+components are.
+
+15
+00:00:57,606 --> 00:01:02,073
+And very importantly from a security
+perspective, it tells it
+
+16
+00:01:02,073 --> 00:01:06,962
+which capabilities of the hardware
+platform on the Android device,
+
+17
+00:01:06,962 --> 00:01:11,429
+or the capabilities provided by other
+apps, like the Contacts
+
+18
+00:01:11,429 --> 00:01:14,820
+app, that you want to have access to in
+your app.
+
+19
+00:01:14,820 --> 00:01:20,770
+So you declare a series of uses
+permissions.
+
+20
+00:01:22,300 --> 00:01:26,280
+And these are things that your app wants
+
+21
+00:01:26,280 --> 00:01:30,690
+to have access to on the underlying
+platform.
+
+22
+00:01:30,690 --> 00:01:33,860
+And each of these user permissions
+corresponds to
+
+23
+00:01:33,860 --> 00:01:38,320
+some type of underlying capability of the
+device.
+
+24
+00:01:38,320 --> 00:01:41,180
+Something like access to the internet,
+maybe.
+
+25
+00:01:41,180 --> 00:01:42,530
+Or, access to the camera.
+
+26
+00:01:43,630 --> 00:01:48,985
+And your app declares all of these things
+up front, so that when the user
+
+27
+00:01:48,985 --> 00:01:54,251
+installs your app on their device, Android
+can go and scan all of these
+
+28
+00:01:54,251 --> 00:02:00,142
+user permissions, figure out what they map
+to in terms of capabilities on your
+
+29
+00:02:00,142 --> 00:02:05,706
+device, and then present a menu to the
+user, saying do you want to allow?
+
+30
+00:02:05,706 --> 00:02:09,800
+[BLANK_AUDIO]
+
+31
+00:02:09,800 --> 00:02:15,097
+This app to have access to X, Y, and Z
+things?
+
+32
+00:02:15,097 --> 00:02:19,754
+So the user gets to decide, is this okay?
+
+33
+00:02:19,754 --> 00:02:22,407
+[BLANK_AUDIO]
+
+34
+00:02:22,407 --> 00:02:27,889
+And if they say that it's okay, what
+Android does, is it takes all of these
+
+35
+00:02:27,889 --> 00:02:33,113
+user permissions, and it goes and creates
+an account on the underlying
+
+36
+00:02:33,113 --> 00:02:38,590
+Linux operation system, that's part of
+Android, for your app.
+
+37
+00:02:38,590 --> 00:02:44,080
+So Android, is a modified version of Linux
+that runs on mobile devices.
+
+38
+00:02:45,230 --> 00:02:50,418
+And when you create that install an app
+and then create a user account for it,
+
+39
+00:02:50,418 --> 00:02:54,313
+what's actually happening is that the
+underlying Linux
+
+40
+00:02:54,313 --> 00:02:57,746
+operating system is creating a user for
+that app.
+
+41
+00:02:57,746 --> 00:03:03,326
+So this and this basically create
+
+42
+00:03:03,326 --> 00:03:08,640
+the Linux user, for your app.
+
+43
+00:03:08,640 --> 00:03:13,520
+This is what's define the capabilities of
+this Linux user.
+
+44
+00:03:13,520 --> 00:03:16,350
+Is the things that you ask for in your
+manifest file?
+
+45
+00:03:17,610 --> 00:03:23,770
+Underneath the hood, each of the things
+you ask for like internet, or camera.
+
+46
+00:03:23,770 --> 00:03:28,100
+Each of those has a separate Linux group
+that's associated with it.
+
+47
+00:03:28,100 --> 00:03:30,720
+For example, you may have the camera
+group.
+
+48
+00:03:31,740 --> 00:03:36,020
+And this is a user group, that is set up
+to
+
+49
+00:03:36,020 --> 00:03:39,520
+define the set of users that have access
+to the camera.
+
+50
+00:03:39,520 --> 00:03:44,630
+And this is already on the device, when
+you install the app.
+
+51
+00:03:44,630 --> 00:03:48,790
+And so what Android does is it creates
+your Linux user.
+
+52
+00:03:48,790 --> 00:03:53,496
+And then based on each of the user permit,
+user's permissions, it figures
+
+53
+00:03:53,496 --> 00:03:59,190
+out which of the different user groups
+your accounts should be associated with.
+
+54
+00:03:59,190 --> 00:04:04,622
+So it associates, this, app, for a photo
+editor, let's say, with it's own Linux
+
+55
+00:04:04,622 --> 00:04:10,470
+user, and then it associates that Linux
+user with the underlying camera group.
+
+56
+00:04:10,470 --> 00:04:15,800
+And so now, when your app is running, if
+your app goes and tries to
+
+57
+00:04:15,800 --> 00:04:21,440
+access the camera, Android and its
+underlying Linux kernel can look
+
+58
+00:04:21,440 --> 00:04:26,220
+at the user account associated with your
+app, and then can check if
+
+59
+00:04:26,220 --> 00:04:31,150
+it's part of this Linux user group that
+should have access to the camera.
+
+60
+00:04:31,150 --> 00:04:33,520
+So underneath the hood, all of these
+permissions
+
+61
+00:04:33,520 --> 00:04:35,920
+that we see in our apps, and that are
+
+62
+00:04:35,920 --> 00:04:40,050
+manifested as uses permissions in the
+Android manifest XML
+
+63
+00:04:40,050 --> 00:04:44,070
+files, actually get mapped down to Linux
+user groups.
+
