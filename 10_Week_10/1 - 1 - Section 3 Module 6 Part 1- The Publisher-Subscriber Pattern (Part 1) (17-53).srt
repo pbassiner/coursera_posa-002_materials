@@ -1,0 +1,1709 @@
+1
+00:00:00,000 --> 00:00:08,700
+[MUSIC]
+
+2
+00:00:08,700 --> 00:00:09,265
+Okay.
+
+3
+00:00:09,265 --> 00:00:10,875
+Any questions about the broker?
+
+4
+00:00:10,875 --> 00:00:13,571
+So now you know more than you ever
+possibly wanted
+
+5
+00:00:13,571 --> 00:00:17,056
+to know about the broker, and how Android
+works, with respect
+
+6
+00:00:17,056 --> 00:00:20,014
+to the binder and AIDL, again believe it
+or not we've
+
+7
+00:00:20,014 --> 00:00:23,760
+just only scratched the surface of this
+very, very rich topic.
+
+8
+00:00:23,760 --> 00:00:26,860
+So, if you're really into this if for some
+reason you're
+
+9
+00:00:26,860 --> 00:00:29,290
+working for a company that has to go in
+and modify
+
+10
+00:00:29,290 --> 00:00:32,130
+parts of Android in order to get its
+requirements met for
+
+11
+00:00:32,130 --> 00:00:35,610
+its customers and users, you're going to
+have to dive down even deeper.
+
+12
+00:00:35,610 --> 00:00:38,900
+But at least now you kind of know how
+things are put together and it'll help
+
+13
+00:00:38,900 --> 00:00:43,800
+to focus your attention on the part that
+matters for what you are trying to do.
+
+14
+00:00:43,800 --> 00:00:46,020
+Okay, the next thing I'm going to talk
+about, and
+
+15
+00:00:46,020 --> 00:00:48,230
+this will really be the last set of
+patterns on
+
+16
+00:00:48,230 --> 00:00:51,380
+these topics unless I get really inspired
+and think of
+
+17
+00:00:51,380 --> 00:00:54,000
+one more between now and Wednesday which I
+probably won't.
+
+18
+00:00:54,000 --> 00:00:57,390
+We're going to talk about something called
+the publisher, subscriber pattern.
+
+19
+00:00:57,390 --> 00:01:02,680
+And we're going to describe first what the
+pattern is, and kind of how it works, what
+
+20
+00:01:02,680 --> 00:01:04,970
+problems it solves, and then we're
+going to talk
+
+21
+00:01:04,970 --> 00:01:06,880
+about how it's implemented in the context
+of Android.
+
+22
+00:01:08,190 --> 00:01:10,900
+So here's, here's a way to think about the
+need for this pattern.
+
+23
+00:01:10,900 --> 00:01:17,030
+There's a bunch of system-related status
+information that's kept on your
+
+24
+00:01:17,030 --> 00:01:22,420
+behalf by Android that is often useful to
+applications in one way or another.
+
+25
+00:01:22,420 --> 00:01:25,270
+For example, the Android middleware and
+the
+
+26
+00:01:25,270 --> 00:01:28,330
+lower level drivers and system services
+keep
+
+27
+00:01:28,330 --> 00:01:30,520
+track of the battery levels, which is
+
+28
+00:01:30,520 --> 00:01:32,370
+a very important thing because if you're
+running
+
+29
+00:01:32,370 --> 00:01:35,060
+low on battery you probably want to know
+about it so you can be
+
+30
+00:01:35,060 --> 00:01:38,589
+alerted and plug your phone in, or switch
+the battery or do something like that.
+
+31
+00:01:40,440 --> 00:01:44,860
+The issue there is how do apps find out
+that the battery is low?
+
+32
+00:01:44,860 --> 00:01:46,620
+Imagine you have the phone app, right?
+
+33
+00:01:46,620 --> 00:01:48,015
+You could be in the middle of a phone
+call,
+
+34
+00:01:48,015 --> 00:01:51,500
+your phone app isn't busy doing anything
+other than you
+
+35
+00:01:51,500 --> 00:01:54,390
+know, helping make sure that that call's
+quality is good,
+
+36
+00:01:54,390 --> 00:01:57,810
+and managing things like three way calling
+or caller id, right?
+
+37
+00:01:57,810 --> 00:02:00,840
+The phone app really shouldn't be sitting
+there,
+
+38
+00:02:00,840 --> 00:02:03,710
+being tightly coupled to the battery
+status module.
+
+39
+00:02:03,710 --> 00:02:03,920
+Right?
+
+40
+00:02:03,920 --> 00:02:05,130
+Why would the phone app need to know
+
+41
+00:02:05,130 --> 00:02:07,460
+about the details of monitoring the
+battery level?
+
+42
+00:02:07,460 --> 00:02:11,350
+That would be, if you hard coded the phone
+app to know about that, you would have
+
+43
+00:02:11,350 --> 00:02:13,620
+a very tightly coupled design that would
+break
+
+44
+00:02:13,620 --> 00:02:15,230
+and be brittle as you try to make changes.
+
+45
+00:02:16,290 --> 00:02:20,730
+Likewise, having the app continually ask
+some service, are you
+
+46
+00:02:20,730 --> 00:02:22,610
+running low on battery, are you running
+low on battery?
+
+47
+00:02:22,610 --> 00:02:25,620
+Well, pretty soon, you're running low on
+battery, because you're
+
+48
+00:02:25,620 --> 00:02:28,310
+spending all your time asking whether
+you're low on battery, right?
+
+49
+00:02:28,310 --> 00:02:31,410
+It gets, it's like having your kids say
+are we there yet, are we there yet, are we
+
+50
+00:02:31,410 --> 00:02:33,930
+there yet, because it's not making it go
+any
+
+51
+00:02:33,930 --> 00:02:36,240
+faster, it's just getting to be a lot more
+painful.
+
+52
+00:02:36,240 --> 00:02:40,000
+So, a polling based model isn't really the
+right way to go, either.
+
+53
+00:02:40,000 --> 00:02:42,380
+So what we're going to do instead is,
+we're going to define
+
+54
+00:02:42,380 --> 00:02:47,240
+a way to automatically publish an intent
+to anybody who happens
+
+55
+00:02:47,240 --> 00:02:50,990
+to care about the status information that
+Android's keeping track
+
+56
+00:02:50,990 --> 00:02:54,760
+of, like the battery levels or other,
+other kinds of things.
+
+57
+00:02:54,760 --> 00:02:58,450
+You know, or, service, service quality,
+you know, like your cellu-,
+
+58
+00:02:58,450 --> 00:02:59,890
+cellular signal strength.
+
+59
+00:02:59,890 --> 00:03:03,020
+You might have something that says, your
+cell signal's getting weak or what not.
+
+60
+00:03:03,020 --> 00:03:05,560
+You move into an open area or whatever.
+
+61
+00:03:05,560 --> 00:03:09,510
+So whenever this information changes you
+want to be able to notify
+
+62
+00:03:09,510 --> 00:03:13,110
+interested subscribers that something has
+happened,
+
+63
+00:03:13,110 --> 00:03:15,090
+that they may be, concerned with.
+
+64
+00:03:16,660 --> 00:03:17,590
+So here's how this works.
+
+65
+00:03:17,590 --> 00:03:20,660
+In Android, we define these things called
+broadcast receivers.
+
+66
+00:03:20,660 --> 00:03:22,340
+We've talked about them before.
+
+67
+00:03:22,340 --> 00:03:24,570
+And they have these on received hook
+methods,
+
+68
+00:03:24,570 --> 00:03:27,340
+that get called back at the appropriate
+time.
+
+69
+00:03:27,340 --> 00:03:31,630
+And you could register these things by
+using a variety of means.
+
+70
+00:03:31,630 --> 00:03:36,350
+You can register them by register
+receiver, you can register them using
+
+71
+00:03:36,350 --> 00:03:41,200
+things like the underline medafest files,
+you know, whatever you need to do.
+
+72
+00:03:41,200 --> 00:03:44,160
+And what will happen there is that, that
+tells
+
+73
+00:03:44,160 --> 00:03:47,230
+the underlying system, it actually tells
+the activity manager services,
+
+74
+00:03:47,230 --> 00:03:49,440
+I care about these kinds of things so if
+
+75
+00:03:49,440 --> 00:03:52,110
+those kind of things occur, let me know
+about it.
+
+76
+00:03:52,110 --> 00:03:54,290
+So, in this case a phone app might say
+something
+
+77
+00:03:54,290 --> 00:03:57,370
+like, hey, I want to know if the battery's
+getting low.
+
+78
+00:03:57,370 --> 00:04:00,520
+And then later when the battery service
+through
+
+79
+00:04:00,520 --> 00:04:05,080
+some lower level means connected probably
+to hardware device
+
+80
+00:04:05,080 --> 00:04:08,570
+drivers and that may actually pull stuff
+periodically, when
+
+81
+00:04:08,570 --> 00:04:11,410
+it starts to realize the battery is
+getting low,
+
+82
+00:04:11,410 --> 00:04:14,740
+it will go ahead and broadcast out the
+battery
+
+83
+00:04:14,740 --> 00:04:18,880
+low option as an intent and that will
+inform
+
+84
+00:04:18,880 --> 00:04:20,690
+anybody who happens to care about this
+that the
+
+85
+00:04:20,690 --> 00:04:22,560
+battery is getting low and then each of
+those
+
+86
+00:04:22,560 --> 00:04:25,450
+things can do whatever they need to do in
+order to be able to handle this.
+
+87
+00:04:25,450 --> 00:04:28,120
+They can pop up a dialog, or they could,
+you
+
+88
+00:04:28,120 --> 00:04:31,710
+know, shut down certain system services,
+they could dim the screen.
+
+89
+00:04:31,710 --> 00:04:33,840
+They might drop your call it might, you
+know,
+
+90
+00:04:33,840 --> 00:04:35,640
+change the speed at which you're
+downloading a file.
+
+91
+00:04:35,640 --> 00:04:38,290
+You know, whatever it is you're trying to
+do different parts
+
+92
+00:04:38,290 --> 00:04:42,220
+of the system might react to battery being
+reduced in different ways.
+
+93
+00:04:42,220 --> 00:04:45,410
+And, of course, battery is not the only
+resource that might get low right?
+
+94
+00:04:45,410 --> 00:04:47,400
+Memory can get low so you may have other
+kinds
+
+95
+00:04:47,400 --> 00:04:50,659
+of things to keep track of memory
+availability, as well.
+
+96
+00:04:52,620 --> 00:04:55,840
+Just as quick note, this example like many
+examples have
+
+97
+00:04:55,840 --> 00:04:59,110
+a variety of patterns involved, so we've
+got activators involved
+
+98
+00:04:59,110 --> 00:05:02,590
+here, we've got brokers involved here,
+typically we've got proxies
+
+99
+00:05:02,590 --> 00:05:05,970
+involved here, there's all kinds of other
+stuff taking place.
+
+100
+00:05:05,970 --> 00:05:08,000
+But the particular pattern we're going to
+talk about here
+
+101
+00:05:08,000 --> 00:05:11,900
+that does this kind of magic callback
+approach, when something
+
+102
+00:05:11,900 --> 00:05:15,850
+happens you're interested in, that pattern
+is called the publisher-subscriber
+
+103
+00:05:15,850 --> 00:05:19,820
+pattern and this is a very, very, very
+popular pattern.
+
+104
+00:05:19,820 --> 00:05:23,140
+It goes by different names we'll see that
+in a second.
+
+105
+00:05:23,140 --> 00:05:25,767
+So, one name is publish-subscribe.
+
+106
+00:05:25,767 --> 00:05:29,327
+The publish-subscribe is really dealing
+with the actions or the verbs.
+
+107
+00:05:29,327 --> 00:05:33,550
+Where as publisher-subscriber is dealing
+with the nouns, the things
+
+108
+00:05:33,550 --> 00:05:37,010
+and most patterns are described, many
+patterns are described in terms
+
+109
+00:05:37,010 --> 00:05:43,930
+of the nouns like adapter or bridge, not
+the actions, adapting,
+
+110
+00:05:43,930 --> 00:05:46,600
+You don't have the adapting pattern you
+have the adapter pattern.
+
+111
+00:05:46,600 --> 00:05:49,780
+So here we call it the
+publisher-subscriber pattern.
+
+112
+00:05:49,780 --> 00:05:53,340
+And the intent of this pattern is to
+notify, event handlers,
+
+113
+00:05:53,340 --> 00:05:58,440
+which could be subscribers, or observers,
+or broadcast receivers, or whatever you
+
+114
+00:05:58,440 --> 00:06:04,190
+want to call them, when something
+interesting happens based on publishers,
+
+115
+00:06:04,190 --> 00:06:08,090
+or observables or subjects or whatever you
+want to call these things.
+
+116
+00:06:08,090 --> 00:06:10,970
+When somebody's state changes, when
+something involves, like the
+
+117
+00:06:10,970 --> 00:06:14,280
+battery becomes low or someone notices a
+battery becomes low.
+
+118
+00:06:14,280 --> 00:06:17,320
+So, when an interesting state change
+occurs, you want to be
+
+119
+00:06:17,320 --> 00:06:21,350
+able to notify interested subscribers that
+something has taken place.
+
+120
+00:06:22,950 --> 00:06:25,480
+There's also a gang of four pattern that's
+very
+
+121
+00:06:25,480 --> 00:06:27,355
+similar, although not identical to
+
+122
+00:06:27,355 --> 00:06:29,880
+publisher-subscriber, that's the observer
+pattern.
+
+123
+00:06:29,880 --> 00:06:31,280
+And the intent of the observer pattern
+
+124
+00:06:31,280 --> 00:06:34,270
+is to define one-to-many dependency
+between objects
+
+125
+00:06:34,270 --> 00:06:38,510
+so that when one object changes state, all
+the dependents are notified and updated.
+
+126
+00:06:38,510 --> 00:06:40,700
+So they're very similar to each other.
+
+127
+00:06:40,700 --> 00:06:43,702
+In my, in my mind, the observer pattern is
+very,
+
+128
+00:06:43,702 --> 00:06:48,870
+very, very commonly used, if you're within
+the single address space.
+
+129
+00:06:48,870 --> 00:06:51,030
+You have a listener or something,that
+gets, you know, a bunch
+
+130
+00:06:51,030 --> 00:06:52,090
+of listeners that get dispatched
+
+131
+00:06:52,090 --> 00:06:54,820
+when something occurs, and the
+publisher-subscriber
+
+132
+00:06:54,820 --> 00:06:57,320
+pattern is typically used more when you're
+trying to go across
+
+133
+00:06:57,320 --> 00:07:01,040
+ad, address spaces, although that
+distinction is somewhat a bit artificial.
+
+134
+00:07:02,860 --> 00:07:05,310
+Take a look here for more information
+about observer.
+
+135
+00:07:05,310 --> 00:07:08,980
+So, let's talk about when you might apply
+the publisher-subscriber pattern.
+
+136
+00:07:08,980 --> 00:07:11,140
+So, one way or one time to apply it is
+
+137
+00:07:11,140 --> 00:07:14,710
+when an abstraction has more than one
+aspect, two aspects.
+
+138
+00:07:14,710 --> 00:07:16,390
+One of them depends on the other, right.
+
+139
+00:07:16,390 --> 00:07:19,500
+So, in our example here, we had battery
+
+140
+00:07:19,500 --> 00:07:22,140
+voltage, or battery level, that was one
+thing.
+
+141
+00:07:22,140 --> 00:07:25,280
+And then we had things who depend on
+battery level,
+
+142
+00:07:25,280 --> 00:07:27,630
+like the phone app or something else on
+the phone.
+
+143
+00:07:27,630 --> 00:07:30,970
+So there's, there's multiple aspects and
+one depends on the other.
+
+144
+00:07:30,970 --> 00:07:35,470
+The behavior of some services or some apps
+may depend on the state of the battery.
+
+145
+00:07:37,010 --> 00:07:41,070
+Likewise, when a change occurs to one
+object, like
+
+146
+00:07:41,070 --> 00:07:45,200
+to the battery level, we want to tell
+potentially many others.
+
+147
+00:07:45,200 --> 00:07:48,760
+Might be zero, might be one, might be n
+where n could be very large.
+
+148
+00:07:48,760 --> 00:07:50,970
+So we don't, and we don't really
+necessarily know how many there are.
+
+149
+00:07:50,970 --> 00:07:54,750
+At least the guy who is monitoring the
+changes doesn't know how many there are.
+
+150
+00:07:54,750 --> 00:07:58,460
+So you may have to notify an unknown
+number of things so we
+
+151
+00:07:58,460 --> 00:08:01,520
+have to notify a number of things and
+those things may need to change.
+
+152
+00:08:02,640 --> 00:08:05,760
+And something else just to make it
+interesting, not every
+
+153
+00:08:05,760 --> 00:08:10,170
+object is always interested in every
+change by every other object.
+
+154
+00:08:10,170 --> 00:08:11,480
+So there may be some need to be able
+
+155
+00:08:11,480 --> 00:08:17,010
+to filter or widow down the number of
+interested
+
+156
+00:08:17,010 --> 00:08:21,420
+subscribers that need to be informed when
+some publisher
+
+157
+00:08:21,420 --> 00:08:24,280
+decides it wants to tell people that
+things have happened.
+
+158
+00:08:24,280 --> 00:08:25,580
+So those are the conditions under which
+
+159
+00:08:25,580 --> 00:08:27,790
+you would typically apply this particular
+pattern.
+
+160
+00:08:27,790 --> 00:08:30,580
+So here are some of the structure of
+participants.
+
+161
+00:08:30,580 --> 00:08:34,630
+As always this maps just beautifully onto
+the stuff that you find in Android.
+
+162
+00:08:34,630 --> 00:08:37,770
+There's something called an event, which
+in android is an intent.
+
+163
+00:08:37,770 --> 00:08:38,690
+That's easy.
+
+164
+00:08:38,690 --> 00:08:42,180
+There is something called a subscriber,
+which is
+
+165
+00:08:42,180 --> 00:08:44,910
+a thing that consumes events, in Android
+that's a
+
+166
+00:08:44,910 --> 00:08:47,800
+broadcast receiver, among other stuff,
+there's other things besides
+
+167
+00:08:47,800 --> 00:08:51,230
+broadcast receivers like content observers
+and stuff like that.
+
+168
+00:08:52,230 --> 00:08:57,190
+There's a way to filter, so that every
+subscriber does not receive every event.
+
+169
+00:08:57,190 --> 00:08:59,360
+That's done through something called the
+intent
+
+170
+00:08:59,360 --> 00:09:01,780
+filters, there's various ways to define
+those.
+
+171
+00:09:01,780 --> 00:09:04,120
+You can define them programatically,
+dynamically, you
+
+172
+00:09:04,120 --> 00:09:06,700
+can define them statically through
+manifest files.
+
+173
+00:09:06,700 --> 00:09:07,960
+It's up to you, what you want to do.
+
+174
+00:09:07,960 --> 00:09:11,900
+You have a publisher, which is used to
+create,
+
+175
+00:09:11,900 --> 00:09:14,185
+the events in the first place, or the
+intents.
+
+176
+00:09:14,185 --> 00:09:16,640
+In Android that's typically a service or
+an activity.
+
+177
+00:09:16,640 --> 00:09:19,510
+And then finally you have something that
+serves as
+
+178
+00:09:19,510 --> 00:09:22,940
+the mediator, the traffic cop that routes
+the information,
+
+179
+00:09:22,940 --> 00:09:26,290
+the intents, the events from the publisher
+to one
+
+180
+00:09:26,290 --> 00:09:29,950
+or more subscribers if their filtering
+criteria is satisfied.
+
+181
+00:09:31,300 --> 00:09:33,120
+That's what's called the event channel.
+
+182
+00:09:33,120 --> 00:09:34,970
+And in Android that's handled by a variety
+
+183
+00:09:34,970 --> 00:09:38,290
+of things, the context, working in
+conjunction with the
+
+184
+00:09:38,290 --> 00:09:40,700
+activity manager service so those are all
+the
+
+185
+00:09:40,700 --> 00:09:43,450
+different pieces mapping, the concepts of
+the pattern to
+
+186
+00:09:43,450 --> 00:09:46,630
+the pieces of Android and that should be
+
+187
+00:09:46,630 --> 00:09:48,300
+helpful because once you understand how it
+works in
+
+188
+00:09:48,300 --> 00:09:51,410
+Android pretty much every other intent
+system and
+
+189
+00:09:51,410 --> 00:09:54,140
+event system has a lot of things in
+common.
+
+190
+00:09:54,140 --> 00:09:57,940
+Here's a quick summary of the dynamic
+interactions in this pattern
+
+191
+00:09:57,940 --> 00:10:01,770
+starts out by having the subscribers
+register with the event channel.
+
+192
+00:10:01,770 --> 00:10:03,890
+Some systems require the publisher to
+register,
+
+193
+00:10:03,890 --> 00:10:05,990
+as well, but it's, that's more optional.
+
+194
+00:10:05,990 --> 00:10:08,760
+It's almost always the case subscribers
+register.
+
+195
+00:10:08,760 --> 00:10:10,820
+And the event channel keeps track of that
+stuff.
+
+196
+00:10:10,820 --> 00:10:14,810
+When the publisher detects something
+that's changed, that it thinks other may
+
+197
+00:10:14,810 --> 00:10:19,600
+be interested in, it then goes ahead and
+notifies, it publishes the event.
+
+198
+00:10:19,600 --> 00:10:22,630
+That goes to the event channel, the event
+channel says there are all these
+
+199
+00:10:22,630 --> 00:10:24,150
+different subscribers, let me see which
+one
+
+200
+00:10:24,150 --> 00:10:26,390
+actually care about this particular type
+of event.
+
+201
+00:10:26,390 --> 00:10:28,110
+Maybe it goes to everybody, maybe it goes
+to
+
+202
+00:10:28,110 --> 00:10:31,520
+some select few, maybe it goes to some
+quorum.
+
+203
+00:10:31,520 --> 00:10:33,160
+Lots of different alternatives there.
+
+204
+00:10:33,160 --> 00:10:35,920
+Those things get pushed along and
+eventually
+
+205
+00:10:35,920 --> 00:10:38,320
+they get delivered to the actual
+subscribers
+
+206
+00:10:38,320 --> 00:10:42,520
+themselves, who will then go ahead and
+consume the event in one way or another.
+
+207
+00:10:44,410 --> 00:10:45,530
+Any questions about that?
+
+208
+00:10:45,530 --> 00:10:47,310
+Pretty, pretty conventional thing to do.
+
+209
+00:10:47,310 --> 00:10:49,210
+You'll find this used all over the place.
+
+210
+00:10:49,210 --> 00:10:51,300
+Probably too much, actually in, in
+practice.
+
+211
+00:10:51,300 --> 00:10:54,280
+So there's a number of benefits
+
+212
+00:10:54,280 --> 00:10:58,390
+and liabilities of using the
+publisher-subscriber pattern.
+
+213
+00:10:58,390 --> 00:11:03,570
+On the good side it allows publishers and
+subscribers to vary independently.
+
+214
+00:11:03,570 --> 00:11:08,340
+You can have different the publishers
+don't have to know about the subscribers.
+
+215
+00:11:08,340 --> 00:11:10,220
+The subscribers don't have to know about
+the publishers.
+
+216
+00:11:10,220 --> 00:11:13,650
+They just have to know about something in
+common which is the event channel.
+
+217
+00:11:13,650 --> 00:11:14,270
+You register.
+
+218
+00:11:14,270 --> 00:11:15,190
+You get notified.
+
+219
+00:11:15,190 --> 00:11:17,480
+You don't really have to care about that
+kind of stuff.
+
+220
+00:11:17,480 --> 00:11:20,700
+Think about services that you might use or
+you
+
+221
+00:11:20,700 --> 00:11:22,380
+might be aware of that might work this
+way.
+
+222
+00:11:22,380 --> 00:11:23,800
+Twitter is a good example.
+
+223
+00:11:25,070 --> 00:11:29,220
+If you want to follow Lady Gaga, why you'd
+want to do this, I don't know.
+
+224
+00:11:29,220 --> 00:11:32,880
+But if you want to follow Lady Gaga, or
+Miley Cyrus because
+
+225
+00:11:32,880 --> 00:11:36,319
+you like to see a train wreck unfolding in
+real time, you know.
+
+226
+00:11:37,680 --> 00:11:41,050
+Then you can subscribe to their, their
+Twitter account.
+
+227
+00:11:41,050 --> 00:11:42,470
+And they don't really know who you are.
+
+228
+00:11:42,470 --> 00:11:44,280
+They don't really care who you are, by the
+way.
+
+229
+00:11:44,280 --> 00:11:46,270
+They just want to know that you're a fan.
+
+230
+00:11:46,270 --> 00:11:48,530
+And so as they go about the crazy things
+they do
+
+231
+00:11:48,530 --> 00:11:50,830
+in their lives and tweet about it, you'll
+be informed, right?
+
+232
+00:11:50,830 --> 00:11:53,130
+So it's this sort of the anonymous
+communication.
+
+233
+00:11:53,130 --> 00:11:54,645
+Then can, in fact, it doesn't even really
+have
+
+234
+00:11:54,645 --> 00:11:56,370
+to be could be them, it could be their
+
+235
+00:11:56,370 --> 00:12:00,330
+handler out there just trying to patch
+over a
+
+236
+00:12:00,330 --> 00:12:02,650
+rough spot to make it look good or
+whatever.
+
+237
+00:12:02,650 --> 00:12:06,220
+So the publishers and subscribers can vary
+and be different.
+
+238
+00:12:06,220 --> 00:12:09,810
+You can add any number of subscribers you
+may want.
+
+239
+00:12:09,810 --> 00:12:12,130
+So you might have one, you might have
+zero, you might have a
+
+240
+00:12:12,130 --> 00:12:16,360
+gazillion, and the different subscribers
+may choose
+
+241
+00:12:16,360 --> 00:12:19,030
+to treat the data in different ways.
+
+242
+00:12:19,030 --> 00:12:24,530
+So, you know, some people when they get
+the tweet of, of, Miley Cyrus's
+
+243
+00:12:24,530 --> 00:12:26,770
+latest, you know, music award thing, they
+
+244
+00:12:26,770 --> 00:12:29,310
+may immediately rush out and watch the
+video.
+
+245
+00:12:29,310 --> 00:12:33,330
+Other people may call the network to
+complain.
+
+246
+00:12:33,330 --> 00:12:37,310
+Other people will, you know, take a shot
+of, of vodka, you know, whatever they do.
+
+247
+00:12:37,310 --> 00:12:39,150
+Different people can react in different
+ways
+
+248
+00:12:39,150 --> 00:12:41,420
+to the information that's coming out their
+way.
+
+249
+00:12:41,420 --> 00:12:43,890
+And so you can customize the behavior.
+
+250
+00:12:43,890 --> 00:12:46,300
+So those are some really powerful positive
+things.
+
+251
+00:12:46,300 --> 00:12:48,150
+And what you end up with when all is said
+
+252
+00:12:48,150 --> 00:12:52,260
+and done by using Publisher-Subscriber or
+event based communication of
+
+253
+00:12:52,260 --> 00:12:54,830
+this form, is you end up being able to
+have
+
+254
+00:12:54,830 --> 00:12:58,260
+a loosely coupled connection between
+different parts of your system.
+
+255
+00:12:58,260 --> 00:13:00,550
+Some things are more evolvable, they are
+more customizable.
+
+256
+00:13:00,550 --> 00:13:02,700
+They don’t have to all variant lockstep.
+
+257
+00:13:02,700 --> 00:13:05,210
+And there's more, even more sophisticated
+things you can do here.
+
+258
+00:13:06,320 --> 00:13:07,950
+There's some down sides though.
+
+259
+00:13:07,950 --> 00:13:11,310
+One of the problems you can get into is
+you can end up with, because
+
+260
+00:13:11,310 --> 00:13:13,540
+the publishers and subscribers don't
+really know
+
+261
+00:13:13,540 --> 00:13:15,490
+about each other you can end up in
+
+262
+00:13:15,490 --> 00:13:18,200
+situations where you have a storm of,
+
+263
+00:13:18,200 --> 00:13:22,630
+of communication taking place that nobody
+really realizes
+
+264
+00:13:22,630 --> 00:13:26,210
+they're propagating and because of the
+aggregate
+
+265
+00:13:26,210 --> 00:13:29,870
+effect of this the system becomes wildly
+overloaded.
+
+266
+00:13:29,870 --> 00:13:33,790
+There was a great example, if you take a
+look at E-mail storm on Wikipedia
+
+267
+00:13:33,790 --> 00:13:35,370
+there's a bunch of examples of E-mail
+
+268
+00:13:35,370 --> 00:13:39,200
+storms and there's a great example of
+Microsoft
+
+269
+00:13:39,200 --> 00:13:41,270
+where they pretty much melted down the
+
+270
+00:13:41,270 --> 00:13:43,960
+Microsoft exchange server, 15 years ago or
+so
+
+271
+00:13:43,960 --> 00:13:46,140
+because they, people hit reply all and
+they
+
+272
+00:13:46,140 --> 00:13:48,790
+didn't realize that everybody kept hitting
+reply all.
+
+273
+00:13:48,790 --> 00:13:51,880
+The story I always like to tell is, back
+in the early
+
+274
+00:13:51,880 --> 00:13:55,480
+days of e-mail when I was first starting
+out as a grad
+
+275
+00:13:55,480 --> 00:14:00,880
+student in the late to mid 80s, people
+weren't as, they weren't
+
+276
+00:14:00,880 --> 00:14:04,900
+as, as accustomed to getting lots of
+unwanted e-mail as they are today.
+
+277
+00:14:04,900 --> 00:14:10,270
+I mean, let's face it, anybody these days
+who gets upset about a piece of spam is
+
+278
+00:14:10,270 --> 00:14:12,680
+probably picking up, you know, probably
+focusing on
+
+279
+00:14:12,680 --> 00:14:14,290
+the wrong thing in life to get upset
+about.
+
+280
+00:14:14,290 --> 00:14:16,400
+You know, you get, you get a email you
+weren't expecting.
+
+281
+00:14:16,400 --> 00:14:18,520
+You don't just blow up and go ballistic.
+
+282
+00:14:18,520 --> 00:14:20,580
+I mean, those people in Nigeria really do
+want
+
+283
+00:14:20,580 --> 00:14:22,850
+to give you all that money for god's sake,
+right?
+
+284
+00:14:22,850 --> 00:14:25,220
+So, so the, the point is we're kind of
+accustom to it.
+
+285
+00:14:25,220 --> 00:14:27,280
+Way back in the day that wasn't the case.
+
+286
+00:14:27,280 --> 00:14:29,450
+And so what happened was funny.
+
+287
+00:14:29,450 --> 00:14:31,620
+You be, you'd end up on mailing in list
+that maybe you
+
+288
+00:14:31,620 --> 00:14:34,370
+didn't know you gotten subscribed to
+somehow, or you'd forgotten, or you
+
+289
+00:14:34,370 --> 00:14:38,450
+weren't expecting to get something and
+somebody would send a posting out
+
+290
+00:14:38,450 --> 00:14:41,070
+that was a little bit off topic, or you
+just didn't know
+
+291
+00:14:41,070 --> 00:14:43,480
+why you were on the mailing list and
+rather than just doing
+
+292
+00:14:43,480 --> 00:14:46,060
+what you did today where you just ignore
+it and delete it,
+
+293
+00:14:46,060 --> 00:14:48,790
+instead what people would do is they would
+reply back to the
+
+294
+00:14:48,790 --> 00:14:53,720
+mailing list and say please stop sending
+irrelevant emails to this list.
+
+295
+00:14:53,720 --> 00:14:56,140
+And of course that would be broadcast to
+everybody on the list too.
+
+296
+00:14:56,140 --> 00:14:58,130
+And everybody else would start chiming in,
+why
+
+297
+00:14:58,130 --> 00:14:59,930
+am I getting all this email I don't want?
+
+298
+00:14:59,930 --> 00:15:01,920
+You know, before you know it, every person
+
+299
+00:15:01,920 --> 00:15:04,310
+is sending responses back to every other
+person.
+
+300
+00:15:04,310 --> 00:15:07,970
+So it becomes this, this sort quadratic
+explosion of emails.
+
+301
+00:15:07,970 --> 00:15:10,150
+And the whole system bogs down and the
+internet
+
+302
+00:15:10,150 --> 00:15:12,820
+comes to a, to a screeching halt and so
+on.
+
+303
+00:15:12,820 --> 00:15:14,760
+That's an example of an email storm.
+
+304
+00:15:14,760 --> 00:15:16,550
+And that occurs because you don't really
+realize
+
+305
+00:15:16,550 --> 00:15:19,650
+that you're actually broadcasting your
+messages to everybody.
+
+306
+00:15:19,650 --> 00:15:21,310
+You think you're just replying to one
+thing
+
+307
+00:15:21,310 --> 00:15:24,960
+but it's actually exploding it out into
+multiple places.
+
+308
+00:15:24,960 --> 00:15:26,720
+Another problem you get into and, and you
+probably
+
+309
+00:15:26,720 --> 00:15:29,230
+also get this with mailing lists you may
+be on.
+
+310
+00:15:29,230 --> 00:15:32,050
+You end up getting a lot of stuff that you
+don't really care about.
+
+311
+00:15:32,050 --> 00:15:36,760
+People just sort of send it out to, you
+know, let's say you subscribe to
+
+312
+00:15:36,760 --> 00:15:39,190
+the red zone channel and so you're
+going to
+
+313
+00:15:39,190 --> 00:15:41,140
+get informed every time someone scores a
+touchdown.
+
+314
+00:15:41,140 --> 00:15:44,220
+Well maybe you only care if your team
+scores a touchdown
+
+315
+00:15:44,220 --> 00:15:47,340
+and you don't care if other teams you
+don't like score touchdowns.
+
+316
+00:15:47,340 --> 00:15:49,990
+In fact it might even irritate you to find
+out that
+
+317
+00:15:49,990 --> 00:15:52,700
+certain teams are scoring lots of
+touchdowns so you might want
+
+318
+00:15:52,700 --> 00:15:54,540
+to be able to have some way of winnowing
+out the
+
+319
+00:15:54,540 --> 00:15:57,350
+stuff you care about from the things that
+you don't care about.
+
+320
+00:15:57,350 --> 00:15:58,940
+So if you're not careful you can end up
+
+321
+00:15:58,940 --> 00:16:01,230
+with lots of extra data that you don't
+really want.
+
+322
+00:16:03,040 --> 00:16:04,870
+Some good examples of known uses pub
+
+323
+00:16:04,870 --> 00:16:08,839
+sub middle wear uses these patterns
+pattern galore.
+
+324
+00:16:10,230 --> 00:16:13,260
+Things like web services notifications,
+date of distribution
+
+325
+00:16:13,260 --> 00:16:17,310
+service, java messaging service, the
+corporate notification service.
+
+326
+00:16:17,310 --> 00:16:20,870
+All kinds of things in that space do this
+pattern.
+
+327
+00:16:20,870 --> 00:16:26,076
+And the more sophisticated ones [SOUND]
+really go off the deep end in terms
+
+328
+00:16:26,076 --> 00:16:29,288
+of being able to have sophisticated
+support
+
+329
+00:16:29,288 --> 00:16:32,869
+for quality of service and other
+capabilities.
+
+330
+00:16:32,869 --> 00:16:34,380
+And then there's, the smart phone event
+
+331
+00:16:34,380 --> 00:16:36,200
+notification systems, like we have in
+Android.
+
+332
+00:16:36,200 --> 00:16:40,670
+So they, things like the, the intent
+service and the binder framework and all
+
+333
+00:16:40,670 --> 00:16:42,800
+the other things, broadcast receivers,
+those are
+
+334
+00:16:42,800 --> 00:16:44,290
+all examples of this pattern as well.
+
+335
+00:16:46,080 --> 00:16:49,240
+So, the bottom line here, is that
+publisher subscriber
+
+336
+00:16:49,240 --> 00:16:51,570
+helps you avoiding hard coding
+
+337
+00:16:51,570 --> 00:16:54,180
+dependencies, between publishers and
+subscribers.
+
+338
+00:16:54,180 --> 00:16:57,440
+So, this things change in a [UNKNOWN] You
+have less re-work to do.
+
+339
+00:16:57,440 --> 00:17:01,580
+In order to take advantage of changes that
+may occur, in terms of numbers of stuff.
+
+340
+00:17:01,580 --> 00:17:03,450
+What they do and response to stuff, and so
+on.
+
+341
+00:17:03,450 --> 00:17:08,180
+And also, subscribers and publishers can
+come and go, and new types can be
+
+342
+00:17:08,180 --> 00:17:10,380
+introduced to the system, often times
+without
+
+343
+00:17:10,380 --> 00:17:12,780
+having to make changes to what's already
+there.
+
+344
+00:17:12,780 --> 00:17:15,600
+And that's one of the powerful features of
+advanced pub sub middleware.
+
+345
+00:17:15,600 --> 00:17:18,300
+It's very change resilient in a lot of
+ways.
+
+346
+00:17:19,440 --> 00:17:22,300
+And the other nice thing is you don't end
+up having to pull stuff.
+
+347
+00:17:22,300 --> 00:17:24,610
+You get informed when things happen, and
+you don't have
+
+348
+00:17:24,610 --> 00:17:28,350
+to sit there and repeatedly ask questions,
+ask questions, ask questions.
+
+349
+00:17:28,350 --> 00:17:31,515
+Chewing up valuable resources including
+your time without
+
+350
+00:17:31,515 --> 00:17:35,132
+really knowing about anything until it
+actually happens, right.
+
+351
+00:17:35,132 --> 00:17:37,488
+So, so those are basically the, that's
+
+352
+00:17:37,488 --> 00:17:41,530
+basically an overview of the publisher
+subscriber pattern.
+
+353
+00:17:41,530 --> 00:17:43,472
+Any questions about the pattern?
+
+354
+00:17:43,472 --> 00:17:45,110
+In terms of what it's intending to do?
+
+355
+00:17:45,110 --> 00:17:50,330
+[MUSIC]
+

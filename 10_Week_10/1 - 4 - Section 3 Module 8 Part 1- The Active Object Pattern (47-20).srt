@@ -1,0 +1,4493 @@
+1
+00:00:00,019 --> 00:00:08,233
+[MUSIC].
+
+2
+00:00:08,233 --> 00:00:11,958
+Welcome to the next class, what we're
+going to be doing today is talking about
+
+3
+00:00:11,958 --> 00:00:14,160
+the Active Object pattern, and relating
+that
+
+4
+00:00:14,160 --> 00:00:17,150
+to the various mechanisms at work in
+Android.
+
+5
+00:00:17,150 --> 00:00:18,650
+So, what we're going to do first is we're
+
+6
+00:00:18,650 --> 00:00:21,770
+going to talk about what the Active Object
+pattern is.
+
+7
+00:00:21,770 --> 00:00:25,940
+And how it's used to structure the
+solution for concurrent software.
+
+8
+00:00:25,940 --> 00:00:27,360
+And then we're going to talk about how the
+
+9
+00:00:27,360 --> 00:00:30,090
+active object pattern can be applied in
+Android.
+
+10
+00:00:30,090 --> 00:00:31,530
+And I'll give you a bunch of different
+examples,
+
+11
+00:00:31,530 --> 00:00:33,600
+from some things we've already seen, to
+some extent.
+
+12
+00:00:33,600 --> 00:00:34,940
+But we're going to look at 'em a little
+
+13
+00:00:34,940 --> 00:00:38,110
+bit differently now, in the context of
+patterns.
+
+14
+00:00:38,110 --> 00:00:40,070
+And we're going to be doing this of
+course, throughout the course.
+
+15
+00:00:40,070 --> 00:00:41,900
+I'll, I'll be talking about how android
+
+16
+00:00:41,900 --> 00:00:44,030
+works, we'll be talking about the classes,
+we'll
+
+17
+00:00:44,030 --> 00:00:45,382
+be talking about the interactions between
+the
+
+18
+00:00:45,382 --> 00:00:48,080
+classes, we'll be talking about the frame
+works.
+
+19
+00:00:48,080 --> 00:00:50,200
+And then what I always try is, whatever
+makes sense, to
+
+20
+00:00:50,200 --> 00:00:54,190
+relate the design choices that android
+makes back to patterns, and the
+
+21
+00:00:54,190 --> 00:00:57,300
+benefit of doing that of course is not
+only do you how
+
+22
+00:00:57,300 --> 00:01:00,440
+Android works a little better because you
+can connect it to other.
+
+23
+00:01:01,500 --> 00:01:04,050
+Written literature that talks about the
+solution in
+
+24
+00:01:04,050 --> 00:01:06,900
+a perhaps more abstract way than Android
+documentation does.
+
+25
+00:01:06,900 --> 00:01:10,490
+But even more importantly you'll
+understand how to solve similar problems.
+
+26
+00:01:10,490 --> 00:01:12,080
+So even if you're not programming an
+Android.
+
+27
+00:01:12,080 --> 00:01:14,200
+If you're programming some other software
+environment.
+
+28
+00:01:14,200 --> 00:01:16,580
+But you run across the same kind of
+forces, that Android
+
+29
+00:01:16,580 --> 00:01:19,960
+ran across, you can know what patterns to
+apply to your solution.
+
+30
+00:01:19,960 --> 00:01:21,440
+So it's, it's meant to give you both
+
+31
+00:01:21,440 --> 00:01:24,410
+something very specific, and also
+something more general.
+
+32
+00:01:24,410 --> 00:01:27,100
+And it's worth pointing out that's one of
+the beautiful things about patterns.
+
+33
+00:01:27,100 --> 00:01:29,980
+They help give you, immediate benefits.
+
+34
+00:01:29,980 --> 00:01:34,130
+And they also give you something that will
+be fundamental and will last for decades.
+
+35
+00:01:34,130 --> 00:01:35,940
+Many of the patterns we cover here have
+been
+
+36
+00:01:35,940 --> 00:01:40,110
+known for 20, for 30 years by some people.
+
+37
+00:01:40,110 --> 00:01:42,480
+And the goal of course, is to make sure
+that you guys know them, as well.
+
+38
+00:01:43,800 --> 00:01:46,330
+All right, so, the particular context
+we're going to
+
+39
+00:01:46,330 --> 00:01:50,360
+focus on here is a situation where a
+client.
+
+40
+00:01:50,360 --> 00:01:53,210
+Wants to invoke methods, of an object
+
+41
+00:01:53,210 --> 00:01:55,150
+that's running in another thread of
+control.
+
+42
+00:01:55,150 --> 00:01:58,110
+Or it wants those methods to run in
+another thread of control.
+
+43
+00:01:58,110 --> 00:02:01,260
+Now, this of course is a generic issue
+we're
+
+44
+00:02:01,260 --> 00:02:04,120
+going to talk about it primarily in the
+context of Android,
+
+45
+00:02:04,120 --> 00:02:05,520
+but as we go to the pattern, you'll see
+
+46
+00:02:05,520 --> 00:02:10,050
+that the topics are much more generalized
+than just Android.
+
+47
+00:02:10,050 --> 00:02:12,280
+In this particular context.
+
+48
+00:02:12,280 --> 00:02:16,900
+A client is any Android code, an activity,
+a
+
+49
+00:02:16,900 --> 00:02:21,690
+service or whatever that wants to execute
+a method.
+
+50
+00:02:21,690 --> 00:02:25,390
+So client, sometimes we think of clients
+as being that.
+
+51
+00:02:25,390 --> 00:02:29,160
+Hardware that is used to connect to
+servers.
+
+52
+00:02:29,160 --> 00:02:32,560
+And that's one way to look at it but the
+more general way to look at
+
+53
+00:02:32,560 --> 00:02:36,992
+it is a client is whoever is invoking the
+operation at any given point of time.
+
+54
+00:02:36,992 --> 00:02:39,355
+So for example we may have a situation
+where
+
+55
+00:02:39,355 --> 00:02:42,720
+some background thread wants to be over to
+invoke.
+
+56
+00:02:42,720 --> 00:02:47,420
+An operation like say send message, and
+pass a message
+
+57
+00:02:47,420 --> 00:02:50,220
+to a handler that's actually connected to
+another thread of control.
+
+58
+00:02:50,220 --> 00:02:53,190
+So that would be the context for this
+particular discussion.
+
+59
+00:02:53,190 --> 00:02:58,610
+So you can see here we have a background
+thread, and it says handler.sendmessage.
+
+60
+00:02:58,610 --> 00:03:02,680
+The handler of course is associated with
+this UI thread, and
+
+61
+00:03:02,680 --> 00:03:06,630
+the handle message method gets called
+back, and it does something rather.
+
+62
+00:03:06,630 --> 00:03:08,980
+That was requested or passed by the
+client,
+
+63
+00:03:08,980 --> 00:03:10,450
+by the color which is a background thread.
+
+64
+00:03:12,510 --> 00:03:16,360
+More generally of course, we can have the
+threads be any threads, they don't
+
+65
+00:03:16,360 --> 00:03:20,510
+have to be a background thread and a UI
+thread that's one common use case.
+
+66
+00:03:20,510 --> 00:03:23,920
+But, in, in Android of course and more
+generally, you can have any
+
+67
+00:03:23,920 --> 00:03:25,300
+threads that are running and they
+
+68
+00:03:25,300 --> 00:03:29,100
+want to invoke objects that, whose
+implementations.
+
+69
+00:03:29,100 --> 00:03:32,550
+Residing in or want to execute in another
+thread of control.
+
+70
+00:03:32,550 --> 00:03:36,420
+So we can generalize this point, same
+pattern applies, same
+
+71
+00:03:36,420 --> 00:03:39,670
+structure applies just a slightly
+different way of looking at it.
+
+72
+00:03:39,670 --> 00:03:42,442
+Slightly different mapping on to
+mechanisms and, and
+
+73
+00:03:42,442 --> 00:03:44,620
+use cases in Android or some other system.
+
+74
+00:03:45,840 --> 00:03:48,490
+So some of the, the problems of design
+forces that
+
+75
+00:03:48,490 --> 00:03:51,200
+we're trying to address here, we'd like to
+able to.
+
+76
+00:03:51,200 --> 00:03:56,090
+Leverage the available parallelism on the
+platform as transparently as possible.
+
+77
+00:03:56,090 --> 00:03:58,920
+We really don't want to require
+application developers to
+
+78
+00:03:58,920 --> 00:04:02,350
+have to know a lot about locking and
+synchronization.
+
+79
+00:04:02,350 --> 00:04:06,200
+Much the same sort of argument we, we
+thought about when we discussed the.
+
+80
+00:04:06,200 --> 00:04:09,000
+Monitor object pattern, but there's a
+little bit more to it here.
+
+81
+00:04:10,700 --> 00:04:12,730
+Remember when we talked about monitor
+object?
+
+82
+00:04:12,730 --> 00:04:17,910
+What was the defining characteristic of an
+invocation on a monitor object?
+
+83
+00:04:17,910 --> 00:04:20,730
+What's the main thing to, to think about
+in that context?
+
+84
+00:04:22,020 --> 00:04:24,230
+Who ends up running that invocation?
+
+85
+00:04:26,610 --> 00:04:29,250
+When you call a method on a monitor
+object, you, when you call
+
+86
+00:04:29,250 --> 00:04:32,520
+a synchronized method on a monitor object,
+who ends up running that method?
+
+87
+00:04:32,520 --> 00:04:33,020
+>> You
+
+88
+00:04:35,780 --> 00:04:35,850
+do.
+
+89
+00:04:35,850 --> 00:04:36,460
+>> You being the?
+
+90
+00:04:36,460 --> 00:04:36,916
+>> The client.
+
+91
+00:04:36,916 --> 00:04:38,221
+>> The client?
+
+92
+00:04:38,221 --> 00:04:39,089
+>> Thread.
+
+93
+00:04:39,089 --> 00:04:39,670
+>> Yeah.
+
+94
+00:04:39,670 --> 00:04:41,890
+So, so, the client thread is what ends up
+invoking it,
+
+95
+00:04:41,890 --> 00:04:45,510
+so basically in a monitor object
+environment, as with a normal object.
+
+96
+00:04:45,510 --> 00:04:51,700
+You invoke a method on the object and, the
+callee, the guy who's called.
+
+97
+00:04:51,700 --> 00:04:55,040
+Steals the thread of control of the caller
+and it runs in that context.
+
+98
+00:04:56,240 --> 00:04:59,320
+Another thing we want to be able to do, is
+ensure that if you
+
+99
+00:04:59,320 --> 00:05:01,100
+have long running operations that they
+don't
+
+100
+00:05:01,100 --> 00:05:03,530
+block other things in the process from
+executing.
+
+101
+00:05:03,530 --> 00:05:06,320
+This is primarily relevent if you're
+trying to run
+
+102
+00:05:06,320 --> 00:05:09,600
+things in the UI thread or in a single
+thread.
+
+103
+00:05:09,600 --> 00:05:13,550
+Solution and anyone control if it were to
+block would cause
+
+104
+00:05:13,550 --> 00:05:15,630
+the whole process to hang and we don't
+want that to happen.
+
+105
+00:05:15,630 --> 00:05:17,630
+That's another problem we want to avoid
+here.
+
+106
+00:05:18,680 --> 00:05:21,020
+And then the last piece of the puzzle here
+you want to make
+
+107
+00:05:21,020 --> 00:05:27,710
+access to these shared objects and
+synchronized objects as, as simple and as.
+
+108
+00:05:27,710 --> 00:05:30,200
+Intuitive as possible, we don't want
+people to have to know about
+
+109
+00:05:30,200 --> 00:05:35,280
+the low level details of conditions,
+monitors, cues, all that kind of stuff.
+
+110
+00:05:35,280 --> 00:05:37,390
+They just want to make a method call, and
+magic
+
+111
+00:05:37,390 --> 00:05:41,200
+happens, and that method is executing in
+another thread of control.
+
+112
+00:05:41,200 --> 00:05:45,700
+So to do this, we're going to apply the
+Active Object pattern.
+
+113
+00:05:45,700 --> 00:05:47,370
+The Active Object pattern is a pattern is
+
+114
+00:05:47,370 --> 00:05:50,080
+a pattern that's documented in the POSA2
+book.
+
+115
+00:05:50,080 --> 00:05:53,350
+And it's actually, it's just later on we
+talk about non uses.
+
+116
+00:05:53,350 --> 00:05:59,002
+It's actually a very widely used pattern
+there's actual languages, there're
+
+117
+00:05:59,002 --> 00:06:02,960
+actual libraries as all kind of things it
+implement this particular model.
+
+118
+00:06:02,960 --> 00:06:07,130
+And we use it to decouple the thread that
+invokes.
+
+119
+00:06:07,130 --> 00:06:09,910
+On that thread, from the thread that runs
+the method.
+
+120
+00:06:09,910 --> 00:06:14,120
+So we're do, and we're going to decouple
+method and vocation from method execution.
+
+121
+00:06:14,120 --> 00:06:18,640
+And method invocation occurs in the client
+thread, caller thread.
+
+122
+00:06:18,640 --> 00:06:20,770
+And method execution occurs in some other
+thread.
+
+123
+00:06:22,560 --> 00:06:24,410
+However from a clients point of view, this
+
+124
+00:06:24,410 --> 00:06:26,580
+should look like just a regular method
+invocation.
+
+125
+00:06:26,580 --> 00:06:28,700
+It doesn't look like you're doing anything
+special.
+
+126
+00:06:28,700 --> 00:06:31,670
+You're not treating the data or the
+invocations in any special way.
+
+127
+00:06:31,670 --> 00:06:34,770
+Just invoking a method and wallah
+something magic happens
+
+128
+00:06:34,770 --> 00:06:38,290
+and the work gets processed in another
+thread of control.
+
+129
+00:06:38,290 --> 00:06:39,800
+In particular that the client doesn't grab
+any
+
+130
+00:06:39,800 --> 00:06:42,650
+locks, it doesn't use condition variables,
+it doesn't
+
+131
+00:06:42,650 --> 00:06:45,270
+do any queueing it just says you know,
+
+132
+00:06:45,270 --> 00:06:49,728
+send message or invoke operation or
+something like that.
+
+133
+00:06:49,728 --> 00:06:52,000
+So the active object pattern, the intent
+of the active
+
+134
+00:06:52,000 --> 00:06:57,150
+object pattern is to define service
+request on components or objects.
+
+135
+00:06:57,150 --> 00:06:59,300
+And make this be the unit of concurrency
+in
+
+136
+00:06:59,300 --> 00:07:03,350
+the program, and then run requests for
+these services.
+
+137
+00:07:03,350 --> 00:07:07,940
+In different thread or threads, then the
+requesting client.
+
+138
+00:07:07,940 --> 00:07:13,050
+And then be able to enable the client and
+the component to interact asynchronously,
+
+139
+00:07:13,050 --> 00:07:18,632
+to produce and consume results, that occur
+as a result of invoking the service.
+
+140
+00:07:18,632 --> 00:07:19,750
+Now that, that may may seem like a bit
+
+141
+00:07:19,750 --> 00:07:21,750
+of a mouthful, but it's actually very very
+straightforward, and
+
+142
+00:07:21,750 --> 00:07:23,650
+we'll, we'll talk about each of those
+steps, each of
+
+143
+00:07:23,650 --> 00:07:26,330
+the pieces of the intent as we walk
+through this.
+
+144
+00:07:26,330 --> 00:07:28,790
+In a nutshell, if you look at this picture
+here.
+
+145
+00:07:28,790 --> 00:07:31,510
+What's happening is we have a client with
+
+146
+00:07:31,510 --> 00:07:35,060
+a client thread invoking some method on
+some interface.
+
+147
+00:07:35,060 --> 00:07:36,960
+And some magic happens.
+
+148
+00:07:36,960 --> 00:07:38,460
+And then this thing gets turned into
+
+149
+00:07:38,460 --> 00:07:42,040
+some kind of, so-called objectified
+service request, which
+
+150
+00:07:42,040 --> 00:07:45,660
+is a, a linearization of the parameters
+and
+
+151
+00:07:45,660 --> 00:07:48,480
+the information that corresponds to the
+method call.
+
+152
+00:07:48,480 --> 00:07:50,960
+And that thing then gets stuck into some
+kind of
+
+153
+00:07:50,960 --> 00:07:56,360
+activation list or queue that is managed
+by the active object.
+
+154
+00:07:56,360 --> 00:07:59,340
+And that guy runs in a separate thread, or
+threads of control.
+
+155
+00:07:59,340 --> 00:08:01,460
+And when the request comes in it gets
+stuck in the queue and
+
+156
+00:08:01,460 --> 00:08:04,240
+then at some point a scheduler takes the
+request out of the queue.
+
+157
+00:08:04,240 --> 00:08:08,910
+And invokes an operation back on some
+servant, which is the, the
+
+158
+00:08:08,910 --> 00:08:13,600
+implementor or the executor, executor of
+the original invocation by the client.
+
+159
+00:08:13,600 --> 00:08:15,300
+So that's how the service request gets
+
+160
+00:08:15,300 --> 00:08:18,540
+invoked in the active object thread or
+threads.
+
+161
+00:08:18,540 --> 00:08:19,160
+Yeah, Sean.
+
+162
+00:08:19,160 --> 00:08:20,700
+>> In a diagram you're calling method
+
+163
+00:08:20,700 --> 00:08:23,070
+one, but method two is eventually getting
+called.
+
+164
+00:08:23,070 --> 00:08:25,410
+Is that
+>> Oh that's, yeah that's a good point.
+
+165
+00:08:25,410 --> 00:08:27,710
+It should be method one getting called,
+that's a really good point.
+
+166
+00:08:27,710 --> 00:08:29,090
+Have to fix that.
+
+167
+00:08:29,090 --> 00:08:30,070
+That's actually a.
+
+168
+00:08:30,070 --> 00:08:32,330
+A typo from some other, somewhere else
+that I gotta fix.
+
+169
+00:08:34,710 --> 00:08:38,560
+There's a paper that talks more about this
+that's on my website.
+
+170
+00:08:38,560 --> 00:08:40,650
+You could also take a look of course at
+the POSA2
+
+171
+00:08:40,650 --> 00:08:44,140
+book which is where that, the full blown
+pattern is, is described.
+
+172
+00:08:45,240 --> 00:08:46,980
+Okay so when would you want to apply this
+pattern?
+
+173
+00:08:46,980 --> 00:08:49,610
+What would be the circumstances under
+which this patter would make sense?
+
+174
+00:08:49,610 --> 00:08:51,470
+Well one circumstance would be.
+
+175
+00:08:51,470 --> 00:08:53,920
+When you want the methods of an
+
+176
+00:08:53,920 --> 00:08:56,900
+object's interface to define its
+concurrency boundaries.
+
+177
+00:08:56,900 --> 00:09:01,120
+So much like with monitor object, when you
+make a method call, you want
+
+178
+00:09:01,120 --> 00:09:02,890
+that thing to be the place where
+
+179
+00:09:02,890 --> 00:09:05,590
+the boundary of concurrency's going to be
+managed.
+
+180
+00:09:05,590 --> 00:09:09,560
+You don't want people to have to acquire a
+release lock explicitly, for example.
+
+181
+00:09:09,560 --> 00:09:12,430
+You should also do this when you want the,
+the.
+
+182
+00:09:12,430 --> 00:09:15,010
+Object, to be able to do all the work
+internally
+
+183
+00:09:15,010 --> 00:09:17,590
+and not make the client responsible for
+any of the work.
+
+184
+00:09:18,770 --> 00:09:22,970
+And you also do this if the methods that
+you call may need to block.
+
+185
+00:09:22,970 --> 00:09:25,470
+Maybe they have to download a big file, or
+they have to grab a
+
+186
+00:09:25,470 --> 00:09:29,660
+lock, or they have to do some long running
+computation that won't return right away.
+
+187
+00:09:29,660 --> 00:09:31,880
+So these are sort of three factors that.
+
+188
+00:09:31,880 --> 00:09:34,990
+Are important to consider when you want to
+apply this pattern.
+
+189
+00:09:36,250 --> 00:09:38,270
+Then some other things that are important
+when you want to be
+
+190
+00:09:38,270 --> 00:09:39,990
+able to have, multiple client method
+
+191
+00:09:39,990 --> 00:09:44,450
+requests running concurrently on a single
+object.
+
+192
+00:09:44,450 --> 00:09:46,030
+Now this is different from the monitor
+object.
+
+193
+00:09:46,030 --> 00:09:49,140
+The monitor object only lets one method
+run at a time.
+
+194
+00:09:49,140 --> 00:09:51,000
+It locks out anybody who's not.
+
+195
+00:09:51,000 --> 00:09:52,280
+That one method.
+
+196
+00:09:52,280 --> 00:09:55,590
+With, with active object however in some
+configurations
+
+197
+00:09:55,590 --> 00:09:58,990
+you can actually have multiple method
+request running simultaneously.
+
+198
+00:09:58,990 --> 00:10:01,870
+Subject to various synchronisation
+constraints or scheduling constraints.
+
+199
+00:10:01,870 --> 00:10:03,360
+We'll talk about that.
+
+200
+00:10:03,360 --> 00:10:06,730
+And another thing you might have here is
+you might want to be able to allow the.
+
+201
+00:10:06,730 --> 00:10:10,500
+Invocation order to differ from the
+execution order.
+
+202
+00:10:10,500 --> 00:10:13,130
+So the, the order in which you invoke the
+operations may not
+
+203
+00:10:13,130 --> 00:10:16,190
+be the same as the order in which the
+operations are actually run.
+
+204
+00:10:16,190 --> 00:10:18,450
+And again, this has to do with scheduling
+constraints, it has
+
+205
+00:10:18,450 --> 00:10:20,990
+to do with timing properties, priorities
+and so on and so forth.
+
+206
+00:10:20,990 --> 00:10:24,040
+So we'll come back and talk a bit about
+that.
+
+207
+00:10:24,040 --> 00:10:25,480
+Now, what's important to note here, and
+we'll come
+
+208
+00:10:25,480 --> 00:10:27,410
+back and look at this a couple different
+times.
+
+209
+00:10:27,410 --> 00:10:31,680
+Is to compare and contrast active object
+with monitor object.
+
+210
+00:10:31,680 --> 00:10:35,080
+Some things are very similar, to stuff in
+green here are essentially
+
+211
+00:10:35,080 --> 00:10:38,370
+the same motivations for why you might
+choose to use monitor object.
+
+212
+00:10:38,370 --> 00:10:40,800
+You don't want clients to really know
+
+213
+00:10:40,800 --> 00:10:43,290
+that synchronization is taking place
+explicitly its
+
+214
+00:10:43,290 --> 00:10:46,200
+implicit in the framework, run
+implementation, you
+
+215
+00:10:46,200 --> 00:10:47,880
+would like to be able to have.
+
+216
+00:10:47,880 --> 00:10:51,610
+The method call interface be the boundary
+for concurrency, and you
+
+217
+00:10:51,610 --> 00:10:54,410
+want to be able to allow things to block
+without causing problems.
+
+218
+00:10:55,630 --> 00:10:57,560
+To some extent, monitor object can still
+get you into
+
+219
+00:10:57,560 --> 00:11:00,000
+trouble if you block, so you have to be
+careful there.
+
+220
+00:11:00,000 --> 00:11:00,790
+In fact, I'll tell you what.
+
+221
+00:11:00,790 --> 00:11:04,660
+Let me, cause this important, let's, let's
+gray that one out.
+
+222
+00:11:04,660 --> 00:11:07,480
+That, that's really not a good, ex,
+reason.
+
+223
+00:11:09,280 --> 00:11:10,960
+So, it's, it's those two reasons, and then
+
+224
+00:11:10,960 --> 00:11:14,100
+the others one are ones where active
+object has.
+
+225
+00:11:14,100 --> 00:11:15,130
+Additional capability.
+
+226
+00:11:15,130 --> 00:11:16,990
+It allows things to run concurrently, it
+allows
+
+227
+00:11:16,990 --> 00:11:20,870
+things to block without disrupting other,
+other threads and
+
+228
+00:11:20,870 --> 00:11:23,720
+other behaviors, and it allows the
+execution order to
+
+229
+00:11:23,720 --> 00:11:26,630
+differ in a, in a wider variety of ways.
+
+230
+00:11:26,630 --> 00:11:28,600
+We'll talk more about active object and
+monitor object
+
+231
+00:11:28,600 --> 00:11:30,900
+here, a good quiz question at some point
+will be.
+
+232
+00:11:30,900 --> 00:11:32,720
+Compare and contrast active object and
+monitor object.
+
+233
+00:11:32,720 --> 00:11:34,790
+So make sure you understand these things
+for the quiz.
+
+234
+00:11:34,790 --> 00:11:36,310
+But, of course, much more importantly,
+
+235
+00:11:36,310 --> 00:11:37,950
+make sure you understand the differences
+because
+
+236
+00:11:37,950 --> 00:11:39,960
+they're important differences to
+understand from
+
+237
+00:11:39,960 --> 00:11:43,880
+a conceptual and, practical point of view.
+
+238
+00:11:43,880 --> 00:11:46,330
+Alright, so here is the structure of the
+active object pattern.
+
+239
+00:11:46,330 --> 00:11:49,240
+As you can see, there's a lot of moving
+parts that are going
+
+240
+00:11:49,240 --> 00:11:53,230
+on here, and so, we're going to step
+through them one at a time.
+
+241
+00:11:53,230 --> 00:11:56,570
+Now, when I, when I show you the example,
+I'm going to do this in two ways.
+
+242
+00:11:56,570 --> 00:11:57,900
+I'm first going to explain it.
+
+243
+00:11:57,900 --> 00:12:01,310
+Actually, I'll tell you what, first I'll
+explain it in terms of
+
+244
+00:12:01,310 --> 00:12:05,210
+every day experiences you may have had at
+some point along your way.
+
+245
+00:12:05,210 --> 00:12:08,380
+And then I'll talk technically about
+what's going on.
+
+246
+00:12:08,380 --> 00:12:10,500
+And so this may help you to understand
+things better.
+
+247
+00:12:10,500 --> 00:12:15,250
+So I'll kind of go through this with a,
+with a metaphor, so the metaphor is.
+
+248
+00:12:15,250 --> 00:12:21,390
+You're going to a fast food restaurant in
+order to get lunch, or to get food.
+
+249
+00:12:21,390 --> 00:12:23,940
+Now as you all noticed, different kinds of
+fast food restaurants,
+
+250
+00:12:23,940 --> 00:12:28,030
+there's the McDonald's style of fast food
+restaurants, where at least historically.
+
+251
+00:12:28,030 --> 00:12:31,300
+They're bit changed a bit over time, but
+historically, you went to McDonald's,
+
+252
+00:12:31,300 --> 00:12:34,260
+the goal, the goal in any fast food
+restaurant is to get people.
+
+253
+00:12:34,260 --> 00:12:36,290
+To pay and out of the way as quickly as
+possible.
+
+254
+00:12:36,290 --> 00:12:36,470
+Right.
+
+255
+00:12:36,470 --> 00:12:37,390
+It's about throughput.
+
+256
+00:12:37,390 --> 00:12:39,450
+Because that equals cashflow, equals
+
+257
+00:12:39,450 --> 00:12:41,480
+profitability, which all entrepreneurs
+like.
+
+258
+00:12:41,480 --> 00:12:42,365
+Right?
+
+259
+00:12:42,365 --> 00:12:45,420
+[LAUGH] And so, what we want to be able to
+do is find a way to maximize throughput.
+
+260
+00:12:45,420 --> 00:12:50,140
+So, if you go to McDonald's and you order
+a Big Mac, fries, and a Coke.
+
+261
+00:12:50,140 --> 00:12:51,450
+At least in the early days, what they
+
+262
+00:12:51,450 --> 00:12:53,670
+would do is they would precook a bunch
+things.
+
+263
+00:12:53,670 --> 00:12:55,920
+They'd have a you know, bunch of precooked
+french
+
+264
+00:12:55,920 --> 00:12:57,490
+fries and they would be under a heat lamp.
+
+265
+00:12:57,490 --> 00:13:00,600
+They'd have a bunch of precooked Big Macs
+under a heat lamp.
+
+266
+00:13:00,600 --> 00:13:02,215
+They might even have had some pre cor,
+
+267
+00:13:02,215 --> 00:13:05,180
+prepoured cokes that were sitting there on
+the counter.
+
+268
+00:13:05,180 --> 00:13:07,130
+So when you say, you know, Big Mac, fries,
+and
+
+269
+00:13:07,130 --> 00:13:12,200
+a coke, the, the cashier just sits there,
+reaches back, grabs
+
+270
+00:13:12,200 --> 00:13:15,720
+the stuff that's been precached, right,
+that's a good, that's a
+
+271
+00:13:15,720 --> 00:13:20,490
+good optimization technique, precaching,
+and give you the stuff right back.
+
+272
+00:13:20,490 --> 00:13:23,380
+And typically that's a synchronous
+transaction.
+
+273
+00:13:23,380 --> 00:13:25,030
+You stand there, you order the food.
+
+274
+00:13:25,030 --> 00:13:28,090
+As long as it's in the cache, you get it,
+you go on their way.
+
+275
+00:13:28,090 --> 00:13:29,570
+They get their money, you get a
+
+276
+00:13:29,570 --> 00:13:33,500
+heart attack or you know, high, high
+cholesterol.
+
+277
+00:13:33,500 --> 00:13:36,760
+And Christoph, now I'm going to get, get
+sued by the food lobby for food libel.
+
+278
+00:13:37,820 --> 00:13:38,140
+anyway.
+
+279
+00:13:38,140 --> 00:13:39,180
+Bad things happen right?
+
+280
+00:13:39,180 --> 00:13:41,240
+But they got the money and everybody's
+happy.
+
+281
+00:13:41,240 --> 00:13:42,840
+So that's one model.
+
+282
+00:13:42,840 --> 00:13:44,570
+That's not the Active Object.
+
+283
+00:13:44,570 --> 00:13:45,580
+Well we'll talk about that later.
+
+284
+00:13:45,580 --> 00:13:48,310
+That, that's called Synchronous two way
+blocking.
+
+285
+00:13:48,310 --> 00:13:50,440
+That's kind like the monitor object
+actually.
+
+286
+00:13:50,440 --> 00:13:53,760
+You can imagine you might have a monitor
+to make sure that the two
+
+287
+00:13:53,760 --> 00:13:57,690
+cashiers are trying to grab a big Mac at
+the same time or whatever.
+
+288
+00:13:57,690 --> 00:13:59,460
+So the Active Object is different and the
+Active
+
+289
+00:13:59,460 --> 00:14:01,380
+Object model, lets use a different kind of
+restaurant.
+
+290
+00:14:01,380 --> 00:14:02,610
+Let's talk about Wendy's.
+
+291
+00:14:02,610 --> 00:14:03,360
+So does anybody know?
+
+292
+00:14:03,360 --> 00:14:07,070
+What's the big differentiator that Wendy's
+has compared to say, McDonald's.
+
+293
+00:14:07,070 --> 00:14:09,210
+>> They don't pre-cook their stuff.
+
+294
+00:14:09,210 --> 00:14:11,590
+>> They cook to order, it's on demand
+right?
+
+295
+00:14:11,590 --> 00:14:14,840
+So imagine what would happen if they did
+Wendy's like they did McDonald's.
+
+296
+00:14:14,840 --> 00:14:17,630
+You'd go up, you'd place your order for a.
+
+297
+00:14:17,630 --> 00:14:20,380
+Double Wendy's you know, cheeseburger or
+something like that.
+
+298
+00:14:20,380 --> 00:14:22,880
+And then they would go pre-cook, they
+would go cook it for you on demand.
+
+299
+00:14:22,880 --> 00:14:24,440
+Well it would take forever, right?
+
+300
+00:14:24,440 --> 00:14:27,500
+You'd be stuck there synchronously in that
+transaction space.
+
+301
+00:14:27,500 --> 00:14:30,950
+It would take a long time, and people
+would get upset.
+
+302
+00:14:30,950 --> 00:14:33,770
+Not some, well everybody behind you in
+line would get upset.
+
+303
+00:14:33,770 --> 00:14:35,720
+The owner of the Wendy's franchise would
+get upset.
+
+304
+00:14:35,720 --> 00:14:36,650
+Everybody would be upset, right?
+
+305
+00:14:36,650 --> 00:14:39,170
+Because they weren't getting throughput,
+you weren't getting served.
+
+306
+00:14:39,170 --> 00:14:40,760
+So what did they do instead?
+
+307
+00:14:40,760 --> 00:14:43,540
+When you show up there, you have this
+transaction with
+
+308
+00:14:43,540 --> 00:14:47,570
+the cashier, and the cashier placed the
+role of a proxy.
+
+309
+00:14:47,570 --> 00:14:50,230
+So the proxy is sort of the one who's
+going to take your order.
+
+310
+00:14:50,230 --> 00:14:52,577
+Its, its the ambassador or surrogate or
+
+311
+00:14:52,577 --> 00:14:55,620
+something that's actually going to do the
+real work.
+
+312
+00:14:55,620 --> 00:14:57,843
+And when you place your order you say I
+
+313
+00:14:57,843 --> 00:15:01,000
+want to have you know, the special burger
+with all the
+
+314
+00:15:01,000 --> 00:15:04,157
+fixings or something, then what they do is
+they turn
+
+315
+00:15:04,157 --> 00:15:08,360
+around and they convert that into some
+kind of future.
+
+316
+00:15:08,360 --> 00:15:08,560
+Right?
+
+317
+00:15:08,560 --> 00:15:11,600
+The future is the little plastic token
+they give
+
+318
+00:15:11,600 --> 00:15:13,250
+you with a number on it, that's the
+future.
+
+319
+00:15:13,250 --> 00:15:14,840
+They hand you something.
+
+320
+00:15:14,840 --> 00:15:16,100
+And then they turn around, and you don't
+
+321
+00:15:16,100 --> 00:15:17,690
+really see this anymore because it's all
+done
+
+322
+00:15:17,690 --> 00:15:22,400
+in, through computer, but that turns up,
+out to be a method request or a message.
+
+323
+00:15:22,400 --> 00:15:26,560
+That shows up in the cook's message queue,
+or message list, right?
+
+324
+00:15:26,560 --> 00:15:27,470
+Of things to cook.
+
+325
+00:15:28,990 --> 00:15:31,860
+And so, there's a queue of those things.
+
+326
+00:15:31,860 --> 00:15:33,880
+Who knows how they're ordered, I, you
+know, they're, let's probably
+
+327
+00:15:33,880 --> 00:15:36,620
+assume they're FIFO order, but they could
+be ordered some other way.
+
+328
+00:15:36,620 --> 00:15:38,180
+If let's see.
+
+329
+00:15:38,180 --> 00:15:39,150
+Trying to figure who'd.
+
+330
+00:15:39,150 --> 00:15:41,950
+If BIll Clinton, Bill Clinton liked to eat
+fast food, right?
+
+331
+00:15:41,950 --> 00:15:43,550
+So Bill Clinton comes in.
+
+332
+00:15:43,550 --> 00:15:46,090
+Chances are his order is going to get
+moved to the front of the queue, so you
+
+333
+00:15:46,090 --> 00:15:48,020
+might rearrange the order of these things
+based
+
+334
+00:15:48,020 --> 00:15:50,090
+on the importance of whoever is making the
+order.
+
+335
+00:15:50,090 --> 00:15:53,270
+So that the, the, the requests are in the
+queue, and
+
+336
+00:15:53,270 --> 00:15:56,230
+then the scheduler, which in this case
+would be the cook, would
+
+337
+00:15:56,230 --> 00:15:58,470
+take the requests off one at a time, take
+a look
+
+338
+00:15:58,470 --> 00:16:01,010
+at what they were, and then would start to
+cook the meal.
+
+339
+00:16:01,010 --> 00:16:03,740
+And when the meal is done then they need
+
+340
+00:16:03,740 --> 00:16:06,520
+to deliver it back to the recipient which
+is the,
+
+341
+00:16:06,520 --> 00:16:10,640
+the this acto so cooking the meal is done
+by
+
+342
+00:16:10,640 --> 00:16:13,542
+the cook when it comes to them from the
+schedule.
+
+343
+00:16:13,542 --> 00:16:15,210
+Says Okay this is what I want you to cook
+now so
+
+344
+00:16:15,210 --> 00:16:19,150
+the cook meal is the operation on the
+servant and when you're
+
+345
+00:16:19,150 --> 00:16:22,270
+all done you then have to give this back
+to the person
+
+346
+00:16:22,270 --> 00:16:24,930
+you place the order and there's a couple
+ways to do this
+
+347
+00:16:24,930 --> 00:16:27,340
+and the way to do it is essential is to
+pass this
+
+348
+00:16:27,340 --> 00:16:31,930
+information back to the caller to the
+future and as all you
+
+349
+00:16:31,930 --> 00:16:34,410
+know in fast food restaurants like Wendy's
+there's one way to do
+
+350
+00:16:34,410 --> 00:16:38,790
+this, one way is to have you periodically
+go up to the pick
+
+351
+00:16:38,790 --> 00:16:41,620
+up window with your little plastic token
+in hand,
+
+352
+00:16:41,620 --> 00:16:45,820
+your future and say is item number 42
+ready yet.
+
+353
+00:16:45,820 --> 00:16:47,130
+That's called polling.
+
+354
+00:16:47,130 --> 00:16:50,040
+So you poll for your results, the other
+approach is for you to
+
+355
+00:16:50,040 --> 00:16:54,490
+go sit there and read a paper, browse the
+web, talk to your friends.
+
+356
+00:16:54,490 --> 00:16:55,570
+Whatever you do, Make a phone call.
+
+357
+00:16:55,570 --> 00:16:59,400
+And then when it's done, the person, the
+runner or the or the cat
+
+358
+00:16:59,400 --> 00:17:02,690
+the crook or somebody will come out and
+deliver the food to your table.
+
+359
+00:17:02,690 --> 00:17:03,706
+That's the call back model.
+
+360
+00:17:03,706 --> 00:17:05,970
+So there's a polling model and a call back
+
+361
+00:17:05,970 --> 00:17:08,650
+model now, of course, you could just stand
+there
+
+362
+00:17:08,650 --> 00:17:10,550
+by the pickup window, you know, just like
+a
+
+363
+00:17:10,550 --> 00:17:12,720
+hungry puppy waiting for the food to show
+up.
+
+364
+00:17:12,720 --> 00:17:13,300
+That's possible.
+
+365
+00:17:13,300 --> 00:17:16,690
+That's sort of a blocking future
+transaction.
+
+366
+00:17:16,690 --> 00:17:19,720
+But that's probably not the best way to
+spend your time.
+
+367
+00:17:19,720 --> 00:17:20,920
+And by the way, the other thing that they
+do
+
+368
+00:17:20,920 --> 00:17:24,320
+in these restaurants, another form of
+optimization, is they have.
+
+369
+00:17:24,320 --> 00:17:26,530
+Customers do some of the work, right?
+
+370
+00:17:26,530 --> 00:17:28,210
+So, they don't fill your cup for you.
+
+371
+00:17:28,210 --> 00:17:31,900
+They give you a cup, and then you go and
+fill up your cup, right?
+
+372
+00:17:31,900 --> 00:17:33,410
+And, and, sort of the way it works is
+
+373
+00:17:33,410 --> 00:17:35,970
+they price the drinks where you'd have to
+drink, like,
+
+374
+00:17:35,970 --> 00:17:37,990
+10 gallons worth of soda to, to make up
+the
+
+375
+00:17:37,990 --> 00:17:39,650
+difference in what you just paid for that
+soda, right?
+
+376
+00:17:39,650 --> 00:17:41,170
+Because it probably cost them.
+
+377
+00:17:41,170 --> 00:17:43,000
+Ten cents and and you paid a dollar 50 for
+the
+
+378
+00:17:43,000 --> 00:17:45,080
+thing so you have to drink a lot of stuff
+before
+
+379
+00:17:45,080 --> 00:17:48,370
+you make up the difference so anyways
+that's the active object
+
+380
+00:17:48,370 --> 00:17:51,850
+pattern described through a fast food
+metaphor and then we also
+
+381
+00:17:51,850 --> 00:17:54,090
+talked about the varies elements and we'll
+talk about them again
+
+382
+00:17:54,090 --> 00:17:58,585
+in a more tactical way next, OK any
+questions so that's
+
+383
+00:17:58,585 --> 00:18:01,080
+that 's kind of thing the other I didn't
+really explain
+
+384
+00:18:01,080 --> 00:18:04,590
+as I was talking this is the mapping on
+android so.
+
+385
+00:18:04,590 --> 00:18:09,270
+You invoke an operation on a handler,
+which is a proxy-like thing.
+
+386
+00:18:09,270 --> 00:18:11,890
+And there's another way to use a, a
+handler as a future.
+
+387
+00:18:11,890 --> 00:18:13,770
+We'll talk about that when we talk later.
+
+388
+00:18:13,770 --> 00:18:16,770
+The method request in Android out of the
+box is essentially a
+
+389
+00:18:16,770 --> 00:18:21,170
+message that gets stuck into a message
+queue, which is the activation list.
+
+390
+00:18:21,170 --> 00:18:23,470
+There's something we've seen before called
+the looper, which plays
+
+391
+00:18:23,470 --> 00:18:26,370
+the role of the scheduler in conjunction
+with the message queue.
+
+392
+00:18:26,370 --> 00:18:30,190
+And then whatever handler you define at
+subclasses from the default
+
+393
+00:18:30,190 --> 00:18:35,480
+handler class and fills in the handle
+message method, that's the servant.
+
+394
+00:18:35,480 --> 00:18:37,790
+And of course the client is whoever
+invoked this thing
+
+395
+00:18:37,790 --> 00:18:40,860
+in the first place which is like some
+activity, perhaps.
+
+396
+00:18:40,860 --> 00:18:43,670
+Okay, so that's the static view.
+
+397
+00:18:43,670 --> 00:18:45,570
+There's also of course a dynamic view,
+which
+
+398
+00:18:45,570 --> 00:18:47,680
+isn't much different from what I just told
+you.
+
+399
+00:18:47,680 --> 00:18:50,420
+because we spent a lot of time talking
+about the metaphor.
+
+400
+00:18:50,420 --> 00:18:53,850
+So the client invokes a method call on a
+proxy.
+
+401
+00:18:53,850 --> 00:18:58,550
+And the proxy converts the method call
+into a method request, or a message.
+
+402
+00:18:58,550 --> 00:19:02,900
+Passes that to the scheduler, and returns
+a future to the proct, to the client.
+
+403
+00:19:02,900 --> 00:19:05,370
+The scheduler sticks the method request
+onto
+
+404
+00:19:05,370 --> 00:19:07,910
+some kind of activation list or queue.
+
+405
+00:19:07,910 --> 00:19:11,230
+At some point later, based on various
+properties, the scheduler
+
+406
+00:19:11,230 --> 00:19:15,810
+takes the message off the queue and then
+goes ahead and.
+
+407
+00:19:15,810 --> 00:19:18,690
+Despatches it on the servant.
+
+408
+00:19:18,690 --> 00:19:21,030
+Oops that should be pointing over here.
+
+409
+00:19:25,070 --> 00:19:30,200
+So the servant is the guy that actually
+does the work and when he is done
+
+410
+00:19:31,840 --> 00:19:36,620
+then the client gets the result either by
+polling or by some kind of callback.
+
+411
+00:19:36,620 --> 00:19:38,060
+Okay, so that's, that's basically the
+steps
+
+412
+00:19:38,060 --> 00:19:40,950
+involved from dynamics in the active
+object pattern.
+
+413
+00:19:42,080 --> 00:19:45,030
+Okay, so let's talk about how, what you
+need to do to implement this pattern.
+
+414
+00:19:45,030 --> 00:19:49,010
+Now I'm going to talk about the
+implementation in general, and then
+
+415
+00:19:49,010 --> 00:19:51,960
+I'm also going to show you ways you could
+implement this in Android.
+
+416
+00:19:51,960 --> 00:19:56,340
+Keep in mind that Android, the things
+we're talking
+
+417
+00:19:56,340 --> 00:19:59,760
+about in Android, don't implement the
+full-blown active object pattern.
+
+418
+00:19:59,760 --> 00:20:01,750
+If you want the full blown active object
+pattern, you'd have
+
+419
+00:20:01,750 --> 00:20:05,760
+to devise a little bit thicker wrapper
+around a couple of pieces.
+
+420
+00:20:05,760 --> 00:20:07,760
+But it's, it's pretty darn close.
+
+421
+00:20:07,760 --> 00:20:09,540
+When we talk later in the course and
+
+422
+00:20:09,540 --> 00:20:12,970
+we start talking about the Android binder
+framework and
+
+423
+00:20:12,970 --> 00:20:17,000
+the Android interface definition language,
+AIDL, you'll see how
+
+424
+00:20:17,000 --> 00:20:20,010
+you can implement the full blown active
+object pattern.
+
+425
+00:20:20,010 --> 00:20:22,750
+As a variant of the so-called broker
+pattern.
+
+426
+00:20:22,750 --> 00:20:26,320
+And we'll talk about all that stuff
+probably, maybe starting next week.
+
+427
+00:20:26,320 --> 00:20:27,280
+Maybe starting the week after.
+
+428
+00:20:28,670 --> 00:20:30,160
+Okay, so the first thing you need to do
+from an
+
+429
+00:20:30,160 --> 00:20:31,560
+implementation point of view is you
+
+430
+00:20:31,560 --> 00:20:35,280
+need to implement the invocation
+infrastructure.
+
+431
+00:20:35,280 --> 00:20:36,750
+Now keep in mind what we're trying to do
+here.
+
+432
+00:20:36,750 --> 00:20:38,810
+We're trying to come up with a way.
+
+433
+00:20:38,810 --> 00:20:44,840
+To convert a method call from the client,
+say from an activity or whatever, some
+
+434
+00:20:44,840 --> 00:20:50,950
+client thread or somebody who's making a
+call, into a method request or a message.
+
+435
+00:20:50,950 --> 00:20:54,270
+And that thing is then going to be stuck
+onto a queue or an activation list.
+
+436
+00:20:54,270 --> 00:20:55,840
+So that's what the proxy's role is.
+
+437
+00:20:55,840 --> 00:20:59,410
+So the proxy is basically this surrogate
+that
+
+438
+00:20:59,410 --> 00:21:02,800
+looks like the actual target of the
+request.
+
+439
+00:21:02,800 --> 00:21:05,210
+But instead is just doing some minimal
+work to convert a
+
+440
+00:21:05,210 --> 00:21:09,120
+method call into something that can be
+queued for later processing.
+
+441
+00:21:10,500 --> 00:21:13,140
+Now, when we talk about more
+
+442
+00:21:13,140 --> 00:21:15,760
+complex environments, when we talk about
+communicating
+
+443
+00:21:15,760 --> 00:21:18,630
+between address spaces on an android
+
+444
+00:21:18,630 --> 00:21:21,380
+device, when we talk about communicating
+between.
+
+445
+00:21:21,380 --> 00:21:26,330
+An Android device, and a server in the
+cloud or a data center somewhere.
+
+446
+00:21:26,330 --> 00:21:29,200
+We'll see how proxy plays another very
+important role.
+
+447
+00:21:29,200 --> 00:21:31,070
+So we'll talk more about proxy later.
+
+448
+00:21:31,070 --> 00:21:34,040
+If you don't have the deep fullest
+understanding of proxy don't despair.
+
+449
+00:21:34,040 --> 00:21:36,640
+We'll cover this as a, as its own pattern
+later.
+
+450
+00:21:36,640 --> 00:21:38,420
+That pattern appears in the gang of four
+book.
+
+451
+00:21:38,420 --> 00:21:39,970
+It also appears in post of one book.
+
+452
+00:21:39,970 --> 00:21:40,670
+You can pick it up online.
+
+453
+00:21:41,710 --> 00:21:43,600
+So that's basically what the proxy is.
+
+454
+00:21:43,600 --> 00:21:49,260
+Or actually let me do something here.
+
+455
+00:21:49,260 --> 00:21:55,910
+Probably want to, clean that slide and add
+proxy.
+
+456
+00:21:55,910 --> 00:22:02,950
+If you take a look online, you'll find out
+the proxy, pattern is described.
+
+457
+00:22:02,950 --> 00:22:04,900
+On Wikipedia so you can find what it looks
+like.
+
+458
+00:22:05,960 --> 00:22:09,880
+Ok so, so that's basically what the proxy
+is.
+
+459
+00:22:09,880 --> 00:22:12,170
+If you take a look at the handler at Java
+file you'll
+
+460
+00:22:12,170 --> 00:22:16,190
+see it defines the proxies in the form of
+these methods called
+
+461
+00:22:16,190 --> 00:22:20,320
+send method or message so there's a cup of
+variations as send
+
+462
+00:22:20,320 --> 00:22:25,050
+message as you can see send message turns
+around called send message delayed.
+
+463
+00:22:25,050 --> 00:22:28,740
+Send message delayed, turns around and
+calls send message
+
+464
+00:22:28,740 --> 00:22:32,340
+at time, and send message at time actually
+does something.
+
+465
+00:22:32,340 --> 00:22:35,620
+And what that something is, is it
+basically converts things
+
+466
+00:22:35,620 --> 00:22:39,860
+into a message that's going to be stuck
+into a message queue.
+
+467
+00:22:39,860 --> 00:22:43,250
+So that, that's the way that the proxy
+works.
+
+468
+00:22:43,250 --> 00:22:46,160
+And this variant of the pattern applied to
+Android.
+
+469
+00:22:46,160 --> 00:22:48,640
+It, it's a very simple, kind of stripped
+down version.
+
+470
+00:22:48,640 --> 00:22:50,890
+The proxy and method request
+implementation for
+
+471
+00:22:50,890 --> 00:22:53,610
+the Android handler, are not as
+sophisticated as
+
+472
+00:22:53,610 --> 00:22:56,640
+the full blown pattern, but they're good
+enough for our purposes to make the point.
+
+473
+00:22:57,930 --> 00:23:00,509
+So, the message gets turned into something
+that gets stuck into a queue.
+
+474
+00:23:01,855 --> 00:23:03,050
+Okay, the next thing you need to do is you
+
+475
+00:23:03,050 --> 00:23:05,440
+need to implement the activation list the
+activation list is
+
+476
+00:23:05,440 --> 00:23:08,700
+the thing that keeps track of these method
+requests which
+
+477
+00:23:08,700 --> 00:23:14,020
+remember a method request is a
+objectification of a method call
+
+478
+00:23:14,020 --> 00:23:16,860
+so it's going to basically store the
+information dealing with
+
+479
+00:23:16,860 --> 00:23:19,940
+the perimeters and other information
+that's necessary to identify what
+
+480
+00:23:19,940 --> 00:23:23,550
+method hat invoked and so you need to be
+able
+
+481
+00:23:23,550 --> 00:23:26,810
+to insert and remove these method request
+into some kind of.
+
+482
+00:23:26,810 --> 00:23:28,540
+Data structure which in this case is
+
+483
+00:23:28,540 --> 00:23:32,520
+accorded activation list in the pattern
+nomenclature.
+
+484
+00:23:32,520 --> 00:23:35,540
+Typically not always but typically this
+list is implemented as
+
+485
+00:23:35,540 --> 00:23:39,570
+some kind of synchronised buffer where you
+can have one thread,
+
+486
+00:23:39,570 --> 00:23:42,730
+or more thread, more than one thread
+putting request method
+
+487
+00:23:42,730 --> 00:23:47,720
+request into the buffer simultaneously in
+a synchronised thread safe way.
+
+488
+00:23:47,720 --> 00:23:49,850
+And then one or more threads, taking
+things out
+
+489
+00:23:49,850 --> 00:23:53,130
+of that buffer in a synchronized and
+thread-safe way.
+
+490
+00:23:53,130 --> 00:23:55,550
+So what would that kind of thing look like
+in Android?
+
+491
+00:23:55,550 --> 00:23:58,910
+Well, that kind of thing in Android would
+be something like the message queue.
+
+492
+00:23:58,910 --> 00:24:01,060
+The message queue is defined as part of
+the
+
+493
+00:24:01,060 --> 00:24:05,960
+core kind of OS framework portion of the
+Android middleware.
+
+494
+00:24:05,960 --> 00:24:09,120
+And it has methods like end queue message,
+which you give a
+
+495
+00:24:09,120 --> 00:24:12,230
+message and a, and a time when you want
+the message to run.
+
+496
+00:24:12,230 --> 00:24:15,450
+And then it also has ways of dequeuing
+things from the message queue
+
+497
+00:24:15,450 --> 00:24:20,740
+using methods like next which will block,
+then we have to go ahead and
+
+498
+00:24:20,740 --> 00:24:24,940
+implement a scheduler of some kind, so in
+this particular case in you can
+
+499
+00:24:24,940 --> 00:24:29,650
+look at the schedule a couple different
+ways but in the contexts of patterns.
+
+500
+00:24:29,650 --> 00:24:35,020
+The scheduler is basically our so called
+command processor and let's say I guess I
+
+501
+00:24:35,020 --> 00:24:42,640
+to be fully, to be fully pattern compliant
+and cross reference enabled.
+
+502
+00:24:42,640 --> 00:24:50,730
+I should mention command processor pattern
+URL here, so the command processor.
+
+503
+00:24:50,730 --> 00:24:53,790
+Pattern is a pattern, which we'll talk
+about later, which you can
+
+504
+00:24:53,790 --> 00:24:56,710
+use to pass command objects between
+
+505
+00:24:56,710 --> 00:24:58,740
+address spaces or between threads of
+control.
+
+506
+00:24:58,740 --> 00:25:01,190
+And so the scheduler basically implements
+this
+
+507
+00:25:01,190 --> 00:25:02,850
+pattern, and you in queue things into the
+
+508
+00:25:02,850 --> 00:25:06,990
+message the activation list, and then you
+get it out in another thread of control.
+
+509
+00:25:06,990 --> 00:25:11,610
+And the scheduler figures out when it can
+retrieve.
+
+510
+00:25:11,610 --> 00:25:14,450
+The request from the activation list.
+
+511
+00:25:14,450 --> 00:25:16,230
+And there's a bunch of different variants.
+
+512
+00:25:16,230 --> 00:25:19,900
+The, the simple one is just to have the
+activation list
+
+513
+00:25:19,900 --> 00:25:24,920
+be a FIFO queue and have the scheduler
+simply do FIFO scheduling.
+
+514
+00:25:24,920 --> 00:25:27,760
+Whatever's next in the queue, you take it
+out.
+
+515
+00:25:27,760 --> 00:25:29,000
+There are all kinds of other variants.
+
+516
+00:25:29,000 --> 00:25:30,980
+You could have a priority queue.
+
+517
+00:25:30,980 --> 00:25:33,090
+That was the example I gave, where, where
+Bill Clinton
+
+518
+00:25:33,090 --> 00:25:35,380
+wants to order a Big Mac, or a Wendy's
+hamburger.
+
+519
+00:25:35,380 --> 00:25:39,660
+So we, we prioritize, presidents get
+special preference over other people.
+
+520
+00:25:41,150 --> 00:25:43,160
+You might also have situation where you're
+going
+
+521
+00:25:43,160 --> 00:25:45,240
+to, to queue things up based on delay.
+
+522
+00:25:45,240 --> 00:25:48,370
+So things don't get de-queued until a
+certain amount of time passes.
+
+523
+00:25:48,370 --> 00:25:51,670
+So you might invoke a bunch of operations,
+but give them different delays.
+
+524
+00:25:51,670 --> 00:25:53,390
+And then they'll show up coming out of the
+que
+
+525
+00:25:53,390 --> 00:25:57,070
+in the order of their earliest deadline
+first, in the que.
+
+526
+00:25:57,070 --> 00:25:58,260
+And there's other variances as well.
+
+527
+00:25:58,260 --> 00:26:01,190
+You can have more complicated
+synchronization guards, where you
+
+528
+00:26:01,190 --> 00:26:03,650
+could check to see if more certain
+conditions were satisfied.
+
+529
+00:26:03,650 --> 00:26:06,250
+And if so, then the scheduler would get a
+
+530
+00:26:06,250 --> 00:26:09,139
+chance to execute or deque those, those
+method requests.
+
+531
+00:26:10,400 --> 00:26:12,500
+In the android case it's pretty simple.
+
+532
+00:26:12,500 --> 00:26:15,790
+We have this message queue and things get
+queued up based on the order
+
+533
+00:26:15,790 --> 00:26:20,510
+that they appear and or the time at which
+they are supposed to run.
+
+534
+00:26:20,510 --> 00:26:25,710
+And so it's basically a timed delay, time
+based queue.
+
+535
+00:26:25,710 --> 00:26:28,270
+And so, basically there's the looper and
+the looper
+
+536
+00:26:28,270 --> 00:26:30,720
+sits there waiting to pull stuff out of
+the queue.
+
+537
+00:26:30,720 --> 00:26:33,410
+And it pulls stuff out of the que and then
+it goes ahead and dispatched
+
+538
+00:26:33,410 --> 00:26:39,100
+it so that's the scheduler and then we
+have the servant servant is actually the
+
+539
+00:26:39,100 --> 00:26:41,090
+guy who does the work who implements
+
+540
+00:26:41,090 --> 00:26:45,200
+the application specific behavior when it
+receives work
+
+541
+00:26:45,200 --> 00:26:51,156
+from a client in general servants can be
+implement in all kinds of different ways.
+
+542
+00:26:51,156 --> 00:26:53,964
+One very common way to implement the
+active
+
+543
+00:26:53,964 --> 00:26:56,850
+pattern is to have the proxy and the
+servants
+
+544
+00:26:56,850 --> 00:26:59,893
+have the same methods with the same
+signatures
+
+545
+00:26:59,893 --> 00:27:02,623
+and that way it looks just like an object,
+
+546
+00:27:02,623 --> 00:27:04,885
+you know when you invoke a method on
+
+547
+00:27:04,885 --> 00:27:08,396
+an object, the implementation of that
+method is, is
+
+548
+00:27:08,396 --> 00:27:11,282
+the same name it's got the same signature,
+
+549
+00:27:11,282 --> 00:27:15,230
+the same [INAUDIBLE] in fact it's the same
+thing.
+
+550
+00:27:15,230 --> 00:27:17,730
+In an active object environment you have a
+couple of choices.
+
+551
+00:27:17,730 --> 00:27:21,560
+One choice you can make is to have a
+mirrored relationship, between the name
+
+552
+00:27:21,560 --> 00:27:24,990
+of the method you invoke and the name on
+the servant that gets called back.
+
+553
+00:27:26,410 --> 00:27:28,630
+Another approach, which is the more way
+Android does it is
+
+554
+00:27:28,630 --> 00:27:31,590
+we have a method we use to pass the
+request there,
+
+555
+00:27:31,590 --> 00:27:34,060
+called send message, then we have a method
+with a slightly
+
+556
+00:27:34,060 --> 00:27:35,550
+different name called handle message, that
+
+557
+00:27:35,550 --> 00:27:38,750
+actually retrieves the requested processes
+it.
+
+558
+00:27:38,750 --> 00:27:41,290
+Probably the most obvious reason for doing
+that is if.
+
+559
+00:27:41,290 --> 00:27:46,380
+They called both methods send method or
+send message you'd have a,
+
+560
+00:27:46,380 --> 00:27:48,840
+an overload ambiguity problem because
+handler
+
+561
+00:27:48,840 --> 00:27:50,220
+needs to support both these things.
+
+562
+00:27:50,220 --> 00:27:54,270
+It needs to be able to support send
+message to get the data to the handler.
+
+563
+00:27:54,270 --> 00:27:57,660
+And it has to have some kind of call-back
+hook to do the work.
+
+564
+00:27:57,660 --> 00:28:01,640
+So that's probably why they did it that
+way, but there are other alternatives.
+
+565
+00:28:01,640 --> 00:28:05,190
+So in the case of Android handle message
+is the thing that actually does the work.
+
+566
+00:28:05,190 --> 00:28:07,850
+It's the servant and you implement it by
+sub
+
+567
+00:28:07,850 --> 00:28:10,800
+classing from handler and filling in
+whatever you want.
+
+568
+00:28:10,800 --> 00:28:12,670
+So here we have a worker handler with
+
+569
+00:28:12,670 --> 00:28:15,940
+a handle message method that does
+something or other.
+
+570
+00:28:15,940 --> 00:28:18,730
+And then the last thing you have to do is
+figure out how you're going
+
+571
+00:28:18,730 --> 00:28:23,850
+to get the results, if any, back to the
+original client who invoked the operation.
+
+572
+00:28:23,850 --> 00:28:27,280
+Now, a lot of times with Android, when you
+do a send
+
+573
+00:28:27,280 --> 00:28:32,340
+message call on a handler, you're not
+really expecting anything back in return.
+
+574
+00:28:33,600 --> 00:28:37,440
+For example, imagine you have some
+long-running computation.
+
+575
+00:28:37,440 --> 00:28:39,870
+That's downloading a file in the
+
+576
+00:28:39,870 --> 00:28:41,590
+background thread and when that background
+thread
+
+577
+00:28:41,590 --> 00:28:45,070
+is done it wants to send the result back
+to the UI thread.
+
+578
+00:28:45,070 --> 00:28:51,480
+Well in that case all it does is it simply
+says send message and then voila handler
+
+579
+00:28:51,480 --> 00:28:53,650
+message gets called back in the UI thread
+and
+
+580
+00:28:53,650 --> 00:28:56,310
+the UI thread does something to display
+the result.
+
+581
+00:28:56,310 --> 00:29:00,490
+So in that case there is no communication
+it's just a one way invocation.
+
+582
+00:29:00,490 --> 00:29:01,840
+There other scenarios and we'll look at
+some
+
+583
+00:29:01,840 --> 00:29:04,180
+in a second where there's two way
+communication.
+
+584
+00:29:04,180 --> 00:29:06,090
+And, so if there's two way communication
+you have to
+
+585
+00:29:06,090 --> 00:29:09,050
+have a way to get back to your original
+caller.
+
+586
+00:29:09,050 --> 00:29:11,100
+And there's a whole bunch of different
+ways to do this.
+
+587
+00:29:11,100 --> 00:29:14,390
+One way to do this, which we show here, in
+Android.
+
+588
+00:29:14,390 --> 00:29:20,630
+Is to pass as part of the original message
+to the to the active object
+
+589
+00:29:20,630 --> 00:29:27,200
+to the handler you contain in the message
+essentially the reply handler the
+
+590
+00:29:27,200 --> 00:29:30,070
+the handler of the guy who set the thing
+in the first place so
+
+591
+00:29:30,070 --> 00:29:32,030
+you can see here in this particular
+
+592
+00:29:32,030 --> 00:29:33,900
+example which we'll look at more detail
+later.
+
+593
+00:29:33,900 --> 00:29:35,950
+We get the message, we go ahead and we
+crack
+
+594
+00:29:35,950 --> 00:29:38,000
+it open, and we get some arguments that
+were passed in.
+
+595
+00:29:38,000 --> 00:29:43,780
+And then we go take a look at the
+args.handler field, and we, that,
+
+596
+00:29:43,780 --> 00:29:47,140
+that's the handler of the guy who sent us
+the message in the first place.
+
+597
+00:29:47,140 --> 00:29:50,225
+And we obtain a, we'd use obtain message,
+which is
+
+598
+00:29:50,225 --> 00:29:53,324
+a factory method that's used to get back a
+message.
+
+599
+00:29:53,324 --> 00:29:54,880
+And then we go ahead and fill
+
+600
+00:29:54,880 --> 00:29:57,999
+in some results and then we say
+reply.sendtoTarget.
+
+601
+00:29:57,999 --> 00:30:00,772
+And sendtoTarget is simply a, a little
+
+602
+00:30:00,772 --> 00:30:04,478
+convenience method that says Send Message,
+this.
+
+603
+00:30:04,478 --> 00:30:07,240
+It basically sends a message back to
+itself.
+
+604
+00:30:07,240 --> 00:30:11,730
+So this guy's going to be used to send a
+message back to, the original client.
+
+605
+00:30:11,730 --> 00:30:14,170
+And I'll show you this in a second to make
+it a little more clear.
+
+606
+00:30:15,990 --> 00:30:16,554
+[SOUND] Okay.
+
+607
+00:30:16,554 --> 00:30:20,060
+So that's kind of, the implementation
+steps.
+
+608
+00:30:20,060 --> 00:30:22,220
+Now what I'm going to do is I'm going to
+show you a really
+
+609
+00:30:22,220 --> 00:30:26,200
+cool place in Android that implements
+this, and, we're going to look at this
+
+610
+00:30:26,200 --> 00:30:28,470
+example later on in the class, and you may
+get a chance
+
+611
+00:30:28,470 --> 00:30:30,860
+to play around with it and use it for one
+of the assignments.
+
+612
+00:30:30,860 --> 00:30:33,440
+But for right now, I'll kind of show you
+how it works under the hood.
+
+613
+00:30:33,440 --> 00:30:34,390
+It's really cool.
+
+614
+00:30:34,390 --> 00:30:38,295
+So there's something in Android that's
+called an AsyncQueryHandler,
+
+615
+00:30:38,295 --> 00:30:41,330
+and AsyncQueryHandler is used in, in just
+a few
+
+616
+00:30:41,330 --> 00:30:42,960
+places in Android but one of the places
+it's
+
+617
+00:30:42,960 --> 00:30:46,445
+used, is in the MMS implementation for
+various things.
+
+618
+00:30:46,445 --> 00:30:51,840
+AsyncQueryHandler is a little helper
+class, [SOUND] that is used to, invoke
+
+619
+00:30:51,840 --> 00:30:57,572
+calls on, content revolvers, which I'll
+talk more about in a second, in such a
+
+620
+00:30:57,572 --> 00:31:00,524
+way that they don't block synchronizely
+
+621
+00:31:00,524 --> 00:31:04,236
+for the content resolution operation to
+complete,
+
+622
+00:31:04,236 --> 00:31:09,925
+so what is a content resolver does anybody
+remember what a content resolver is.
+
+623
+00:31:09,925 --> 00:31:11,827
+Chad, [LAUGH].
+
+624
+00:31:11,827 --> 00:31:14,780
+>> it, handles the results from the
+content provider.
+
+625
+00:31:14,780 --> 00:31:16,690
+>> Right, and what's a ContentProvider
+[LAUGH].
+
+626
+00:31:16,690 --> 00:31:18,270
+>> A way of sharing information?
+
+627
+00:31:18,270 --> 00:31:18,420
+>> Right.
+
+628
+00:31:18,420 --> 00:31:23,770
+So the ContentProvider is basically a, a
+facade, or a proxy, to data that's often
+
+629
+00:31:23,770 --> 00:31:29,630
+stored persistently, most commonly using
+SQLite Database implementations.
+
+630
+00:31:29,630 --> 00:31:30,400
+You can use other things, too.
+
+631
+00:31:30,400 --> 00:31:31,220
+You can use FileStar.
+
+632
+00:31:31,220 --> 00:31:34,730
+But basically, it's a way of getting
+access to some persistent data.
+
+633
+00:31:34,730 --> 00:31:36,670
+And, out of the box.
+
+634
+00:31:36,670 --> 00:31:39,520
+[SOUND] if you use the ContentResolver.
+
+635
+00:31:39,520 --> 00:31:42,818
+You'll do the following, you'll have an
+activity, and you'll call an
+
+636
+00:31:42,818 --> 00:31:47,120
+operation like say query, there's other
+operations to insert, delete and so on.
+
+637
+00:31:47,120 --> 00:31:50,050
+But you can call query on a
+ContentResolver, and
+
+638
+00:31:50,050 --> 00:31:54,230
+by default, the ContentResolver will go
+out and get
+
+639
+00:31:54,230 --> 00:31:57,340
+the data and return it back to the caller
+
+640
+00:31:57,340 --> 00:32:00,810
+but the, caller thread blocks until the
+caller returns.
+
+641
+00:32:00,810 --> 00:32:05,670
+So that's what's called a syncronis two
+way operation.
+
+642
+00:32:05,670 --> 00:32:07,690
+Now as you may imagine, there's all kinds
+of downsides.
+
+643
+00:32:07,690 --> 00:32:10,870
+What's, what's one of the main downsides
+with this, in the context of Android?
+
+644
+00:32:12,090 --> 00:32:13,800
+>> You couldn't do anything to UI.
+
+645
+00:32:13,800 --> 00:32:15,380
+>> The UI thread will be blocked while
+this is
+
+646
+00:32:15,380 --> 00:32:17,900
+taking place, and if you're doing a very
+complicated query.
+
+647
+00:32:17,900 --> 00:32:20,840
+Then, you could end up with the dreaded
+application not
+
+648
+00:32:20,840 --> 00:32:24,460
+responding dialog popping up and then
+you'll have problems right.
+
+649
+00:32:24,460 --> 00:32:29,740
+So what AsyncQueryHandler does, is it
+implements the Active Object.
+
+650
+00:32:29,740 --> 00:32:32,420
+It actually implements the full blown
+Active Object.
+
+651
+00:32:32,420 --> 00:32:36,610
+Well a, pretty full blown Active Object
+here, in order to be able to.
+
+652
+00:32:36,610 --> 00:32:40,800
+Decouple the invocation from the
+processing, from the reply.
+
+653
+00:32:40,800 --> 00:32:42,690
+And here's essentially how this works.
+
+654
+00:32:42,690 --> 00:32:48,140
+So, the activity invokes an operation on,
+a subclass of
+
+655
+00:32:48,140 --> 00:32:50,950
+async handler called my async handler,
+which you would create.
+
+656
+00:32:50,950 --> 00:32:52,780
+We'll talk about why you do that in a
+second.
+
+657
+00:32:52,780 --> 00:32:56,490
+You do that so you can get the results of
+the, operations when they're done.
+
+658
+00:32:56,490 --> 00:33:00,000
+And you, you do an operation with the name
+start.
+
+659
+00:33:00,000 --> 00:33:00,870
+Like start query.
+
+660
+00:33:00,870 --> 00:33:02,170
+Start, insert.
+
+661
+00:33:02,170 --> 00:33:04,300
+Start, delete, and so on.
+
+662
+00:33:04,300 --> 00:33:08,150
+And start, goes ahead and kicks things
+off, but it returns right away.
+
+663
+00:33:08,150 --> 00:33:09,160
+It, it doesn't block.
+
+664
+00:33:09,160 --> 00:33:10,080
+It's an async.
+
+665
+00:33:10,080 --> 00:33:12,440
+It, it starts things off, and returns
+immediately.
+
+666
+00:33:13,600 --> 00:33:19,180
+And what happens is that, the start query
+method creates a message.
+
+667
+00:33:19,180 --> 00:33:24,410
+And, it does a send message, to a worker
+thread,
+
+668
+00:33:24,410 --> 00:33:27,740
+it's a worker handler that's running in,
+in the background.
+
+669
+00:33:27,740 --> 00:33:29,490
+So it's a background thread that's started
+up
+
+670
+00:33:29,490 --> 00:33:32,950
+when the whole thing starts, and it,
+continuously runs.
+
+671
+00:33:32,950 --> 00:33:37,650
+And, the send message calls also returns
+right away, but the first thing
+
+672
+00:33:37,650 --> 00:33:42,160
+it does is it converts the arguments into
+a, method request or a message.
+
+673
+00:33:42,160 --> 00:33:45,570
+Sticks them onto the worker handler's,
+message queue or
+
+674
+00:33:45,570 --> 00:33:49,850
+activation list, returns right away, so
+that doesn't block.
+
+675
+00:33:49,850 --> 00:33:55,420
+And then, the worker handlers handle
+message call gets invoked
+
+676
+00:33:55,420 --> 00:33:59,090
+in a separate thread of control, and that
+guy goes off.
+
+677
+00:33:59,090 --> 00:34:03,020
+And he does the blocking, call on the
+ContentResolver.
+
+678
+00:34:03,020 --> 00:34:05,390
+So the original worker, the original
+activity thread is
+
+679
+00:34:05,390 --> 00:34:07,060
+off doing whatever the activity thread
+wants to do
+
+680
+00:34:07,060 --> 00:34:10,020
+with this point, waiting for more, input
+from users,
+
+681
+00:34:10,020 --> 00:34:12,200
+and there's work taking place in the
+background, in the
+
+682
+00:34:12,200 --> 00:34:14,440
+background thread and the worker thread,
+and that guy
+
+683
+00:34:14,440 --> 00:34:18,640
+is querying, the actual ContentResolver,
+he's blocking what he can
+
+684
+00:34:18,640 --> 00:34:20,250
+afford to block cause he's not blocking
+the UI
+
+685
+00:34:20,250 --> 00:34:22,690
+thread so that's perfectly, perfectly
+calls you to do that.
+
+686
+00:34:24,730 --> 00:34:29,800
+[COUGH] When, the handle message in the
+worker thread, returns.
+
+687
+00:34:29,800 --> 00:34:33,610
+I'm sorry, when the query operation in the
+handle worker, thre, worker
+
+688
+00:34:33,610 --> 00:34:38,480
+thread returns, that guy then turns around
+and does a send to target.
+
+689
+00:34:38,480 --> 00:34:45,320
+Call on the actual, reply handler that
+corresponds back to this thing
+
+690
+00:34:45,320 --> 00:34:48,390
+that was originally used to invoke the
+operation in the first place.
+
+691
+00:34:48,390 --> 00:34:50,500
+My Async Query Handler.
+
+692
+00:34:50,500 --> 00:34:53,320
+And that asynchronously sends the results
+back and
+
+693
+00:34:53,320 --> 00:34:56,020
+returns right away so he can process other
+request,.
+
+694
+00:34:56,020 --> 00:34:59,250
+And then this guy's handle message, method
+gets called.
+
+695
+00:34:59,250 --> 00:35:05,030
+And he turns around and dispatches, the
+callback hook that is defined
+
+696
+00:35:05,030 --> 00:35:11,680
+as an abstract method in AsyncQueryHandler
+that does the completion processing.
+
+697
+00:35:11,680 --> 00:35:14,480
+So when you invoke, say, an async query,
+when
+
+698
+00:35:14,480 --> 00:35:16,812
+the query is done, you get the result of
+that
+
+699
+00:35:16,812 --> 00:35:18,660
+async query, which typically come back to
+you as
+
+700
+00:35:18,660 --> 00:35:21,760
+a cursor which has the data that was
+requested that
+
+701
+00:35:21,760 --> 00:35:26,400
+match your query, that comes back as a
+cursor, back in the activity thread or the
+
+702
+00:35:26,400 --> 00:35:31,910
+incur thread and that comes back with a on
+query complete
+
+703
+00:35:31,910 --> 00:35:37,010
+call back cut and so un query complete is
+a an abstract
+
+704
+00:35:37,010 --> 00:35:40,100
+method to find a query abstract query
+handle.
+
+705
+00:35:40,100 --> 00:35:42,710
+You sub-class that, fill it in, and that
+guy
+
+706
+00:35:42,710 --> 00:35:46,180
+gets called back after the query has
+returned asynchronously.
+
+707
+00:35:46,180 --> 00:35:48,780
+So you can kind of see it's a really nice
+example, of the
+
+708
+00:35:48,780 --> 00:35:51,170
+active object pattern because we're
+decoupling
+
+709
+00:35:51,170 --> 00:35:52,980
+the end vocation of an operation.
+
+710
+00:35:52,980 --> 00:35:55,580
+In other words you know, run a query.
+
+711
+00:35:55,580 --> 00:35:58,400
+From, the processing of that operation,
+and then we get
+
+712
+00:35:58,400 --> 00:36:00,680
+the result back at some later time through
+a call back.
+
+713
+00:36:00,680 --> 00:36:05,130
+In this, in this case it's a call back, on
+a, on a future that was, dispatched.
+
+714
+00:36:06,760 --> 00:36:11,776
+Really, really, really cool stuff that,
+query handler stuff is described here.
+
+715
+00:36:11,776 --> 00:36:17,747
+Oh I guess I should also, probably add
+path name for a sync
+
+716
+00:36:17,747 --> 00:36:24,147
+[SOUND] createhandler.java so you can look
+at the codes and it's really
+
+717
+00:36:24,147 --> 00:36:29,906
+cool to watch how it works and, if you
+don't know the active Java
+
+718
+00:36:29,906 --> 00:36:36,338
+pattern and you don't understand all the
+things we've talked about.
+
+719
+00:36:36,338 --> 00:36:38,919
+it's a little bit difficult to figure out
+what the code is doing, once
+
+720
+00:36:38,919 --> 00:36:41,808
+you understand the pattern is just a
+breeze you're like oh yeah, that's this
+
+721
+00:36:41,808 --> 00:36:43,778
+piece, that's the proxy, that's the
+scheduler,
+
+722
+00:36:43,778 --> 00:36:45,355
+that's the activation list and what makes
+
+723
+00:36:45,355 --> 00:36:46,536
+it tricky of course is that these
+
+724
+00:36:46,536 --> 00:36:48,520
+are things that appear in multiple places,
+right.
+
+725
+00:36:48,520 --> 00:36:55,090
+It's not, self contained the the handler
+file has some pieces of it, the looper and
+
+726
+00:36:55,090 --> 00:36:59,460
+handler parts of Android have some other
+pieces of it but the pattern is what.
+
+727
+00:36:59,460 --> 00:37:03,368
+Pulls all this stuff together, [SOUND] and
+knowledge of how that pattern works
+
+728
+00:37:03,368 --> 00:37:07,292
+help make it a lot easier to understand
+how to use this particular mechanism.
+
+729
+00:37:07,292 --> 00:37:10,823
+I remember over the summer we were doing
+a, a project with some folks here, and
+
+730
+00:37:10,823 --> 00:37:12,267
+we were trying to decide do we use
+
+731
+00:37:12,267 --> 00:37:15,050
+AsyncQueryHandler do we use cursor
+loaders, and I think
+
+732
+00:37:15,050 --> 00:37:17,458
+one of the things that made,
+AsyncQueryHandler hard
+
+733
+00:37:17,458 --> 00:37:19,329
+at the time was just really knowing how
+all
+
+734
+00:37:19,329 --> 00:37:21,362
+the pieces fit together, right, so once
+you
+
+735
+00:37:21,362 --> 00:37:23,380
+know the pattern, it makes it a lot
+easier.
+
+736
+00:37:25,350 --> 00:37:26,448
+Okay.
+
+737
+00:37:26,448 --> 00:37:31,420
+internally, the AsyncQueryHandler uses a
+subset of the Active Object pattern.
+
+738
+00:37:31,420 --> 00:37:34,160
+So as you can see, we start the query.
+
+739
+00:37:34,160 --> 00:37:36,330
+That turns into a, creates a message.
+
+740
+00:37:36,330 --> 00:37:39,440
+We call the worker, handler thread, send
+message call.
+
+741
+00:37:39,440 --> 00:37:40,650
+That goes over here to the worker
+
+742
+00:37:40,650 --> 00:37:44,230
+handler, object and its thread, through
+its handler.
+
+743
+00:37:44,230 --> 00:37:46,270
+And this guy has a looper.
+
+744
+00:37:46,270 --> 00:37:48,910
+And he pulls the request off, does some
+processing
+
+745
+00:37:48,910 --> 00:37:50,630
+and then they get called back, and so on,
+
+746
+00:37:50,630 --> 00:37:52,050
+and there's, there's more parts to it than
+I'm
+
+747
+00:37:52,050 --> 00:37:54,430
+showing you here but these are the basic
+pieces.
+
+748
+00:37:54,430 --> 00:37:56,450
+There's the, there's the source code.
+
+749
+00:37:56,450 --> 00:37:57,250
+I can get rid of that.
+
+750
+00:37:58,520 --> 00:37:59,636
+[SOUND] Comment over here.
+
+751
+00:37:59,636 --> 00:38:01,058
+We actually don't need to do that.
+
+752
+00:38:01,058 --> 00:38:04,301
+[SOUND].
+
+753
+00:38:04,301 --> 00:38:07,611
+Let's see if there's anything else we need
+to cover there.
+
+754
+00:38:07,611 --> 00:38:11,294
+[NOISE] So, anyway, it's, it's definitely
+worthwhile to take a
+
+755
+00:38:11,294 --> 00:38:13,940
+look at that code and sort of puzzle
+through it.
+
+756
+00:38:13,940 --> 00:38:16,280
+Once you understand the pattern, all the
+pieces make a lot more sense.
+
+757
+00:38:16,280 --> 00:38:20,210
+And you find this, through and throughout
+Android, through and throughout Java.
+
+758
+00:38:20,210 --> 00:38:24,360
+The people who, implemented Java, the
+people under, who implemented Android.
+
+759
+00:38:24,360 --> 00:38:25,850
+Really understand patterns.
+
+760
+00:38:25,850 --> 00:38:30,152
+So you'll see a lot of recurring,
+approaches over, and over, and over again.
+
+761
+00:38:30,152 --> 00:38:32,960
+And it's, it's almost, you know, paint by
+number after awhile.
+
+762
+00:38:32,960 --> 00:38:34,620
+There's certain other idioms we'll talk
+about later, when
+
+763
+00:38:34,620 --> 00:38:38,640
+we talk about services that use command,
+command processor pattern.
+
+764
+00:38:38,640 --> 00:38:39,770
+And they do the same thing every time.
+
+765
+00:38:40,950 --> 00:38:44,860
+Okay, so let's talk a bit about the, the
+consequences of this pattern.
+
+766
+00:38:44,860 --> 00:38:49,910
+So, the good part about this pattern is,
+it enhances concurrency.
+
+767
+00:38:49,910 --> 00:38:53,200
+And simplifies, synchronization
+complexity.
+
+768
+00:38:53,200 --> 00:38:56,140
+And, the reason that it enhances this
+stuff is because it
+
+769
+00:38:56,140 --> 00:39:03,020
+allows us to have, client threads and
+method invocations run, concurrently.
+
+770
+00:39:03,020 --> 00:39:05,740
+You, you invoke an operation and it was in
+another thread.
+
+771
+00:39:05,740 --> 00:39:07,820
+Multiple threads can invoke operations.
+
+772
+00:39:07,820 --> 00:39:11,570
+They'll run in those, in the other thread,
+or threads as we'll see in a second.
+
+773
+00:39:11,570 --> 00:39:13,550
+You can have a scheduler that can
+
+774
+00:39:13,550 --> 00:39:16,080
+be used to evaluate various
+synchronization restraints.
+
+775
+00:39:17,200 --> 00:39:21,250
+If you have multicore, processors on your
+platform,
+
+776
+00:39:21,250 --> 00:39:25,380
+and you, have the stomach to make sure
+you're.
+
+777
+00:39:25,380 --> 00:39:27,580
+Servant code is thread safe.
+
+778
+00:39:27,580 --> 00:39:30,510
+Then you could actually spawn a pool of
+threads.
+
+779
+00:39:30,510 --> 00:39:34,650
+Typically, roughly around the same size as
+the number of cores, give or take.
+
+780
+00:39:34,650 --> 00:39:37,680
+Typically, give, you have few more threads
+than there are cores.
+
+781
+00:39:37,680 --> 00:39:39,010
+Maybe if you have four cores, you might
+
+782
+00:39:39,010 --> 00:39:41,880
+have eight threads in the pool for various
+reasons.
+
+783
+00:39:41,880 --> 00:39:44,470
+And, so, in that case, when you invoke
+these operations,
+
+784
+00:39:44,470 --> 00:39:47,910
+you could have multiple threads or one
+thread invoking multiple operations.
+
+785
+00:39:47,910 --> 00:39:50,590
+And all of these operations without one
+concurrently,
+
+786
+00:39:50,590 --> 00:39:53,700
+so you can transparently speed your,
+program up
+
+787
+00:39:53,700 --> 00:39:56,020
+assuming a; that there's work that could
+be
+
+788
+00:39:56,020 --> 00:39:58,090
+paralyzed which is always tricky and that
+you've
+
+789
+00:39:58,090 --> 00:40:01,620
+done a proper job of doing locking and
+other things in your code, and once you
+
+790
+00:40:01,620 --> 00:40:04,540
+understand monitor objects once you
+understand, the basics
+
+791
+00:40:04,540 --> 00:40:07,350
+of synchronization with Java that becomes
+tractable certainly.
+
+792
+00:40:08,810 --> 00:40:11,740
+Another interesting thing is the, method
+of invocation
+
+793
+00:40:11,740 --> 00:40:14,860
+order and the method execution order can
+differ.
+
+794
+00:40:14,860 --> 00:40:17,320
+Now, this is true for the pattern in
+general but
+
+795
+00:40:17,320 --> 00:40:20,900
+in the case of Android if you, put the lay
+operations.
+
+796
+00:40:20,900 --> 00:40:23,960
+If you know, take a look here you can see
+we have these delay calls.
+
+797
+00:40:23,960 --> 00:40:26,840
+When you invoke a message, you can, get a
+delay time, you can either
+
+798
+00:40:26,840 --> 00:40:29,590
+give it an absolute time, or you can give
+it a time that's relative to
+
+799
+00:40:29,590 --> 00:40:32,650
+the current time of day, there are
+different method calls for each one of
+
+800
+00:40:32,650 --> 00:40:38,390
+those things, and that will affect where
+the method, goes and when it gets run.
+
+801
+00:40:38,390 --> 00:40:40,830
+And so, they store things in a way so that
+they're
+
+802
+00:40:40,830 --> 00:40:43,469
+queued up and running at the right time or
+the appropriate time.
+
+803
+00:40:45,240 --> 00:40:46,350
+There are of course.
+
+804
+00:40:46,350 --> 00:40:50,530
+There's very, very rarely there's a
+totally free lunch in a, software design.
+
+805
+00:40:50,530 --> 00:40:54,660
+So there are some, liabilities or
+downsides to this particular pattern.
+
+806
+00:40:54,660 --> 00:40:57,560
+So one of the things you gotta be very
+careful of, is that you don't end up.
+
+807
+00:40:58,780 --> 00:41:03,130
+Running into an additional over head, for
+al the different parts that are
+
+808
+00:41:03,130 --> 00:41:07,640
+needed to make the Active Object work
+properly and let's, let's talk about
+
+809
+00:41:07,640 --> 00:41:09,950
+where those over heads come from so one
+the things you got to
+
+810
+00:41:09,950 --> 00:41:11,940
+do when you do active object is
+
+811
+00:41:11,940 --> 00:41:14,740
+you typically have to delicate the
+dynamically.
+
+812
+00:41:14,740 --> 00:41:17,300
+Because the thread that, invokes something
+is
+
+813
+00:41:17,300 --> 00:41:19,480
+different from the thread that, executes
+it.
+
+814
+00:41:19,480 --> 00:41:21,270
+And therefore you have to allocate,
+typically you have
+
+815
+00:41:21,270 --> 00:41:23,530
+to allocate dynamically, because they
+can't share buffers easily.
+
+816
+00:41:23,530 --> 00:41:27,600
+And the minute you start allocating things
+dynamically, there's a bunch of issues.
+
+817
+00:41:27,600 --> 00:41:30,440
+The code maybe, somewhat slower, because
+you have
+
+818
+00:41:30,440 --> 00:41:32,080
+to allocate stuff and go out to the heap.
+
+819
+00:41:32,080 --> 00:41:34,700
+You typically have to acquire a lock to
+lock the heap.
+
+820
+00:41:34,700 --> 00:41:37,820
+And in languages like, like C++ and
+
+821
+00:41:37,820 --> 00:41:40,680
+C, where you have, don't have garbage
+collection.
+
+822
+00:41:40,680 --> 00:41:44,280
+You have to de-allocate stuff and that
+requires things, and it, does heap
+
+823
+00:41:44,280 --> 00:41:46,100
+memories, all kinds of stuff that is
+
+824
+00:41:46,100 --> 00:41:48,350
+potentially downside if you allocate
+memory dynamically.
+
+825
+00:41:48,350 --> 00:41:49,670
+In Java, you don't have a lot of choice
+
+826
+00:41:49,670 --> 00:41:51,240
+most of the time, but in other languages
+you do.
+
+827
+00:41:52,490 --> 00:41:54,610
+Another consequence is whenever you, put
+these things
+
+828
+00:41:54,610 --> 00:41:57,410
+on and off the queue that involve
+synchronization operations,
+
+829
+00:41:57,410 --> 00:41:59,790
+and synchronization operations are pretty
+fast, but they're not,
+
+830
+00:41:59,790 --> 00:42:04,140
+complete free now days good
+synchronization, operations that are
+
+831
+00:42:04,140 --> 00:42:05,950
+implemented in the hardware probably
+running at the
+
+832
+00:42:05,950 --> 00:42:08,620
+order of nano seconds or tens of nano
+seconds
+
+833
+00:42:08,620 --> 00:42:10,590
+or maybe you know, micro seconds or
+something like
+
+834
+00:42:10,590 --> 00:42:12,860
+that they're really fast but it's more
+then nothing.
+
+835
+00:42:13,960 --> 00:42:16,110
+The real kicker is the context switches
+when you start
+
+836
+00:42:16,110 --> 00:42:21,560
+moving things between, threads or between
+processors cords on a machine.
+
+837
+00:42:21,560 --> 00:42:25,020
+Then, it typically takes a while to switch
+contexts and that
+
+838
+00:42:25,020 --> 00:42:28,490
+can start running in, you know, thousands
+of instructions to do that.
+
+839
+00:42:28,490 --> 00:42:30,450
+There may be, I know tens or
+
+840
+00:42:30,450 --> 00:42:33,451
+hundreds of microseconds of overhead for
+context switches
+
+841
+00:42:33,451 --> 00:42:36,660
+which is, we're getting faster and faster
+all the time but it's still not for free.
+
+842
+00:42:37,680 --> 00:42:39,040
+And another tricky thing, if you start
+
+843
+00:42:39,040 --> 00:42:41,970
+running, in multi-core environments or,
+shared memory
+
+844
+00:42:41,970 --> 00:42:44,500
+environments, where you move data between
+different
+
+845
+00:42:44,500 --> 00:42:48,830
+processors, that can involve various
+low-level CPU cache.
+
+846
+00:42:48,830 --> 00:42:49,300
+Overhead.
+
+847
+00:42:49,300 --> 00:42:53,380
+From moving, flushing caches, and, dealing
+with cache lines, and all kinds of things.
+
+848
+00:42:53,380 --> 00:42:54,970
+That's kind of a hidden, overhead, because
+it
+
+849
+00:42:54,970 --> 00:42:57,150
+doesn't really show up at the software
+level.
+
+850
+00:42:57,150 --> 00:43:00,550
+But it's all part of what the, underlying
+bus and memory hierarchy and
+
+851
+00:43:00,550 --> 00:43:03,700
+memory system is doing to actually
+implement the stuff, down in the hardware.
+
+852
+00:43:03,700 --> 00:43:06,070
+So those are some things that can make.
+
+853
+00:43:06,070 --> 00:43:09,170
+The overhead be more, that would be the
+case, just make a normal method call.
+
+854
+00:43:10,400 --> 00:43:13,170
+Now, when would this matter, when would
+this not matter?
+
+855
+00:43:13,170 --> 00:43:16,810
+If you're going to run an operation that
+runs for a long time,
+
+856
+00:43:16,810 --> 00:43:20,580
+you're going to invoke an active object
+method that's going to run for, a minute.
+
+857
+00:43:20,580 --> 00:43:21,860
+The fact that it took.
+
+858
+00:43:21,860 --> 00:43:24,320
+A couple of microsecond to, to switch
+contexts and
+
+859
+00:43:24,320 --> 00:43:27,900
+synchronise and allocate memory, is
+completely in the noise.
+
+860
+00:43:27,900 --> 00:43:30,200
+If you're going to run, an operation that
+adds to numbers
+
+861
+00:43:30,200 --> 00:43:34,230
+together and returns them, these overheads
+really start to add up.
+
+862
+00:43:34,230 --> 00:43:36,440
+So think carefully about how long your
+operations
+
+863
+00:43:36,440 --> 00:43:39,000
+run, before you decide to use active
+object.
+
+864
+00:43:39,000 --> 00:43:40,785
+Don't just go crazy and put active object
+everywhere,
+
+865
+00:43:40,785 --> 00:43:42,680
+because it will guarantee to slow your
+system down.
+
+866
+00:43:44,030 --> 00:43:46,700
+Another tricky thing is, and this is
+almost always
+
+867
+00:43:46,700 --> 00:43:50,530
+a liability, when you're starting to do
+with concurrency.
+
+868
+00:43:50,530 --> 00:43:53,140
+Just at anything you do that runs
+concurrently is going to be tricky to the
+
+869
+00:43:53,140 --> 00:43:54,770
+bug, because you got multiple things going
+
+870
+00:43:54,770 --> 00:43:56,680
+on, there's challenges that we talked
+about
+
+871
+00:43:56,680 --> 00:44:00,710
+before, the accidental complexities,
+crummy debuggers, changing
+
+872
+00:44:00,710 --> 00:44:01,990
+in terms of the order in which
+
+873
+00:44:01,990 --> 00:44:04,520
+things run, changing the time, duration of
+
+874
+00:44:04,520 --> 00:44:06,500
+which things run, those are all but
+subtle.
+
+875
+00:44:06,500 --> 00:44:07,770
+And tricky issues.
+
+876
+00:44:07,770 --> 00:44:10,890
+And so, there's non determin, determinism
+issues.
+
+877
+00:44:10,890 --> 00:44:12,780
+Your program may not execute the same each
+time
+
+878
+00:44:12,780 --> 00:44:15,090
+you run it, so debugging can be more
+difficult.
+
+879
+00:44:15,090 --> 00:44:16,465
+That's just a problem in general.
+
+880
+00:44:16,465 --> 00:44:17,650
+>> [COUGH].
+
+881
+00:44:17,650 --> 00:44:21,230
+>> People sometimes use subsets of Active
+Objects to make this more tractable.
+
+882
+00:44:21,230 --> 00:44:24,410
+A very common subset of Active Object is
+to kind of simplify the proxy,
+
+883
+00:44:24,410 --> 00:44:28,480
+kind of simplify the service, and kind of
+pass messages back and forth using.
+
+884
+00:44:28,480 --> 00:44:29,380
+Using queues.
+
+885
+00:44:29,380 --> 00:44:31,070
+If you think about, what I showed
+
+886
+00:44:31,070 --> 00:44:33,230
+you with Android, it's kind of somewhere
+in between.
+
+887
+00:44:33,230 --> 00:44:36,820
+It's not the full-blown Active Object, but
+it's not just a message queue, either.
+
+888
+00:44:36,820 --> 00:44:39,810
+It's got some additional, flare on either
+side of that.
+
+889
+00:44:39,810 --> 00:44:42,130
+So, it works more sophisticated.
+
+890
+00:44:42,130 --> 00:44:45,290
+But it's certainly an example, a nice
+example, of Active Objects.
+
+891
+00:44:46,770 --> 00:44:48,990
+There's lots of, known uses of this stuff.
+
+892
+00:44:48,990 --> 00:44:50,790
+There's a, bunch of programming languages
+that are
+
+893
+00:44:50,790 --> 00:44:52,810
+based on the so-called actor model, which
+is
+
+894
+00:44:52,810 --> 00:44:57,020
+a, mathematical model of computation,
+concurrent computation, and
+
+895
+00:44:57,020 --> 00:44:59,000
+it basically does what we've just talked
+about.
+
+896
+00:44:59,000 --> 00:45:00,560
+If you read the Wikipedia article about
+the
+
+897
+00:45:00,560 --> 00:45:02,710
+actor model, it sounds like the active
+object patter.
+
+898
+00:45:02,710 --> 00:45:05,750
+Don't be surprised, it's basically the
+same thing.
+
+899
+00:45:05,750 --> 00:45:09,280
+There Active Object implementations in
+various languages and frameworks.
+
+900
+00:45:09,280 --> 00:45:10,950
+Here's a nice example, that.
+
+901
+00:45:10,950 --> 00:45:13,900
+Herb Sutter from Microsoft did, showing
+how to
+
+902
+00:45:13,900 --> 00:45:16,270
+do, a simple Active Object implementation
+in C++ 11.
+
+903
+00:45:16,270 --> 00:45:19,500
+I won't go through this, in the interest
+of time, I
+
+904
+00:45:19,500 --> 00:45:22,580
+won't go this in full, full-blown detail,
+but it's really cool.
+
+905
+00:45:22,580 --> 00:45:25,740
+It basically typed us a, a functor with
+
+906
+00:45:25,740 --> 00:45:30,400
+a, operator function call method defined
+in it.
+
+907
+00:45:30,400 --> 00:45:32,340
+And you go down here and in the
+constructor
+
+908
+00:45:32,340 --> 00:45:35,350
+of this active class it goes ahead and,
+creates a
+
+909
+00:45:35,350 --> 00:45:38,632
+new thread with an anonymous Lambda,
+expression that would
+
+910
+00:45:38,632 --> 00:45:42,970
+run a separate thread of control, calling
+the run method
+
+911
+00:45:42,970 --> 00:45:45,190
+here's the run method, the run method
+loops while
+
+912
+00:45:45,190 --> 00:45:48,190
+we're not done, and it pulls messages out
+of this
+
+913
+00:45:48,190 --> 00:45:52,160
+message queue, and it goes ahead and it
+executes
+
+914
+00:45:52,160 --> 00:45:54,830
+those messages because they have a falter
+default on them.
+
+915
+00:45:54,830 --> 00:45:57,640
+And when the destructor runs it says shut
+yourself down.
+
+916
+00:45:57,640 --> 00:45:59,960
+So, anyway I won't go through the whole,
+the whole thing in here
+
+917
+00:45:59,960 --> 00:46:03,230
+but it's pretty cool, and it illustrates
+how to implement the stuff in C++11.
+
+918
+00:46:03,230 --> 00:46:03,730
+ACE,
+
+919
+00:46:05,850 --> 00:46:07,380
+the framework that we've developed, for
+many
+
+920
+00:46:07,380 --> 00:46:09,280
+years here at Vanderbilt and other places
+
+921
+00:46:09,280 --> 00:46:13,170
+also has Active Objects implementations so
+you can, learn more about those as well.
+
+922
+00:46:14,390 --> 00:46:19,570
+so to summarize clients, may sometimes
+need to be able to issue, service request
+
+923
+00:46:19,570 --> 00:46:24,000
+that need to run on other threads of
+control in that case we may want to
+
+924
+00:46:24,000 --> 00:46:28,300
+schedule the activities to run or skip to
+the operations request to run based on
+
+925
+00:46:28,300 --> 00:46:33,720
+varies criteria such as the time or the
+priority or the deadlines and so on.
+
+926
+00:46:33,720 --> 00:46:36,580
+The active object kind of coordinates
+these stuff and makes
+
+927
+00:46:36,580 --> 00:46:40,000
+it easier to program so it looks more like
+a regular.
+
+928
+00:46:40,000 --> 00:46:41,760
+Programming an object it just happens to
+run
+
+929
+00:46:41,760 --> 00:46:45,300
+concurrently and you can read more about
+it
+
+930
+00:46:45,300 --> 00:46:47,980
+here, and as I mention before its
+instructive
+
+931
+00:46:47,980 --> 00:46:50,880
+to compare to test Active Object with
+another object.
+
+932
+00:46:50,880 --> 00:46:53,170
+The main difference is, Active Object is
+more
+
+933
+00:46:53,170 --> 00:46:57,810
+powerful, it, it can run things, more
+concurrently but.
+
+934
+00:46:57,810 --> 00:47:00,920
+It also, is more complicated, and there
+could be
+
+935
+00:47:00,920 --> 00:47:03,248
+some additional overhead, for the reasons
+we talked about before.
+
+936
+00:47:03,248 --> 00:47:06,054
+Okay.
+
+937
+00:47:06,054 --> 00:47:09,465
+Any questions about, any of the topics
+that we just covered?
+
+938
+00:47:09,465 --> 00:47:11,672
+[SOUND].
+
+939
+00:47:11,672 --> 00:47:19,360
+[MUSIC]
+

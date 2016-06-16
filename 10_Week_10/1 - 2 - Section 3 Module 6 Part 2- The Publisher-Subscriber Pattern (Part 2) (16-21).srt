@@ -1,0 +1,1507 @@
+1
+00:00:01,028 --> 00:00:08,716
+[MUSIC]
+
+2
+00:00:08,716 --> 00:00:10,212
+So let’s talk now about, how you
+
+3
+00:00:10,212 --> 00:00:13,710
+would actually implement the
+publisher-subscriber in Android.
+
+4
+00:00:13,710 --> 00:00:15,400
+And there’s a, a bunch of different ways
+to do it.
+
+5
+00:00:15,400 --> 00:00:16,859
+So, we’re just going to focus on one part.
+
+6
+00:00:19,370 --> 00:00:20,930
+So first, let's talk about what it means
+
+7
+00:00:20,930 --> 00:00:22,210
+to implement the pattern in the first
+place.
+
+8
+00:00:22,210 --> 00:00:25,090
+So, there's a bunch of steps that you need
+to do.
+
+9
+00:00:25,090 --> 00:00:26,910
+One of which is you have to, input,
+
+10
+00:00:26,910 --> 00:00:30,320
+define or determine what the
+publisher-subscriber mapping is.
+
+11
+00:00:30,320 --> 00:00:33,090
+How do, how do publishers and subscribers,
+you know,
+
+12
+00:00:33,090 --> 00:00:36,550
+interact, what's the, what's the means by
+which they communicate.
+
+13
+00:00:36,550 --> 00:00:41,180
+And, and of course in the context of
+Android, this is done via an intent.
+
+14
+00:00:41,180 --> 00:00:43,560
+And as you all know at this point.
+
+15
+00:00:43,560 --> 00:00:45,360
+And keeps track of various things.
+
+16
+00:00:45,360 --> 00:00:48,560
+Optionally it keeps track of the name of
+something, more likely in
+
+17
+00:00:48,560 --> 00:00:51,780
+the case of pub-sub like models, it keeps
+track of the data.
+
+18
+00:00:51,780 --> 00:00:53,760
+It keeps track of the action.
+
+19
+00:00:53,760 --> 00:00:56,280
+It keeps track of the extras, the
+category, et cetera.
+
+20
+00:00:56,280 --> 00:01:00,260
+Those are things you can, put into a, an
+Intent data structure.
+
+21
+00:01:00,260 --> 00:01:02,260
+And then that information will get
+distributed, by
+
+22
+00:01:02,260 --> 00:01:06,150
+some, magic cloud like thing, to the
+various receivers.
+
+23
+00:01:08,160 --> 00:01:10,630
+If, you want to avoid this overhead, of
+giving
+
+24
+00:01:10,630 --> 00:01:13,140
+everybody everything all the time, then
+you need to come
+
+25
+00:01:13,140 --> 00:01:16,480
+up with some kind of filtering mechanism
+to narrow, people's
+
+26
+00:01:16,480 --> 00:01:19,610
+interests in certain topics, or certain
+parts of certain topics.
+
+27
+00:01:19,610 --> 00:01:22,720
+So in Android, this is done by, the
+concept
+
+28
+00:01:22,720 --> 00:01:27,420
+of intent filters, and there's different
+ways to define or.
+
+29
+00:01:27,420 --> 00:01:31,760
+Program implement intent filters, you can
+do them dynamically by creating
+
+30
+00:01:31,760 --> 00:01:34,830
+an intent filter and then registering it,
+when you call register receiver.
+
+31
+00:01:34,830 --> 00:01:37,460
+You can also use the manifest file like we
+showed here,
+
+32
+00:01:37,460 --> 00:01:42,130
+to specify different things, different
+actions, different data, and so on.
+
+33
+00:01:42,130 --> 00:01:46,060
+And then, you will only receive that stuff
+that matches your filters.
+
+34
+00:01:46,060 --> 00:01:48,000
+So, it's kind of like a sieve and only
+things
+
+35
+00:01:48,000 --> 00:01:50,350
+that pass through the filter or pass
+through the sieve.
+
+36
+00:01:50,350 --> 00:01:53,870
+Are actually delivered to the end, end
+result to the broadcast receivers.
+
+37
+00:01:55,290 --> 00:01:58,170
+Another thing you need to do, is figure
+out how you're going to go ahead
+
+38
+00:01:58,170 --> 00:02:01,990
+and define and implement the subscriber
+registration API
+
+39
+00:02:01,990 --> 00:02:04,450
+and there's a couple of pieces to this.
+
+40
+00:02:04,450 --> 00:02:06,120
+First, you're going to have to figure out,
+how you're going to
+
+41
+00:02:06,120 --> 00:02:10,570
+let applications, which in this case could
+be activities or services.
+
+42
+00:02:10,570 --> 00:02:13,930
+Go ahead and register broadcast receivers,
+to get
+
+43
+00:02:13,930 --> 00:02:16,780
+called back and there's a couple different
+variants here.
+
+44
+00:02:16,780 --> 00:02:20,421
+You can, you can have a register receiver
+model where you pass in
+
+45
+00:02:20,421 --> 00:02:25,458
+the receiver you want called back and
+optionally the intent filter, or not.
+
+46
+00:02:25,458 --> 00:02:28,410
+And then you can also give permissions and
+you can actually
+
+47
+00:02:28,410 --> 00:02:31,620
+even in the second case, you can actually
+give a handler.
+
+48
+00:02:31,620 --> 00:02:35,190
+Where you want the, call to take place if
+you don't want it to
+
+49
+00:02:35,190 --> 00:02:38,120
+take place, on the thread of control
+
+50
+00:02:38,120 --> 00:02:40,780
+where the, broadcast receiver was
+originally created.
+
+51
+00:02:40,780 --> 00:02:42,270
+So, you have a lot of flexibility in
+Android
+
+52
+00:02:42,270 --> 00:02:46,270
+about, how you control where things are
+going to run.
+
+53
+00:02:46,270 --> 00:02:50,250
+These subscriptions that you make, the
+registrations you make at the
+
+54
+00:02:50,250 --> 00:02:55,040
+receivers are typically stored, in some
+kind of internal data structure somewhere.
+
+55
+00:02:55,040 --> 00:02:57,170
+In the case of Android, there's a
+
+56
+00:02:57,170 --> 00:03:00,340
+very complicated means for doing this
+called the
+
+57
+00:03:00,340 --> 00:03:02,540
+Activity Manager Service, which I
+encourage you to
+
+58
+00:03:02,540 --> 00:03:04,580
+take a look at sometime, it's, it's vast.
+
+59
+00:03:04,580 --> 00:03:07,360
+It's, like, 16,000 lines of code or, or
+more.
+
+60
+00:03:08,600 --> 00:03:12,580
+There's a method called Register Receiver
+in there that's, that's non-trivial.
+
+61
+00:03:12,580 --> 00:03:15,330
+There's even longer methods we'll look at
+in a second.
+
+62
+00:03:15,330 --> 00:03:19,810
+And basically what they do, is they build
+some kind of hash map called, M registered
+
+63
+00:03:19,810 --> 00:03:23,650
+receivers which is going to, keep track of
+
+64
+00:03:23,650 --> 00:03:26,860
+whose registered, for which different
+kinds of things.
+
+65
+00:03:26,860 --> 00:03:29,800
+So, when you call registered receiver, it
+goes ahead and check
+
+66
+00:03:29,800 --> 00:03:35,180
+to see if this particular receivers
+already registered for this stuff.
+
+67
+00:03:35,180 --> 00:03:38,290
+And if so, it adds it to a link list of
+things, that are going to be registered.
+
+68
+00:03:38,290 --> 00:03:41,460
+And then it goes ahead and sticks it into
+this hash map.
+
+69
+00:03:41,460 --> 00:03:45,100
+So you can end up with, multiple receivers
+registered
+
+70
+00:03:45,100 --> 00:03:47,740
+for the same intent, and that is what's
+used
+
+71
+00:03:47,740 --> 00:03:50,650
+to support this group communication, this
+[COUGH] one to
+
+72
+00:03:50,650 --> 00:03:54,890
+many communication, that's the hallmark of
+the publisher-subscriber pattern.
+
+73
+00:03:54,890 --> 00:03:57,150
+You can have, many things be dispatched
+just
+
+74
+00:03:57,150 --> 00:03:58,630
+as you can have one thing be dispatched.
+
+75
+00:04:00,940 --> 00:04:04,470
+Then you also have to figure out how to
+define and implement the, notification
+
+76
+00:04:04,470 --> 00:04:10,600
+API, this is the thing that, that the
+publisher uses, to notify the subscribers.
+
+77
+00:04:10,600 --> 00:04:12,320
+And once again, there's a couple different
+variants.
+
+78
+00:04:12,320 --> 00:04:15,380
+We have a way of being able to say, from
+our application
+
+79
+00:04:15,380 --> 00:04:18,780
+point of view, from a publisher point of
+view, send out this intent.
+
+80
+00:04:18,780 --> 00:04:20,080
+To all the notify, all the
+
+81
+00:04:20,080 --> 00:04:23,210
+registered broadcast receivers, or all the
+subscribers.
+
+82
+00:04:23,210 --> 00:04:25,850
+And Android has a couple of different
+variants of this if you recall.
+
+83
+00:04:25,850 --> 00:04:27,580
+One, is called send broadcast.
+
+84
+00:04:27,580 --> 00:04:29,590
+And that sends it out to everybody.
+
+85
+00:04:29,590 --> 00:04:30,450
+Kind of in parallel.
+
+86
+00:04:30,450 --> 00:04:32,790
+And the other, is called send ordered
+broadcast.
+
+87
+00:04:32,790 --> 00:04:36,380
+Which serializes the way, in which the
+dispatching takes place.
+
+88
+00:04:36,380 --> 00:04:37,830
+And there's a whole pile of variants of
+
+89
+00:04:37,830 --> 00:04:40,660
+send ordered broadcasts that do various
+kinds of things.
+
+90
+00:04:40,660 --> 00:04:41,900
+So, I recommend you take a look
+
+91
+00:04:41,900 --> 00:04:45,150
+at the documentation, for more details
+about that.
+
+92
+00:04:45,150 --> 00:04:47,610
+Under the hood, in the activity manager
+service,
+
+93
+00:04:47,610 --> 00:04:49,510
+there's a bunch of methods that handle
+this.
+
+94
+00:04:49,510 --> 00:04:51,910
+There's a method called, broadcast intent,
+which is kind of
+
+95
+00:04:51,910 --> 00:04:54,910
+the entry point into the activity manager
+service, and it
+
+96
+00:04:54,910 --> 00:04:59,210
+very quickly grabs a lock and calls
+broadcast intent locked,
+
+97
+00:04:59,210 --> 00:05:02,910
+and broadcast intent locked is like, 350
+lines of code.
+
+98
+00:05:02,910 --> 00:05:06,380
+It's, it's very, very nasty, hard to
+figure out code.
+
+99
+00:05:06,380 --> 00:05:08,750
+But what it basically does, is it goes
+ahead
+
+100
+00:05:08,750 --> 00:05:12,810
+and it takes the, the intent that's being
+broadcast,
+
+101
+00:05:12,810 --> 00:05:15,560
+and it looks up to see whether or not,
+
+102
+00:05:15,560 --> 00:05:19,980
+that intent has been registered for an
+Android Manifest Files.
+
+103
+00:05:19,980 --> 00:05:22,170
+Those are the static receivers.
+
+104
+00:05:22,170 --> 00:05:27,300
+And or, registered via calls to Register
+Receiver, which is a dynamic call.
+
+105
+00:05:27,300 --> 00:05:32,880
+And it builds up, a set of receivers that
+are going to handle these requests.
+
+106
+00:05:32,880 --> 00:05:35,010
+And then it goes on and does a lot more
+stuff which
+
+107
+00:05:35,010 --> 00:05:36,880
+I'm not going to talk about here in
+detail, but, if you look
+
+108
+00:05:36,880 --> 00:05:38,970
+at the code, you'll see basically what it
+tries to do, it
+
+109
+00:05:38,970 --> 00:05:42,000
+tries to send out the registered
+
+110
+00:05:42,000 --> 00:05:44,550
+receivers, in other words, the dynamic
+ones.
+
+111
+00:05:44,550 --> 00:05:45,860
+If it, if you're not doing an ordered
+
+112
+00:05:45,860 --> 00:05:48,610
+broadcast it tries to send them all out
+concurrently.
+
+113
+00:05:48,610 --> 00:05:49,490
+So they all get sent.
+
+114
+00:05:49,490 --> 00:05:52,283
+It just goes through a wild loop going
+send, send, send, send, send.
+
+115
+00:05:52,283 --> 00:05:55,690
+And those things get sent to all the ones,
+that are, that are dynamically registered.
+
+116
+00:05:55,690 --> 00:05:59,030
+And that's because, the assumption is,
+that those processes,
+
+117
+00:05:59,030 --> 00:06:02,530
+those activities, those services, what
+not, are up and running.
+
+118
+00:06:02,530 --> 00:06:04,640
+Or could be up and running quickly and so
+they
+
+119
+00:06:04,640 --> 00:06:07,860
+will get delivered the messages very fast,
+the intents very fast.
+
+120
+00:06:07,860 --> 00:06:11,130
+All the things that are, actually
+registered statically by
+
+121
+00:06:11,130 --> 00:06:14,395
+manifest files, however, are delivered one
+at a time.
+
+122
+00:06:14,395 --> 00:06:18,420
+because you have to start up the activity,
+or the service.
+
+123
+00:06:18,420 --> 00:06:19,924
+[COUGH] You have to start up the process
+
+124
+00:06:19,924 --> 00:06:22,480
+and then deliver the thing, to the
+broadcast receiver.
+
+125
+00:06:22,480 --> 00:06:25,340
+And so, they don't want to start up all
+these processes unnecessarily.
+
+126
+00:06:25,340 --> 00:06:27,720
+They do them one at a time, because that
+takes more effort to do that.
+
+127
+00:06:27,720 --> 00:06:30,320
+So, it's very, very complicated code.
+
+128
+00:06:30,320 --> 00:06:32,660
+I've, I've read a number of times for a
+variety of reasons.
+
+129
+00:06:32,660 --> 00:06:34,560
+And it's really fascinating to figure out
+how it all works.
+
+130
+00:06:36,570 --> 00:06:37,090
+Okay.
+
+131
+00:06:37,090 --> 00:06:40,680
+So, that's basically, an overview of how
+you might implement the pattern.
+
+132
+00:06:40,680 --> 00:06:44,120
+Now, let's talk about how this pattern
+gets applied in the Android.
+
+133
+00:06:44,120 --> 00:06:47,410
+And to do this, I decided to dive down
+into the
+
+134
+00:06:47,410 --> 00:06:52,860
+implementation of this pattern, in the
+context of the battery service.
+
+135
+00:06:52,860 --> 00:06:56,194
+And the phone app which exists in Android
+4.0.
+
+136
+00:06:56,194 --> 00:07:00,530
+So, Android 4.0, is where I got the
+example from here.
+
+137
+00:07:00,530 --> 00:07:05,880
+Oddly enough, Android 4.1 has changed this
+example slightly, and so I couldn't show
+
+138
+00:07:05,880 --> 00:07:09,320
+you the 4.1 version, because I haven't
+figured out all the pieces there yet.
+
+139
+00:07:09,320 --> 00:07:11,540
+I'm not sure whether they still do this
+anymore
+
+140
+00:07:11,540 --> 00:07:13,790
+in Android 4.1, but they still have to
+somehow.
+
+141
+00:07:13,790 --> 00:07:16,050
+Anyway, what happens here is, is the
+follow, the following.
+
+142
+00:07:16,050 --> 00:07:20,190
+When the phone app starts up, in part
+
+143
+00:07:20,190 --> 00:07:23,590
+of its initialization, before the onCreate
+method is called,.
+
+144
+00:07:23,590 --> 00:07:25,720
+It goes ahead and it creates, a
+
+145
+00:07:25,720 --> 00:07:28,930
+broadcast receiver called phone app
+broadcast receiver.
+
+146
+00:07:28,930 --> 00:07:31,220
+So, it makes an instance of this thing.
+
+147
+00:07:31,220 --> 00:07:33,565
+And then, in it's onCreate method, it goes
+
+148
+00:07:33,565 --> 00:07:36,480
+ahead and creates a bunch of intent
+filters.
+
+149
+00:07:36,480 --> 00:07:40,700
+One of which is for, action battery low,
+which is an intent.
+
+150
+00:07:41,730 --> 00:07:44,220
+And then it goes ahead and it registers
+
+151
+00:07:44,220 --> 00:07:47,560
+that intent filter, along with the phone
+app
+
+152
+00:07:47,560 --> 00:07:50,450
+broadcast receiver, it takes all those
+things and
+
+153
+00:07:50,450 --> 00:07:53,740
+it registers those, with the activity
+manager service.
+
+154
+00:07:53,740 --> 00:07:55,440
+So, that goes inside of the, register
+
+155
+00:07:55,440 --> 00:07:57,630
+receiver callback that we looked at
+before,
+
+156
+00:07:57,630 --> 00:08:00,860
+and that stashes all that stuff inside
+that hash map that we were looking at.
+
+157
+00:08:02,770 --> 00:08:05,240
+At some point down the road, dot, dot,
+dot,
+
+158
+00:08:05,240 --> 00:08:08,570
+the battery service, which is a system
+service is running.
+
+159
+00:08:08,570 --> 00:08:10,910
+And when the battery service starts up,
+
+160
+00:08:10,910 --> 00:08:13,860
+its constructor, actually does something
+really interesting.
+
+161
+00:08:13,860 --> 00:08:16,070
+This is a, kind of, cool example of, of
+
+162
+00:08:16,070 --> 00:08:20,530
+patterns connected to patterns, right, a
+compound pattern, example here.
+
+163
+00:08:20,530 --> 00:08:23,230
+So, what it basically does, is it creates
+something that's
+
+164
+00:08:23,230 --> 00:08:29,070
+a called a U Event Observer, for user
+event observer.
+
+165
+00:08:29,070 --> 00:08:33,710
+And it creates this thing called an
+M-Power Supply Observer.
+
+166
+00:08:33,710 --> 00:08:35,580
+And it goes ahead and it registers this
+
+167
+00:08:35,580 --> 00:08:39,450
+observer, with some low level mechanism,
+this is, this
+
+168
+00:08:39,450 --> 00:08:42,760
+is the battery monitoring hardware, or
+device drive,
+
+169
+00:08:42,760 --> 00:08:46,960
+or something that's lurking inside, the
+Android device framework.
+
+170
+00:08:46,960 --> 00:08:48,203
+[COUGH] And then it, it goes ahead and
+
+171
+00:08:48,203 --> 00:08:49,950
+just, you know, waits for something to
+happen.
+
+172
+00:08:51,530 --> 00:08:54,320
+So, this is an example of using the
+observer pattern, at the
+
+173
+00:08:54,320 --> 00:08:59,760
+low level to wait for a notification, that
+battery that voltage is low.
+
+174
+00:08:59,760 --> 00:09:00,260
+When
+
+175
+00:09:02,440 --> 00:09:06,670
+when the low level, driver discovers that
+battery is low.
+
+176
+00:09:06,670 --> 00:09:10,100
+It calls back on the on U event callback
+
+177
+00:09:10,100 --> 00:09:13,620
+method, using the observer pattern and
+that thing turns
+
+178
+00:09:13,620 --> 00:09:16,130
+around and calls the update method, on the
+battery
+
+179
+00:09:16,130 --> 00:09:20,090
+service and the update method calls the
+process values method.
+
+180
+00:09:20,090 --> 00:09:23,620
+And the process values method creates an
+intent, which
+
+181
+00:09:23,620 --> 00:09:27,440
+is the action battery low intent, and it
+broadcasts
+
+182
+00:09:27,440 --> 00:09:30,020
+that, to anybody who happens to care about
+this,
+
+183
+00:09:30,020 --> 00:09:32,370
+and there is various things that care
+about this.
+
+184
+00:09:32,370 --> 00:09:38,030
+In this particular case for the Android
+4.0, this ends up being, sent to
+
+185
+00:09:38,030 --> 00:09:39,910
+the activity manager service, the activity
+manager
+
+186
+00:09:39,910 --> 00:09:42,520
+service says, aha, who cares about this?
+
+187
+00:09:42,520 --> 00:09:46,090
+Oh, I know who cares about this, the phone
+app cares about this and
+
+188
+00:09:46,090 --> 00:09:48,900
+then some other stuff that he cares about,
+but the phone app cares about this.
+
+189
+00:09:48,900 --> 00:09:51,610
+So it turns around and calls the method
+internally called form
+
+190
+00:09:51,610 --> 00:09:54,930
+receive which is a whole pile of things
+and eventually goes ahead
+
+191
+00:09:54,930 --> 00:09:59,390
+and dispatches the on receive hook method,
+on the phone app and
+
+192
+00:09:59,390 --> 00:10:02,600
+then that goes ahead and does something
+that informs the phone application.
+
+193
+00:10:02,600 --> 00:10:03,720
+That the battery is getting low.
+
+194
+00:10:03,720 --> 00:10:07,920
+And there's, it's a bunch of call backs,
+and very convoluted and so on.
+
+195
+00:10:07,920 --> 00:10:10,160
+But that's basically the path, to the
+portion
+
+196
+00:10:10,160 --> 00:10:15,190
+of the Android, that's handling that kind
+of stuff.
+
+197
+00:10:15,190 --> 00:10:16,989
+Any questions about, about that?
+
+198
+00:10:18,960 --> 00:10:20,920
+So that's an example of, the illustration
+
+199
+00:10:20,920 --> 00:10:24,010
+of publisher-subscriber pattern, in the
+context of Android.
+
+200
+00:10:24,010 --> 00:10:29,280
+And all low and behold, it also uses the
+observer pattern, at a lower level.
+
+201
+00:10:29,280 --> 00:10:30,680
+In order to be able to, wait to be
+
+202
+00:10:30,680 --> 00:10:34,720
+notified, when the battery voltage low,
+lowness is detected.
+
+203
+00:10:34,720 --> 00:10:37,360
+That notifies the battery services, the
+battery service turns
+
+204
+00:10:37,360 --> 00:10:40,620
+around and does a broadcast, to send the
+event out.
+
+205
+00:10:40,620 --> 00:10:44,060
+So, what we're using is patterns, kind of
+combining them together,
+
+206
+00:10:44,060 --> 00:10:46,700
+chaining patterns together, in order to be
+have this call
+
+207
+00:10:46,700 --> 00:10:52,220
+back driven asynchronous, anonymous,
+decoupled in time and space way
+
+208
+00:10:52,220 --> 00:10:55,270
+of being able to inform, interested
+parties that something has occurred.
+
+209
+00:10:55,270 --> 00:10:57,580
+And if there's nobody who cares, you know,
+if you
+
+210
+00:10:57,580 --> 00:10:59,910
+just decided, I don't care if my battery
+is running low.
+
+211
+00:10:59,910 --> 00:11:00,470
+Doesn't bother me.
+
+212
+00:11:00,470 --> 00:11:03,160
+I'll just, my phone will just shut itself
+down automatically.
+
+213
+00:11:03,160 --> 00:11:04,970
+Then there don't need to be a subscriber
+here.
+
+214
+00:11:04,970 --> 00:11:07,900
+It'll just evaporate into thin air, so,
+then nothing will happen at all.
+
+215
+00:11:10,415 --> 00:11:15,390
+Okay, so, Android implements
+publisher-subscriber via
+
+216
+00:11:15,390 --> 00:11:18,010
+Intents and the Intents framework and it
+
+217
+00:11:18,010 --> 00:11:22,180
+does this to give you this nice, late
+binding, effect where you can.
+
+218
+00:11:22,180 --> 00:11:24,000
+Make changes after the system is running.
+
+219
+00:11:24,000 --> 00:11:28,690
+For example, what I just showed you here,
+takes place after the system is launched.
+
+220
+00:11:28,690 --> 00:11:32,330
+So, we're not doing what I just described
+to you there, we're not
+
+221
+00:11:32,330 --> 00:11:36,370
+doing this registration in the manifest
+files, instead we're doing it in the app.
+
+222
+00:11:36,370 --> 00:11:39,170
+So, the phone app, the phone app starts
+up, it goes ahead and
+
+223
+00:11:39,170 --> 00:11:43,250
+it creates an intent filter that says I
+want to hear about the activity.
+
+224
+00:11:43,250 --> 00:11:44,680
+For the action battery I want to hear
+
+225
+00:11:44,680 --> 00:11:48,180
+about the, intent for the action battery
+low.
+
+226
+00:11:48,180 --> 00:11:50,140
+It registers that dynamically.
+
+227
+00:11:50,140 --> 00:11:52,290
+The battery service doesn't know about the
+phone app, it
+
+228
+00:11:52,290 --> 00:11:54,630
+doesn't know about the status service, it
+doesn't know about anything.
+
+229
+00:11:54,630 --> 00:11:56,460
+It just knows when it learns the battery
+is
+
+230
+00:11:56,460 --> 00:11:59,530
+low, it's going to tell anybody who cares,
+something is happening.
+
+231
+00:11:59,530 --> 00:12:00,170
+So, it's very dynamic.
+
+232
+00:12:00,170 --> 00:12:01,690
+You can come along and make changes.
+
+233
+00:12:02,840 --> 00:12:06,710
+The intent data in this case, is, is sort
+of a passive descriptor, it's a
+
+234
+00:12:06,710 --> 00:12:09,420
+data structure, that keeps track of what
+has
+
+235
+00:12:09,420 --> 00:12:13,060
+changed and is being announced in the
+system.
+
+236
+00:12:13,060 --> 00:12:16,560
+So, something's happened, battery's low,
+we tell everybody about that.
+
+237
+00:12:16,560 --> 00:12:20,200
+That's one use of intents.
+
+238
+00:12:20,200 --> 00:12:22,520
+There are other uses of intents as well,
+where you say,
+
+239
+00:12:22,520 --> 00:12:26,240
+I want you to start this activity, right,
+so start service.
+
+240
+00:12:26,240 --> 00:12:30,700
+That's another example of using intent to,
+start something to be run.
+
+241
+00:12:30,700 --> 00:12:33,410
+The broadcast example, is when something's
+happened and you want to
+
+242
+00:12:33,410 --> 00:12:37,360
+inform or notify others, of the occurrence
+of something else.
+
+243
+00:12:38,950 --> 00:12:40,759
+[COUGH] And you can, in Android, you
+
+244
+00:12:40,759 --> 00:12:43,355
+can basically pass these intent objects in
+various
+
+245
+00:12:43,355 --> 00:12:46,009
+ways, using start broadcast and start, oh
+sorry,
+
+246
+00:12:46,009 --> 00:12:49,530
+send broadcast, send ordered broadcast,
+send sticky broadcast.
+
+247
+00:12:49,530 --> 00:12:52,633
+There's a bunch of different ways you can
+do, to pass this information around.
+
+248
+00:12:52,633 --> 00:12:56,900
+Okay, any questions about the publisher
+subscriber pattern?
+
+249
+00:12:56,900 --> 00:12:58,550
+Any questions about the
+
+250
+00:13:02,690 --> 00:13:03,700
+broker pattern?
+
+251
+00:13:03,700 --> 00:13:05,376
+Again, just to kind of underscore the
+point [COUGH].
+
+252
+00:13:06,710 --> 00:13:11,080
+As you, take a look at this stuff under
+the hood, you'll often find out
+
+253
+00:13:11,080 --> 00:13:12,950
+that, that many patterns are used
+together,
+
+254
+00:13:12,950 --> 00:13:14,810
+in order to implement this kind of stuff.
+
+255
+00:13:14,810 --> 00:13:19,135
+So, for example, you'll find brokers used
+in both
+
+256
+00:13:19,135 --> 00:13:23,400
+publisher-subscribers,and, and, brokers,
+that's pretty common in both systems.
+
+257
+00:13:23,400 --> 00:13:25,280
+You can go across address bases.
+
+258
+00:13:25,280 --> 00:13:31,450
+In some systems, people, layer
+publisher-subscriber, on top of
+
+259
+00:13:31,450 --> 00:13:34,170
+broker, that's, that's one law, that's the
+way that Corba
+
+260
+00:13:34,170 --> 00:13:36,850
+did it, the nice part there is that you
+get
+
+261
+00:13:36,850 --> 00:13:39,820
+reuse, the downside is you get extra
+layers of overhead.
+
+262
+00:13:39,820 --> 00:13:42,550
+Other systems that implement
+publisher-subscriber,
+
+263
+00:13:42,550 --> 00:13:44,900
+do so without making a broker,
+
+264
+00:13:44,900 --> 00:13:48,890
+they just have publisher-subscriber kind
+of as the, the native mechanism.
+
+265
+00:13:48,890 --> 00:13:50,010
+And there's all kinds of ways, you
+
+266
+00:13:50,010 --> 00:13:52,790
+can then layer brokers on top of
+publisher-subscribers.
+
+267
+00:13:52,790 --> 00:13:55,790
+So, you, you can basically, take these
+patterns, and you can take
+
+268
+00:13:55,790 --> 00:13:57,780
+implementations of these patterns, and
+re-arrange
+
+269
+00:13:57,780 --> 00:13:59,260
+them in all kinds of interesting ways.
+
+270
+00:14:00,300 --> 00:14:04,590
+In real life, these days, more and more
+people
+
+271
+00:14:04,590 --> 00:14:09,410
+tend to move towards, some kind of
+Publisher-Subscriber, like model.
+
+272
+00:14:09,410 --> 00:14:11,540
+Because, you can do an awful lot of things
+with it.
+
+273
+00:14:11,540 --> 00:14:14,040
+But, you have to be careful that you don't
+end up,
+
+274
+00:14:14,040 --> 00:14:20,200
+falling into the trap of consistency, at
+the expense of clarity.
+
+275
+00:14:20,200 --> 00:14:22,620
+So, not everything in life requires or
+
+276
+00:14:22,620 --> 00:14:26,630
+benefits from a, an anonymous group
+communication mechanism.
+
+277
+00:14:26,630 --> 00:14:27,470
+Although many things do.
+
+278
+00:14:27,470 --> 00:14:29,990
+So, here are some examples right.
+
+279
+00:14:29,990 --> 00:14:33,500
+So, [COUGH] imagine that you want to, tell
+all of your
+
+280
+00:14:33,500 --> 00:14:38,120
+friends, you just got into, I don't know,
+Stanford for grad school.
+
+281
+00:14:38,120 --> 00:14:38,320
+Right?
+
+282
+00:14:38,320 --> 00:14:39,640
+So, how would you tell them that?
+
+283
+00:14:39,640 --> 00:14:42,060
+You would go ahead and post it on your,
+your
+
+284
+00:14:42,060 --> 00:14:45,840
+Facebook page or something like that or
+you'd tweet it, right?
+
+285
+00:14:45,840 --> 00:14:48,095
+And that would be a good example of, of
+mass broad
+
+286
+00:14:48,095 --> 00:14:51,067
+communication, publisher-subscriber, you
+publish, lots
+
+287
+00:14:51,067 --> 00:14:53,730
+of people find out, that's great.
+
+288
+00:14:53,730 --> 00:14:58,290
+If you want to, I don't know, invite your
+parents over
+
+289
+00:14:58,290 --> 00:15:01,720
+or invite yourself over to your parent's
+for dinner this weekend.
+
+290
+00:15:01,720 --> 00:15:03,110
+Are you going to publish that on Facebook?
+
+291
+00:15:03,110 --> 00:15:03,700
+Probably not, right?
+
+292
+00:15:03,700 --> 00:15:04,640
+You're going to pick up the phone.
+
+293
+00:15:04,640 --> 00:15:06,890
+You're going to say, hey, I'm coming home
+this weekend.
+
+294
+00:15:06,890 --> 00:15:08,820
+Can I, can I bring my laundry?
+
+295
+00:15:08,820 --> 00:15:10,770
+Or whatever else you want to do.
+
+296
+00:15:10,770 --> 00:15:13,826
+And so, that's a good example of a point
+to point communication.
+
+297
+00:15:13,826 --> 00:15:16,830
+Probably using, a publisher-subscriber
+mechanism to
+
+298
+00:15:16,830 --> 00:15:17,850
+inform, you know, you're tweeting to
+
+299
+00:15:17,850 --> 00:15:21,290
+the world that you're going home to see
+your parents this weekend.
+
+300
+00:15:21,290 --> 00:15:24,370
+un, unless your Oedipus or something like
+that, just isn't very notable yeah?
+
+301
+00:15:25,425 --> 00:15:28,850
+[LAUGH] so, the point is, that different
+things are usable
+
+302
+00:15:28,850 --> 00:15:31,740
+in different context, by the way, did
+anybody get that?
+
+303
+00:15:31,740 --> 00:15:31,860
+>> Yeah.
+
+304
+00:15:31,860 --> 00:15:33,710
+>> Okay, good, all, all the, this is the
+value
+
+305
+00:15:33,710 --> 00:15:35,460
+of liberal arts education, I just want to
+point it out
+
+306
+00:15:35,460 --> 00:15:38,600
+to you right [LAUGH] [LAUGH] Everybody
+who's, who's only like,
+
+307
+00:15:38,600 --> 00:15:40,700
+in pure engineering like, Oedipus what,
+what the heck is that?
+
+308
+00:15:40,700 --> 00:15:43,629
+And, and why do we care if he's going to
+see his parents?
+
+309
+00:15:43,629 --> 00:15:45,848
+[LAUGH]
+
+310
+00:15:45,848 --> 00:15:50,710
+so so anyway, the point is that, you
+want to
+
+311
+00:15:50,710 --> 00:15:54,380
+pick and choose the mechanisms to use and
+patterns, give
+
+312
+00:15:54,380 --> 00:15:57,100
+you a, language to describe that and of
+course,
+
+313
+00:15:57,100 --> 00:16:00,290
+readable software like we find in Android
+and other middleware.
+
+314
+00:16:00,290 --> 00:16:03,970
+Give us the vehicle for being able to,
+implement it and re-use it more readily.
+
+315
+00:16:06,510 --> 00:16:10,570
+Okay, so that's it for this session.
+
+316
+00:16:10,570 --> 00:16:12,403
+Any other questions?
+
+317
+00:16:12,403 --> 00:16:20,179
+[MUSIC]
+

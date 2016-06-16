@@ -1,0 +1,3745 @@
+1
+00:00:00,000 --> 00:00:07,776
+[MUSIC]
+
+2
+00:00:07,776 --> 00:00:11,641
+Today we're going to continue with our
+discussions relating to
+
+3
+00:00:11,641 --> 00:00:15,647
+threading and synchronization in Android
+and what we're going to
+
+4
+00:00:15,647 --> 00:00:17,934
+do now and for the next class is start to
+
+5
+00:00:17,934 --> 00:00:22,600
+discuss some of the patterns that underlie
+the Android concurrency.
+
+6
+00:00:22,600 --> 00:00:26,800
+Idioms and mechanisms that we've been
+talking about things like handlers,
+
+7
+00:00:26,800 --> 00:00:31,720
+messages, runnables, a sync tasks and
+other capabilities like the looper.
+
+8
+00:00:33,140 --> 00:00:35,030
+So speaking of looper, looper we're
+
+9
+00:00:35,030 --> 00:00:37,150
+going to start off by talking about
+looper's.
+
+10
+00:00:37,150 --> 00:00:38,810
+So you may remember in one of
+
+11
+00:00:38,810 --> 00:00:42,540
+the discussions we had fleetingly in last
+class
+
+12
+00:00:42,540 --> 00:00:47,020
+I mentioned how a looper is, there can
+only be on looper per thread in Android.
+
+13
+00:00:47,020 --> 00:00:51,720
+And if you take a look at the
+documentation, it explains that fact.
+
+14
+00:00:51,720 --> 00:00:54,370
+If you poke around, by the way, on Stack
+Overflow, you'll see a lot
+
+15
+00:00:54,370 --> 00:00:56,210
+of people complaining about there only
+being
+
+16
+00:00:56,210 --> 00:00:58,150
+one looper in Android and running across
+problems.
+
+17
+00:00:58,150 --> 00:00:59,950
+So, if you ever run into problems with
+
+18
+00:00:59,950 --> 00:01:02,190
+loopers, uh,be aware that other people
+have run
+
+19
+00:01:02,190 --> 00:01:05,289
+into them as well, and Stack Overflow has
+a lot of good discussion of this topic.
+
+20
+00:01:06,370 --> 00:01:08,250
+So, it's an interesting question.
+
+21
+00:01:08,250 --> 00:01:14,530
+How might you go about ensuring that
+there's only one looper per thread?
+
+22
+00:01:14,530 --> 00:01:19,170
+It's certainly a worthwhile design
+exercise to think about briefly.
+
+23
+00:01:19,170 --> 00:01:23,750
+And, if you think about it very long, your
+first temptation
+
+24
+00:01:23,750 --> 00:01:28,500
+might be to try to design some kind of
+looper registry.
+
+25
+00:01:28,500 --> 00:01:31,710
+So, as I show in this example here, we
+have a, looper
+
+26
+00:01:31,710 --> 00:01:38,690
+registry, which is a static hashmap that's
+nestled inside of our looper class,
+
+27
+00:01:38,690 --> 00:01:42,390
+and when the prepare method is called, the
+prepare method is the
+
+28
+00:01:42,390 --> 00:01:46,300
+method that checks to see whether or not
+there's more than one looper.
+
+29
+00:01:46,300 --> 00:01:49,870
+What we could do, is we could go ahead and
+synchronize on
+
+30
+00:01:49,870 --> 00:01:53,400
+the looper class, because this is a static
+method we can’t use this.
+
+31
+00:01:53,400 --> 00:01:57,700
+We’d synchronize on something that we know
+would be there like the looper class.
+
+32
+00:01:57,700 --> 00:02:00,040
+And then, we would go ahead and we would
+look up on the hash map
+
+33
+00:02:00,040 --> 00:02:04,550
+to see whether or not we already have a
+looper registered with this thread ID.
+
+34
+00:02:04,550 --> 00:02:07,570
+So in this particular case, we have a
+hashmap that maps.
+
+35
+00:02:07,570 --> 00:02:09,970
+Thread ID, which is along to looper.
+
+36
+00:02:11,000 --> 00:02:14,690
+And if we get back something from this get
+operation and
+
+37
+00:02:14,690 --> 00:02:19,720
+it's not null, then that means someone has
+already registered a looper.
+
+38
+00:02:19,720 --> 00:02:20,860
+And that's a, that's a no, no.
+
+39
+00:02:20,860 --> 00:02:21,950
+So we can't, we can't do that.
+
+40
+00:02:21,950 --> 00:02:22,760
+We have to quit first.
+
+41
+00:02:22,760 --> 00:02:24,170
+We have to get rid of this.
+
+42
+00:02:24,170 --> 00:02:27,380
+So, in that case we're going to throw a
+run time exception.
+
+43
+00:02:27,380 --> 00:02:31,130
+And bail out say, hey only, only one
+looper can be configured per thread.
+
+44
+00:02:32,300 --> 00:02:36,980
+If we don't find a looper pre-registered,
+then we go ahead and we add our looper
+
+45
+00:02:36,980 --> 00:02:40,610
+we make a new looper and we stick it in
+our looper registry under the thread ID.
+
+46
+00:02:40,610 --> 00:02:43,670
+And then we release the lock in the
+synchronized block.
+
+47
+00:02:44,970 --> 00:02:45,530
+Okay.
+
+48
+00:02:45,530 --> 00:02:49,220
+Any questions, any comments about that
+particular solution?
+
+49
+00:02:51,270 --> 00:02:53,450
+So arguably it will work in the sense of
+
+50
+00:02:53,450 --> 00:02:55,030
+it'll tell us if we have more than one
+looper.
+
+51
+00:02:56,070 --> 00:02:56,800
+Whoops.
+
+52
+00:02:56,800 --> 00:02:58,290
+Let's fix this problem.
+
+53
+00:02:58,290 --> 00:02:59,190
+Yes, sir.
+
+54
+00:02:59,190 --> 00:03:02,790
+So, as this looper's getting messages?
+
+55
+00:03:02,790 --> 00:03:04,490
+Uh-huh.
+
+56
+00:03:04,490 --> 00:03:08,730
+And it's processing them, is it doing work
+on itself?
+
+57
+00:03:08,730 --> 00:03:13,550
+Or on the other thread that passed
+[UNKNOWN] I don't understand.
+
+58
+00:03:13,550 --> 00:03:14,380
+That's a really good question.
+
+59
+00:03:14,380 --> 00:03:15,920
+So, keep in mind a couple things.
+
+60
+00:03:15,920 --> 00:03:19,040
+First of all you can have only a single
+thread
+
+61
+00:03:19,040 --> 00:03:21,630
+in your, in your whole activity, in your
+whole application.
+
+62
+00:03:21,630 --> 00:03:25,580
+And so you can do work, and if you have
+something that's going to take
+
+63
+00:03:25,580 --> 00:03:28,010
+a while to run, or you'd like to have it
+run at some later point.
+
+64
+00:03:28,010 --> 00:03:30,260
+You can go ahead and, and post that or
+send that
+
+65
+00:03:30,260 --> 00:03:33,180
+and that'll end up going back into your
+own looper thread.
+
+66
+00:03:33,180 --> 00:03:35,030
+So that's how you kind of defer things
+till
+
+67
+00:03:35,030 --> 00:03:37,150
+future processing so that's one way to do
+things.
+
+68
+00:03:38,500 --> 00:03:42,120
+And if you're really gung ho on not having
+threads that's kind of how you program.
+
+69
+00:03:42,120 --> 00:03:43,540
+That's a little tedious of course and and
+
+70
+00:03:43,540 --> 00:03:45,520
+it means, you can't do anything that
+blocks for
+
+71
+00:03:45,520 --> 00:03:47,160
+any length of time because otherwise
+you'll get
+
+72
+00:03:47,160 --> 00:03:52,830
+the, the dreaded application not
+responding exception, or dialog.
+
+73
+00:03:52,830 --> 00:03:54,440
+The other approach, which is what we've
+been talking about.
+
+74
+00:03:54,440 --> 00:03:57,300
+And we'll, we'll actually talk about this
+further next class, is
+
+75
+00:03:57,300 --> 00:04:01,400
+the concept of having multiple threads,
+the background threads, if you will.
+
+76
+00:04:01,400 --> 00:04:03,460
+And they're doing stuff, and they can
+block.
+
+77
+00:04:03,460 --> 00:04:06,860
+And when they're done, they're going to
+pass messages from
+
+78
+00:04:06,860 --> 00:04:09,740
+themselves in separate threads back to the
+main UI thread.
+
+79
+00:04:09,740 --> 00:04:12,150
+And the way they would do that, there are
+various ways to do that,
+
+80
+00:04:12,150 --> 00:04:15,320
+but one way they'd do that is they would
+take a handler that would, was
+
+81
+00:04:15,320 --> 00:04:18,970
+created in the UI thread so it had to have
+been created in the
+
+82
+00:04:18,970 --> 00:04:22,700
+UI thread and that's because we want it to
+be associated with the UI thread.
+
+83
+00:04:22,700 --> 00:04:25,420
+And well actually, that's another example
+of what we're about to talk about is if
+
+84
+00:04:25,420 --> 00:04:27,990
+you take a look at the handler
+implementation,
+
+85
+00:04:27,990 --> 00:04:30,870
+it, it knows the thread that was created.
+
+86
+00:04:30,870 --> 00:04:32,390
+It keeps tracking it and its constructor.
+
+87
+00:04:32,390 --> 00:04:35,340
+Depending on which constructor you'll use,
+of course.
+
+88
+00:04:35,340 --> 00:04:41,040
+So in this case, other threads are doing
+work and their hand being the work through
+
+89
+00:04:41,040 --> 00:04:44,880
+messages or intervals off to the looper
+thread,
+
+90
+00:04:44,880 --> 00:04:47,480
+the, to the UI thread, which wants a
+looper.
+
+91
+00:04:47,480 --> 00:04:48,410
+And, that uses under the hood.
+
+92
+00:04:48,410 --> 00:04:50,180
+We haven't really talked about this in
+detail.
+
+93
+00:04:50,180 --> 00:04:51,720
+But under the hood uses some kind
+
+94
+00:04:51,720 --> 00:04:54,863
+of inter-process communication mechanism,
+that goes and uses
+
+95
+00:04:54,863 --> 00:04:58,980
+low level descriptors and so on in order
+to move data from one thread to another.
+
+96
+00:04:58,980 --> 00:05:00,450
+So that's typically how that works.
+
+97
+00:05:02,660 --> 00:05:04,540
+So think about it like this.
+
+98
+00:05:04,540 --> 00:05:08,380
+There's various ways to think about this,
+we'll talk at length next class about
+
+99
+00:05:08,380 --> 00:05:10,310
+the active object pattern, which is a
+
+100
+00:05:10,310 --> 00:05:13,450
+variant to what's used in this whole
+affair.
+
+101
+00:05:13,450 --> 00:05:19,950
+But basically, you can think about a, a
+chef at a, at a fast food restaurant
+
+102
+00:05:19,950 --> 00:05:26,210
+where people, people like clerks or
+cashiers give the chef orders to fulfill.
+
+103
+00:05:26,210 --> 00:05:28,610
+And so the chef might have a, a list of
+
+104
+00:05:28,610 --> 00:05:31,300
+orders or a queue of orders, a queue of
+pending orders.
+
+105
+00:05:31,300 --> 00:05:34,760
+And so the cashiers would be responsible
+for taking the orders.
+
+106
+00:05:34,760 --> 00:05:38,760
+Imagine, like a Wendy's hamburger
+restaurant or something like that.
+
+107
+00:05:38,760 --> 00:05:42,960
+The chef, the, the cashiers will be
+responsible for taking the orders.
+
+108
+00:05:42,960 --> 00:05:46,530
+They're so, so, like, the, the handlers,
+if you will, or the threads,
+
+109
+00:05:46,530 --> 00:05:50,310
+and they go ahead and they use the queue
+interface, which might be
+
+110
+00:05:50,310 --> 00:05:52,950
+as simple as taking a piece of paper and
+sticking it onto a
+
+111
+00:05:52,950 --> 00:05:56,650
+revolving merry-go-round, like, mechanism,
+so that the
+
+112
+00:05:56,650 --> 00:05:58,500
+chef knows what things to handle next.
+
+113
+00:05:58,500 --> 00:06:00,260
+We'll talk more about that when we talk
+about active object.
+
+114
+00:06:01,440 --> 00:06:01,620
+Okay.
+
+115
+00:06:01,620 --> 00:06:03,610
+Any other questions about this particular
+approach?
+
+116
+00:06:03,610 --> 00:06:06,006
+So the downside with this particular
+approach-
+
+117
+00:06:06,006 --> 00:06:06,139
+I was just [CROSSTALK].
+
+118
+00:06:06,139 --> 00:06:06,900
+Yeah.
+
+119
+00:06:06,900 --> 00:06:09,730
+Is it supposed to say ensuring one looper
+per thread?
+
+120
+00:06:09,730 --> 00:06:10,175
+Yes.
+
+121
+00:06:10,175 --> 00:06:11,030
+[INAUDIBLE].
+
+122
+00:06:11,030 --> 00:06:11,410
+Whoops.
+
+123
+00:06:11,410 --> 00:06:12,320
+Does it say on?
+
+124
+00:06:12,320 --> 00:06:13,360
+Yep.
+
+125
+00:06:13,360 --> 00:06:13,695
+Oh.
+
+126
+00:06:13,695 --> 00:06:17,310
+[LAUGH]
+
+127
+00:06:17,310 --> 00:06:22,426
+Let's change that, that's the kind of
+thing I would forget.
+
+128
+00:06:22,426 --> 00:06:25,550
+All right.
+
+129
+00:06:25,550 --> 00:06:28,560
+So any questions about the particular
+issues of the design?
+
+130
+00:06:30,240 --> 00:06:31,650
+So the downside with this approach of
+
+131
+00:06:31,650 --> 00:06:33,770
+course, is that we've got synchronization
+taking
+
+132
+00:06:33,770 --> 00:06:37,740
+place, so we could end up with a, with a
+bottleneck at least in theory.
+
+133
+00:06:37,740 --> 00:06:40,580
+If you had lots and lots and lots of, of
+threads running loopers.
+
+134
+00:06:40,580 --> 00:06:45,110
+They'd all be kind of coordinating here
+and that could end up being inefficient.
+
+135
+00:06:45,110 --> 00:06:47,060
+So, the question is, what's a better
+solution to do?
+
+136
+00:06:47,060 --> 00:06:49,070
+So the solution we're going to talk about,
+which
+
+137
+00:06:49,070 --> 00:06:50,990
+is actually what Android does, so it's not
+just
+
+138
+00:06:50,990 --> 00:06:53,120
+a good idea, it's actually what's done in
+Android,
+
+139
+00:06:53,120 --> 00:06:56,690
+is to apply something called the thread
+specific storage pattern.
+
+140
+00:06:56,690 --> 00:07:02,209
+And this is realized in Java through
+something called the Thread Local Class.
+
+141
+00:07:03,220 --> 00:07:09,220
+And this basically gives you a up
+seemingly global object, when in
+
+142
+00:07:09,220 --> 00:07:14,280
+fact the implementation of the object is
+specifically to every thread of control.
+
+143
+00:07:14,280 --> 00:07:16,340
+So, it looks like a global object to the
+outside world,
+
+144
+00:07:16,340 --> 00:07:20,190
+but when you access it, you're actually
+accessing thread specific state.
+
+145
+00:07:20,190 --> 00:07:21,950
+So, here is an example of how this works,
+we'll,
+
+146
+00:07:21,950 --> 00:07:23,960
+we'll look at, a more of this example
+later when
+
+147
+00:07:23,960 --> 00:07:25,980
+we come back after talking more detail
+about how the
+
+148
+00:07:25,980 --> 00:07:29,860
+pattern is specified and how the
+implementation of Android works.
+
+149
+00:07:29,860 --> 00:07:33,820
+Basically the looper contains a
+thread-local object,
+
+150
+00:07:33,820 --> 00:07:37,490
+which is a generic that's customized by
+looper.
+
+151
+00:07:37,490 --> 00:07:40,744
+And as you can see here, what prepare does
+is it goes
+
+152
+00:07:40,744 --> 00:07:46,020
+in and says, ha anybody stored something
+into thread specific storage yet?
+
+153
+00:07:46,020 --> 00:07:49,250
+And if the answer is yes, then we're in
+
+154
+00:07:49,250 --> 00:07:52,840
+trouble because we've got already gone
+through and initialized ourselves.
+
+155
+00:07:52,840 --> 00:07:58,650
+If the answer is no, this returns null and
+so we're okay.
+
+156
+00:07:59,730 --> 00:08:01,980
+And then we go down here and we create a
+
+157
+00:08:01,980 --> 00:08:05,840
+new looper and we set it into thread's
+local storage.
+
+158
+00:08:05,840 --> 00:08:08,140
+And what's interesting about this as we'll
+see shortly
+
+159
+00:08:08,140 --> 00:08:11,500
+is that there's no locking operations
+required anywhere here.
+
+160
+00:08:11,500 --> 00:08:13,760
+So all the locking operations are moved
+outside
+
+161
+00:08:13,760 --> 00:08:15,450
+of the thread, and so there actually is
+
+162
+00:08:15,450 --> 00:08:18,460
+no synchronization overhead at all, even
+though it
+
+163
+00:08:18,460 --> 00:08:21,750
+looks at first glance very much the other
+example.
+
+164
+00:08:21,750 --> 00:08:21,910
+Right.
+
+165
+00:08:21,910 --> 00:08:25,330
+It looks like you got an object and you're
+accessing it by calling get.
+
+166
+00:08:25,330 --> 00:08:27,370
+In this particular case, what you're
+
+167
+00:08:27,370 --> 00:08:29,990
+accessing is actually getting to
+thread-specific storage.
+
+168
+00:08:29,990 --> 00:08:31,670
+So we're going to talk about that.
+
+169
+00:08:31,670 --> 00:08:33,350
+It's a really interesting pattern.
+
+170
+00:08:33,350 --> 00:08:34,570
+It's a very cool.
+
+171
+00:08:34,570 --> 00:08:37,440
+Not very well understood and should be
+used
+
+172
+00:08:37,440 --> 00:08:40,520
+sparingly of course, for the reasons we'll
+discuss.
+
+173
+00:08:40,520 --> 00:08:45,070
+So take a look at thread local HTML page
+on the Android site and it
+
+174
+00:08:45,070 --> 00:08:47,560
+will talk to you more about what thread
+local is and we'll talk more about that.
+
+175
+00:08:48,570 --> 00:08:52,980
+Okay, so this is not just a random
+assortment of class and methods.
+
+176
+00:08:52,980 --> 00:08:55,790
+This is a particular instantiation of a
+pattern,
+
+177
+00:08:55,790 --> 00:08:58,025
+the pattern appeared in the posting into
+book.
+
+178
+00:08:58,025 --> 00:09:00,360
+It's called thread-specific storage.
+
+179
+00:09:00,360 --> 00:09:03,640
+The intent of this pattern is to allow
+multiple threads
+
+180
+00:09:03,640 --> 00:09:09,250
+to use one logically global access point,
+object for example.
+
+181
+00:09:09,250 --> 00:09:12,480
+To retrieve instances of objects that are
+local to a thread,
+
+182
+00:09:12,480 --> 00:09:14,500
+stored local to a thread, without
+
+183
+00:09:14,500 --> 00:09:17,120
+incurring locking overhead on every
+access.
+
+184
+00:09:17,120 --> 00:09:18,430
+So you don't have to incur the overhead
+
+185
+00:09:18,430 --> 00:09:21,010
+of locking, but you're getting stuff
+that's thread specific.
+
+186
+00:09:21,010 --> 00:09:25,050
+And there therefore, capable of being used
+without having to worry about intention.
+
+187
+00:09:25,050 --> 00:09:28,060
+And this pattern is used very, very widely
+
+188
+00:09:28,060 --> 00:09:31,810
+in Dewey frameworks and threads, and
+threading frameworks.
+
+189
+00:09:31,810 --> 00:09:32,690
+If you take a look here.
+
+190
+00:09:32,690 --> 00:09:34,077
+It's in the post in the 2 book, but
+
+191
+00:09:34,077 --> 00:09:36,500
+you can also look here and find the
+pattern online.
+
+192
+00:09:36,500 --> 00:09:39,820
+And it's quite interesting, it's
+documented using C plus,
+
+193
+00:09:39,820 --> 00:09:41,410
+plus, but it applies quite nicely to Java
+too.
+
+194
+00:09:42,980 --> 00:09:45,150
+So when would you want to use this thing?
+
+195
+00:09:45,150 --> 00:09:49,840
+Well you want to use this thing if you
+want a concurrent program that is
+
+196
+00:09:49,840 --> 00:09:55,310
+both easy to program and efficient, which
+is sometimes kind of hard to do.
+
+197
+00:09:55,310 --> 00:09:57,030
+And of course, efficient means different
+things to
+
+198
+00:09:57,030 --> 00:09:58,990
+different people but in this particular
+case is.
+
+199
+00:09:58,990 --> 00:10:03,080
+What we want to be able to do is make it
+easy to program, so it doesn't require
+
+200
+00:10:03,080 --> 00:10:06,080
+all kinds of special purpose programming
+tricks, but we
+
+201
+00:10:06,080 --> 00:10:08,420
+don't want people to have to know anything
+about locking.
+
+202
+00:10:08,420 --> 00:10:09,940
+You just want to be able to access this
+stuff and
+
+203
+00:10:09,940 --> 00:10:14,630
+have it be magically thread safe and
+atomic, and so on.
+
+204
+00:10:14,630 --> 00:10:16,320
+Often in life, there's trade-offs, right?
+
+205
+00:10:16,320 --> 00:10:18,740
+So they always talk about good fast cheap.
+
+206
+00:10:18,740 --> 00:10:19,230
+Pick two of three, right.
+
+207
+00:10:19,230 --> 00:10:23,540
+So here's a case where we're going to get
+simplicity of programming and efficiency.
+
+208
+00:10:23,540 --> 00:10:24,370
+You don't always get that.
+
+209
+00:10:24,370 --> 00:10:27,650
+Now, there are some limitations to this of
+course, but we'll talk about that later.
+
+210
+00:10:29,570 --> 00:10:31,110
+The original reason why people came up
+
+211
+00:10:31,110 --> 00:10:33,630
+with thread-specific storage was kind of
+interesting.
+
+212
+00:10:33,630 --> 00:10:35,130
+The original reason was people have a lot
+
+213
+00:10:35,130 --> 00:10:38,080
+of legacy code that they'd written, which
+only had
+
+214
+00:10:38,080 --> 00:10:41,840
+a single thread of control in it and that
+
+215
+00:10:41,840 --> 00:10:48,610
+code accessed global resources without
+passing parameters to functions.
+
+216
+00:10:48,610 --> 00:10:51,840
+And what that meant was, when people
+started to try to use this
+
+217
+00:10:51,840 --> 00:10:55,620
+legacy code in modern multi threaded
+systems,
+
+218
+00:10:55,620 --> 00:10:57,780
+they had a problem in certain places.
+
+219
+00:10:57,780 --> 00:10:59,290
+And we're going to talk more about this
+particular
+
+220
+00:10:59,290 --> 00:11:01,730
+problem when we get to the known uses
+discussion.
+
+221
+00:11:01,730 --> 00:11:04,240
+But one of the classic, classic examples
+where this
+
+222
+00:11:04,240 --> 00:11:08,700
+is a big issue is in the context of errno.
+
+223
+00:11:08,700 --> 00:11:10,410
+Does anybody know what errno is?
+
+224
+00:11:12,830 --> 00:11:15,750
+You'd have to be sort of a C or C plus,
+plus programmer to really.
+
+225
+00:11:15,750 --> 00:11:16,320
+No error known.
+
+226
+00:11:16,320 --> 00:11:18,170
+And you'd have to be sort of a systems
+programmer.
+
+227
+00:11:18,170 --> 00:11:18,600
+Yeah.
+
+228
+00:11:18,600 --> 00:11:22,505
+So then the integer that holds the last
+error number returned by some operation?
+
+229
+00:11:22,505 --> 00:11:24,413
+That's right.
+
+230
+00:11:24,413 --> 00:11:29,114
+So, historically, so what errno, it's a
+value that
+
+231
+00:11:29,114 --> 00:11:35,200
+stores the last reason why something
+failed if something fails.
+
+232
+00:11:35,200 --> 00:11:40,100
+And historically it was stored as an int,
+and it was a global int, and so if
+
+233
+00:11:40,100 --> 00:11:41,970
+you wanted to access errno, you just sort
+
+234
+00:11:41,970 --> 00:11:45,180
+of said extern int errno, and there it
+was.
+
+235
+00:11:45,180 --> 00:11:47,180
+There's a huge problem when you start
+trying to use things
+
+236
+00:11:47,180 --> 00:11:49,160
+like errno in concurrent programs,
+
+237
+00:11:49,160 --> 00:11:50,980
+however, and this example illustrates
+this.
+
+238
+00:11:50,980 --> 00:11:53,860
+So, imagine we have two threads, thread T1
+and thread
+
+239
+00:11:53,860 --> 00:11:58,190
+T2, and one comes along and does a receive
+operation.
+
+240
+00:11:58,190 --> 00:11:59,790
+And for whatever reason that receive
+operation
+
+241
+00:11:59,790 --> 00:12:02,470
+can't make progress because, it's flow
+controlled.
+
+242
+00:12:02,470 --> 00:12:05,910
+And so it gives back the, a minus one
+
+243
+00:12:05,910 --> 00:12:08,640
+with the error no value set to
+ewouldblock, which
+
+244
+00:12:08,640 --> 00:12:10,770
+says it would block if we were to, to
+
+245
+00:12:10,770 --> 00:12:12,570
+actually wait on this thing, so it's flow
+controlled.
+
+246
+00:12:13,860 --> 00:12:21,070
+Okay, and between the point when we return
+from receive and check the value of errno.
+
+247
+00:12:21,070 --> 00:12:25,780
+Another thread comes along also calls
+recv, which is a system call and for
+
+248
+00:12:25,780 --> 00:12:31,570
+whatever reason that, that got interrupted
+so it got the E enter errno value set.
+
+249
+00:12:31,570 --> 00:12:36,310
+Well, what happens here of course is if T2
+is preempted and T1 starts to run again.
+
+250
+00:12:36,310 --> 00:12:39,000
+T1 will say, uh-huh, I have a minus one
+
+251
+00:12:39,000 --> 00:12:42,870
+value for received, but my error value is
+E enter.
+
+252
+00:12:42,870 --> 00:12:44,240
+And be completely confused.
+
+253
+00:12:44,240 --> 00:12:48,130
+Because it's trying to access a global
+that
+
+254
+00:12:48,130 --> 00:12:51,360
+is not protected by any kind of
+synchronization mechanism.
+
+255
+00:12:52,570 --> 00:12:54,170
+Now how might we, how might we fix this?
+
+256
+00:12:54,170 --> 00:12:56,440
+Well we might fix this the same way that
+we tried to fix
+
+257
+00:12:56,440 --> 00:12:59,940
+the stuff earlier while I was showing you
+about the, the registry for loopers.
+
+258
+00:12:59,940 --> 00:13:02,990
+But that is horribly broken, just
+hideously broken.
+
+259
+00:13:02,990 --> 00:13:04,840
+Number one, it would require everybody to
+put locks
+
+260
+00:13:04,840 --> 00:13:07,560
+around errno and number two, it really
+wouldn't even work
+
+261
+00:13:07,560 --> 00:13:09,210
+because even if you, you'd have to put the
+
+262
+00:13:09,210 --> 00:13:12,630
+blocks around the point where you made the
+receive call.
+
+263
+00:13:12,630 --> 00:13:15,980
+And when it returned, you'd still have to
+hold the lock, and then you check errnos,
+
+264
+00:13:15,980 --> 00:13:19,120
+so you'd have unbelievable, contention in
+your program,
+
+265
+00:13:19,120 --> 00:13:21,310
+and it would just be a big mess.
+
+266
+00:13:21,310 --> 00:13:26,250
+So, instead of doing that kind of stuff,
+people use thread-specific storage, and
+
+267
+00:13:26,250 --> 00:13:31,660
+that way, each specific thread gets its
+own specific version of errno, and so it.
+
+268
+00:13:31,660 --> 00:13:34,480
+It can set it and check it at its leisure,
+never
+
+269
+00:13:34,480 --> 00:13:38,850
+having to worry about contention or race
+conditions on that particular variable.
+
+270
+00:13:38,850 --> 00:13:40,010
+So, we'll talk more about that later.
+
+271
+00:13:41,140 --> 00:13:44,540
+Okay, here's the structure and
+participants of this particular pattern,
+
+272
+00:13:44,540 --> 00:13:46,600
+and it's kind of interesting, because
+there's a bunch of tool
+
+273
+00:13:46,600 --> 00:13:49,120
+kits that give you building blocks of some
+of this stuff,
+
+274
+00:13:49,120 --> 00:13:52,310
+but they're somewhat unsatisfying if you
+don't do the whole pattern.
+
+275
+00:13:52,310 --> 00:13:54,800
+So I'm going to talk about the different
+pieces in a term.
+
+276
+00:13:54,800 --> 00:13:58,790
+The first piece we're going to talk about
+is the thread specific object proxy.
+
+277
+00:13:58,790 --> 00:14:03,970
+The purpose of this particular interface
+class element module and
+
+278
+00:14:03,970 --> 00:14:07,360
+so on, role a better word, is to try to
+give
+
+279
+00:14:07,360 --> 00:14:10,660
+people a nice high level way of accessing
+thread specific storage
+
+280
+00:14:10,660 --> 00:14:13,650
+so you don't have to take care of low
+level details.
+
+281
+00:14:13,650 --> 00:14:18,570
+Some framework, some programming languages
+make this easy, other frameworks, other
+
+282
+00:14:18,570 --> 00:14:22,230
+programming languages make it less easy,
+Java is somewhere in the middle.
+
+283
+00:14:22,230 --> 00:14:25,950
+C is very much at the low end, you have to
+build all this stuff yourself.
+
+284
+00:14:25,950 --> 00:14:28,710
+Java kind of gives you an intermediate
+thing, the thread
+
+285
+00:14:28,710 --> 00:14:33,200
+local class is the thread specific object
+proxy the ace
+
+286
+00:14:33,200 --> 00:14:35,920
+framework, which we'll see later, has some
+really cool support
+
+287
+00:14:35,920 --> 00:14:37,630
+using C plus, plus delegation operator,
+we'll look at that.
+
+288
+00:14:37,630 --> 00:14:39,870
+So that's one piece of the pie.
+
+289
+00:14:39,870 --> 00:14:42,690
+There's also something called the key
+factory, and that's used to
+
+290
+00:14:42,690 --> 00:14:45,620
+make the ways to identify each of the
+threads specific objects.
+
+291
+00:14:45,620 --> 00:14:46,820
+We're not going to talk much about that.
+
+292
+00:14:46,820 --> 00:14:48,620
+It doesn't really show up in Java.
+
+293
+00:14:48,620 --> 00:14:51,810
+It's kind of hidden from you by the thread
+local class.
+
+294
+00:14:52,940 --> 00:14:55,210
+The next thing which is really the key
+workhorse
+
+295
+00:14:55,210 --> 00:14:58,020
+here is something that's called the thread
+specific object set.
+
+296
+00:14:58,020 --> 00:15:00,510
+This is a map or some kind of data
+
+297
+00:15:00,510 --> 00:15:04,140
+structure that will take a key which
+corresponds to
+
+298
+00:15:04,140 --> 00:15:06,510
+the object that you're dealing with and it
+will
+
+299
+00:15:06,510 --> 00:15:11,700
+give you back a pointer to a
+thread-specific object.
+
+300
+00:15:11,700 --> 00:15:13,880
+And we'll talk about how that works later.
+
+301
+00:15:13,880 --> 00:15:16,880
+In the case of Android and Java,.
+
+302
+00:15:16,880 --> 00:15:19,900
+It's threadlocal.values, that's the thing
+the
+
+303
+00:15:19,900 --> 00:15:21,500
+data structure, that keeps track of this.
+
+304
+00:15:21,500 --> 00:15:21,640
+Yeah.
+
+305
+00:15:21,640 --> 00:15:24,550
+Is it a lot similar to the registry idea
+that you were talking about?
+
+306
+00:15:24,550 --> 00:15:25,620
+It is, absolutely.
+
+307
+00:15:25,620 --> 00:15:27,090
+The difference, that's a great question.
+
+308
+00:15:27,090 --> 00:15:30,240
+So, the question is isn't this sort of
+like the registry we're talking about?
+
+309
+00:15:30,240 --> 00:15:30,730
+Absolutely.
+
+310
+00:15:30,730 --> 00:15:34,750
+The difference is that that registry that
+we saw was shared by all threads.
+
+311
+00:15:34,750 --> 00:15:36,380
+And therefore you have to lock it.
+
+312
+00:15:36,380 --> 00:15:42,190
+The thread-specific object set is either
+logically or physically local to
+
+313
+00:15:42,190 --> 00:15:45,140
+a thread, so it's a map, but it's only in
+one thread.
+
+314
+00:15:45,140 --> 00:15:46,950
+And each thread has one typically.
+
+315
+00:15:46,950 --> 00:15:49,130
+We'll, we'll talk about different ways to
+implement this in a second.
+
+316
+00:15:49,130 --> 00:15:50,850
+Yeah, that's a great observation.
+
+317
+00:15:50,850 --> 00:15:52,120
+There's a thing called thread.local
+values,
+
+318
+00:15:52,120 --> 00:15:53,470
+and we'll look at that momentarily.
+
+319
+00:15:53,470 --> 00:15:56,290
+And then the last piece of the puzzle is
+the thread-specific object.
+
+320
+00:15:56,290 --> 00:15:59,120
+This is actually the thing that, that does
+whatever it does, right?
+
+321
+00:15:59,120 --> 00:16:00,920
+It's something that you're going to store.
+
+322
+00:16:00,920 --> 00:16:02,440
+And for that specific storage.
+
+323
+00:16:02,440 --> 00:16:05,810
+And a particular example we're going to
+talk about here of course, is the looper.
+
+324
+00:16:05,810 --> 00:16:08,100
+So that's what we're going to put inside
+specific storage.
+
+325
+00:16:08,100 --> 00:16:10,800
+But of course, you could put other things
+into that specific storage as well.
+
+326
+00:16:12,380 --> 00:16:12,560
+Okay.
+
+327
+00:16:12,560 --> 00:16:13,700
+Here's the dynamic view.
+
+328
+00:16:13,700 --> 00:16:15,420
+And there's, there's a whole different
+variant, I'm, I'm
+
+329
+00:16:15,420 --> 00:16:17,320
+just focusing on a piece of this whole
+thing.
+
+330
+00:16:17,320 --> 00:16:20,600
+If you read the pattern description it'll
+give you more details of this.
+
+331
+00:16:20,600 --> 00:16:23,330
+So typically what happens is here, you
+come along, depending
+
+332
+00:16:23,330 --> 00:16:27,820
+on how powerful your thread-specific
+storage interface is, and your language.
+
+333
+00:16:27,820 --> 00:16:32,790
+And you invoke some method on an instance
+of a thread-specific object proxy.
+
+334
+00:16:32,790 --> 00:16:36,720
+Now, the goal of this is to make it look
+like to the application developer.
+
+335
+00:16:36,720 --> 00:16:38,770
+That you're just making a method call on
+an object.
+
+336
+00:16:38,770 --> 00:16:41,730
+They shouldn't have to know what's in
+thread specific storage and what's not.
+
+337
+00:16:41,730 --> 00:16:43,600
+They should just want to make a method
+call and leave it
+
+338
+00:16:43,600 --> 00:16:46,900
+up to the implementation to ferret out
+where the actual stuff resides.
+
+339
+00:16:46,900 --> 00:16:48,680
+And we'll see how that works in a second.
+
+340
+00:16:48,680 --> 00:16:52,700
+So you make a method call under the scenes
+that goes and figures out what thread
+
+341
+00:16:52,700 --> 00:16:56,210
+you're in, figures out what key your
+associating
+
+342
+00:16:56,210 --> 00:16:59,290
+this particular method call on the object
+ID.
+
+343
+00:16:59,290 --> 00:17:04,220
+And it goes and it looks up in the object
+specific thread-specific object set and
+
+344
+00:17:04,220 --> 00:17:08,280
+it gets you back at thread specific object
+and it returns it back to the proxy.
+
+345
+00:17:08,280 --> 00:17:12,470
+And in certain cool implementations like
+in C plus, plus and like in ACE.
+
+346
+00:17:12,470 --> 00:17:15,960
+Then it goes ahead and it, it
+automatically delegates the method
+
+347
+00:17:15,960 --> 00:17:19,790
+call to the thread-specific object without
+you having to do anything else.
+
+348
+00:17:19,790 --> 00:17:22,330
+So it just kind of magically forwards to
+the call.
+
+349
+00:17:22,330 --> 00:17:23,770
+And then you get the result back.
+
+350
+00:17:23,770 --> 00:17:24,820
+So that's kind of how things work.
+
+351
+00:17:24,820 --> 00:17:26,990
+So you invoke a method on a proxy.
+
+352
+00:17:26,990 --> 00:17:29,590
+It gets the underlying thread specific
+object, and
+
+353
+00:17:29,590 --> 00:17:32,100
+then it automatically invokes a method on
+the object.
+
+354
+00:17:32,100 --> 00:17:33,650
+You'll see that Java doesn't quite go that
+
+355
+00:17:33,650 --> 00:17:35,700
+far because Java doesn't really have
+anything quite like
+
+356
+00:17:35,700 --> 00:17:37,630
+the delegation operator in C plus, plus
+but
+
+357
+00:17:37,630 --> 00:17:39,560
+I'll show you that also it's, it's pretty
+cool.
+
+358
+00:17:40,830 --> 00:17:41,100
+All right.
+
+359
+00:17:41,100 --> 00:17:43,190
+So how does this actually work under the
+hood?
+
+360
+00:17:43,190 --> 00:17:45,090
+What's the, the technique?
+
+361
+00:17:45,090 --> 00:17:46,920
+So, there's a couple things you gotta
+think about.
+
+362
+00:17:46,920 --> 00:17:48,850
+First thing you gotta do is implement some
+
+363
+00:17:48,850 --> 00:17:52,600
+kind of thread-specific object proxy, and
+this is the
+
+364
+00:17:52,600 --> 00:17:57,590
+guy that mediates the access to the
+underlying framework
+
+365
+00:17:57,590 --> 00:17:59,810
+that keeps track of all of these moving
+parts.
+
+366
+00:17:59,810 --> 00:18:03,670
+And, essentially what you're doing is
+finding an interface for a variable.
+
+367
+00:18:03,670 --> 00:18:05,400
+They look just like your regular variable
+object, but
+
+368
+00:18:05,400 --> 00:18:07,940
+each instance of it is stored in a
+thread-specific way.
+
+369
+00:18:07,940 --> 00:18:11,950
+There are a couple different ways to do
+this in, in ACE, we do it
+
+370
+00:18:11,950 --> 00:18:15,080
+by having a template class that's
+parameterized
+
+371
+00:18:15,080 --> 00:18:17,250
+by the type you want to make
+thread-specific.
+
+372
+00:18:17,250 --> 00:18:18,976
+And it uses the C plus, plus operator
+
+373
+00:18:18,976 --> 00:18:21,830
+arrow, which is the so called delegation
+operator.
+
+374
+00:18:21,830 --> 00:18:23,950
+And I'll show you the implementation in a
+second.
+
+375
+00:18:23,950 --> 00:18:25,840
+Other technologies work a slightly
+different way.
+
+376
+00:18:25,840 --> 00:18:26,889
+But you need to define it somehow.
+
+377
+00:18:28,310 --> 00:18:31,990
+The next thing you need to do is implement
+the thread-specific object sets.
+
+378
+00:18:31,990 --> 00:18:35,430
+And as sharp pointed out, there's a couple
+different ways to do this.
+
+379
+00:18:35,430 --> 00:18:40,025
+One, one way to do this which is typically
+the way things work if you use
+
+380
+00:18:40,025 --> 00:18:43,500
+thread-specific storage that's actually
+implemented as part of
+
+381
+00:18:43,500 --> 00:18:48,440
+the run time system of your, your
+threading library.
+
+382
+00:18:48,440 --> 00:18:48,630
+Right.
+
+383
+00:18:48,630 --> 00:18:50,950
+So if your, your using like Java Threads
+or your
+
+384
+00:18:50,950 --> 00:18:53,840
+using PASIC-P's Threads or something like
+that has this built in.
+
+385
+00:18:53,840 --> 00:18:57,310
+And what they'll particularly do is that
+they'll reserve some space
+
+386
+00:18:57,310 --> 00:19:01,850
+or a pointer to store some space in each
+thread control block.
+
+387
+00:19:01,850 --> 00:19:04,880
+So every application thread, or every
+thread you have has some
+
+388
+00:19:04,880 --> 00:19:08,440
+space that it's used to hold the thread's
+specific storage map.
+
+389
+00:19:08,440 --> 00:19:10,050
+So that goes back to what you're asking,
+each
+
+390
+00:19:10,050 --> 00:19:12,520
+thread has its own map as opposed to
+sharing them.
+
+391
+00:19:12,520 --> 00:19:14,080
+So that's one way to do things.
+
+392
+00:19:14,080 --> 00:19:18,150
+And that turns out to be very efficient,
+for a variety of reasons.
+
+393
+00:19:18,150 --> 00:19:22,560
+The other way to do it is to have thread
+external, thread specific object sets.
+
+394
+00:19:22,560 --> 00:19:24,765
+You would typically do this if you were
+trying emulate
+
+395
+00:19:24,765 --> 00:19:29,150
+thread-specific storage in an environment
+that not, that's not natively supported.
+
+396
+00:19:29,150 --> 00:19:33,410
+For example, some earlier implementations
+of embedded operating systems
+
+397
+00:19:33,410 --> 00:19:37,330
+like early versions of Ex Works lack
+Thread-Specific Storage.
+
+398
+00:19:37,330 --> 00:19:39,780
+Other implementations of things like
+windows.
+
+399
+00:19:39,780 --> 00:19:41,430
+Have really goofy thread-specific storage.
+
+400
+00:19:41,430 --> 00:19:44,250
+Where you only get a very small number of
+thread-specific
+
+401
+00:19:44,250 --> 00:19:49,230
+storage objects per thread like 32 or 64
+some small number.
+
+402
+00:19:49,230 --> 00:19:51,220
+So in those environments you may have to
+emulate this.
+
+403
+00:19:51,220 --> 00:19:52,620
+In that case, you would have some kind of
+
+404
+00:19:52,620 --> 00:19:55,280
+data structure and then you would mediate
+access to it.
+
+405
+00:19:55,280 --> 00:19:57,640
+This is obviously less desirable though
+because
+
+406
+00:19:57,640 --> 00:19:59,420
+you end up with some locking overhead.
+
+407
+00:19:59,420 --> 00:20:03,430
+Then you have to figure out these data
+structures that, that map
+
+408
+00:20:03,430 --> 00:20:06,490
+things appropriately and it's sort of two
+things that you gotta think about.
+
+409
+00:20:06,490 --> 00:20:13,190
+One is, how do you map the keys to thread
+specific objects?
+
+410
+00:20:13,190 --> 00:20:19,540
+And the other is how do you map the thread
+IDs to thread-specific object sets.
+
+411
+00:20:19,540 --> 00:20:21,350
+So there's two parts of this thing.
+
+412
+00:20:21,350 --> 00:20:24,280
+So typically what you do, the most common
+way to do
+
+413
+00:20:24,280 --> 00:20:28,160
+it is you have this data structure on a
+per thread basis.
+
+414
+00:20:28,160 --> 00:20:30,490
+And if you have a fixed number of
+thread-specific objects
+
+415
+00:20:30,490 --> 00:20:33,020
+per thread, you might have an array of
+these things.
+
+416
+00:20:33,020 --> 00:20:35,610
+So you might have an array of 64 or
+
+417
+00:20:35,610 --> 00:20:38,720
+32 thread-specific slots you can store
+thread-specific objects in.
+
+418
+00:20:38,720 --> 00:20:41,810
+The nice thing about that is it's super
+fast, because it's just an index.
+
+419
+00:20:41,810 --> 00:20:45,970
+The key is just an index into that table
+or array or vector.
+
+420
+00:20:45,970 --> 00:20:49,040
+If you want to support a much larger
+number, then you're
+
+421
+00:20:49,040 --> 00:20:52,080
+going to have to use a data structure
+that's capable of expanding.
+
+422
+00:20:52,080 --> 00:20:54,860
+And the most common thing to use there is
+some kind of hash map.
+
+423
+00:20:54,860 --> 00:20:57,730
+So that's another way that you could do
+it, you could store a hash map and
+
+424
+00:20:57,730 --> 00:20:59,650
+so you would look things up and find
+
+425
+00:20:59,650 --> 00:21:02,030
+the thread specific object that was stored
+here.
+
+426
+00:21:02,030 --> 00:21:05,957
+So, leaving aside implementation details
+from logical
+
+427
+00:21:05,957 --> 00:21:09,146
+point of view, each thread specific
+object,
+
+428
+00:21:09,146 --> 00:21:12,582
+or each thread specific object proxy
+corresponds
+
+429
+00:21:12,582 --> 00:21:15,060
+to a row in a two dimensional table.
+
+430
+00:21:15,060 --> 00:21:19,730
+And each thread corresponds to a column in
+this table.
+
+431
+00:21:19,730 --> 00:21:21,610
+And when you have a particular object in
+
+432
+00:21:21,610 --> 00:21:25,370
+a particular thread access, a particular
+key, that
+
+433
+00:21:25,370 --> 00:21:27,890
+will, that two pull will get you to
+
+434
+00:21:27,890 --> 00:21:31,750
+a pointer or reference to the
+thread-specific object.
+
+435
+00:21:31,750 --> 00:21:33,230
+Now what's interesting about this, is that
+the
+
+436
+00:21:33,230 --> 00:21:36,430
+object itself could actually be any old
+object.
+
+437
+00:21:36,430 --> 00:21:38,680
+So the object isn't necessarily thread
+specific it's
+
+438
+00:21:38,680 --> 00:21:41,530
+the access to the object that's thread
+specific.
+
+439
+00:21:41,530 --> 00:21:44,822
+Now 9 times out of 10 or 99 times out of a
+100.
+
+440
+00:21:44,822 --> 00:21:49,160
+The object you're accessing is only
+accessed by that thread.
+
+441
+00:21:49,160 --> 00:21:51,320
+But if you really want it to be perverse,
+you could make
+
+442
+00:21:51,320 --> 00:21:54,240
+a pointer to some global object and stick
+it in this thing.
+
+443
+00:21:54,240 --> 00:21:55,280
+It would be a bad idea because it
+
+444
+00:21:55,280 --> 00:21:58,040
+would defeat the purpose of having
+thread-specific storage.
+
+445
+00:21:58,040 --> 00:22:00,130
+But it's not really the object that's
+thread-specific It's
+
+446
+00:22:00,130 --> 00:22:04,070
+the access to the object that is being
+thread-specific.
+
+447
+00:22:04,070 --> 00:22:05,770
+So it's, it's that combination of things.
+
+448
+00:22:05,770 --> 00:22:09,040
+It's, it's the thread ID, it's the
+particular object,
+
+449
+00:22:09,040 --> 00:22:11,510
+it's the key, it's the proxy, it's all
+these things.
+
+450
+00:22:11,510 --> 00:22:15,960
+That collaborate to get you to the
+specific object that you care about.
+
+451
+00:22:15,960 --> 00:22:16,330
+All right.
+
+452
+00:22:16,330 --> 00:22:19,500
+So let's take a look and see how this
+particular pattern is actually
+
+453
+00:22:19,500 --> 00:22:23,475
+implemented in Android, now that we've
+sort of talked about the various pieces.
+
+454
+00:22:23,475 --> 00:22:26,750
+[SOUND] So, there's this class called,
+thread local.
+
+455
+00:22:26,750 --> 00:22:30,230
+And that implements a thread-specific
+storage pattern, or a variant of it.
+
+456
+00:22:30,230 --> 00:22:35,080
+The main difference is that in Android, it
+doesn't give you the full blown proxy.
+
+457
+00:22:35,080 --> 00:22:38,350
+So in the C plus, plus versions we were
+talking about with delegation
+
+458
+00:22:38,350 --> 00:22:42,650
+operator, you have a full blown proxy, you
+invoke a method on that proxy.
+
+459
+00:22:42,650 --> 00:22:44,760
+It goes in under the hood, grabs the
+
+460
+00:22:44,760 --> 00:22:47,930
+thread specific object, and then
+re-delegates to it.
+
+461
+00:22:47,930 --> 00:22:49,310
+In Java you can't quite do that.
+
+462
+00:22:49,310 --> 00:22:52,240
+So what you have to do is you first have
+to call a get,
+
+463
+00:22:52,240 --> 00:22:57,270
+on the thread specific object proxy which
+is really more just like a wrapper.
+
+464
+00:22:57,270 --> 00:22:58,670
+It's not really a proxy at this point.
+
+465
+00:22:58,670 --> 00:23:03,260
+It's just an interface or a class with
+some methods, put and get.
+
+466
+00:23:03,260 --> 00:23:05,840
+That goes behind the scenes, get's the
+
+467
+00:23:05,840 --> 00:23:09,900
+underlying thread-specific object it
+returns it to you
+
+468
+00:23:09,900 --> 00:23:11,850
+and once you've got that thing then you
+
+469
+00:23:11,850 --> 00:23:14,620
+make a method call on that thread-specific
+object.
+
+470
+00:23:14,620 --> 00:23:18,210
+So notice you have to do two calls here in
+the Java model.
+
+471
+00:23:18,210 --> 00:23:21,690
+Where is in the full blown pattern, all
+you have to do is make
+
+472
+00:23:21,690 --> 00:23:25,260
+one methods call it gets the thing for you
+and it delegates it automatically.
+
+473
+00:23:25,260 --> 00:23:29,330
+I will show you how to implement that in
+just a second just so you'll know.
+
+474
+00:23:29,330 --> 00:23:29,966
+All right.
+
+475
+00:23:29,966 --> 00:23:32,490
+So, so that's, that's one part of it.
+
+476
+00:23:32,490 --> 00:23:35,670
+And if you take a look at the Thread Local
+header file, you'll learn more about that.
+
+477
+00:23:37,190 --> 00:23:41,200
+So, all threads share the same
+thread-local object.
+
+478
+00:23:41,200 --> 00:23:43,460
+So, thinking about our looper example that
+we had before.
+
+479
+00:23:43,460 --> 00:23:49,900
+You're going to have the looper and it's
+going to have the, The get method on it.
+
+480
+00:23:49,900 --> 00:23:53,150
+So you go get the looper, and what that's
+going to do,
+
+481
+00:23:53,150 --> 00:23:55,930
+is it's going to you know in this case it
+would be the
+
+482
+00:23:55,930 --> 00:23:59,350
+thread local optic that we had defined
+specially for our particular use
+
+483
+00:23:59,350 --> 00:24:02,920
+case or Android is defined specifically
+for the use case for the looper.
+
+484
+00:24:04,150 --> 00:24:08,159
+And in fact let's just a step back here
+and see what that was called.
+
+485
+00:24:09,320 --> 00:24:13,205
+That was called S Thread Local.
+
+486
+00:24:13,205 --> 00:24:16,290
+So, you come back here.
+
+487
+00:24:16,290 --> 00:24:22,551
+You know, so it's, it's really more
+
+488
+00:24:22,551 --> 00:24:29,385
+like sthreadloca: [SOUND] That's a little
+
+489
+00:24:29,385 --> 00:24:36,044
+bit more like what it's actually doing.
+
+490
+00:24:36,044 --> 00:24:37,800
+I'll come back and fix all that up later.
+
+491
+00:24:38,850 --> 00:24:44,740
+Well what that says is that the that's the
+particular thing that's playing this role.
+
+492
+00:24:46,570 --> 00:24:54,740
+And then [SOUND] Each thread calls the get
+method.
+
+493
+00:24:54,740 --> 00:24:57,620
+Is actually going to get back a different
+object.
+
+494
+00:24:57,620 --> 00:24:59,110
+So, one thread versus others is actually
+going
+
+495
+00:24:59,110 --> 00:25:00,529
+to get back a different looper for
+example.
+
+496
+00:25:02,260 --> 00:25:06,250
+So internally, I'm going to look at the
+implementation here in a second.
+
+497
+00:25:06,250 --> 00:25:09,180
+The way it works is that there's, this
+data structure called values.
+
+498
+00:25:09,180 --> 00:25:11,950
+It's a strut, or a class.
+
+499
+00:25:11,950 --> 00:25:15,480
+There's an instance of this thing called
+local values.
+
+500
+00:25:15,480 --> 00:25:17,450
+And every thread has that.
+
+501
+00:25:17,450 --> 00:25:20,200
+And so that's used to actually keep track
+of the thread specific data.
+
+502
+00:25:20,200 --> 00:25:24,350
+And it uses a hash like mechanism, which
+we'll look at in a second too.
+
+503
+00:25:24,350 --> 00:25:26,380
+And then the last thing is why you put all
+
+504
+00:25:26,380 --> 00:25:28,350
+those together, it'll find you the looper
+that we want.
+
+505
+00:25:29,710 --> 00:25:32,640
+Okay, so if you actually look at the code,
+it's kind of cool.
+
+506
+00:25:32,640 --> 00:25:36,070
+And I'm going to show you the code here.
+
+507
+00:25:36,070 --> 00:25:38,280
+well, first of all, tell you about the
+code.
+
+508
+00:25:38,280 --> 00:25:39,010
+Then we'll go look at it.
+
+509
+00:25:39,010 --> 00:25:43,710
+So, thread-local.set figures out what the
+appropriate values map
+
+510
+00:25:43,710 --> 00:25:45,890
+is, in other words, the one that's for
+that thread.
+
+511
+00:25:45,890 --> 00:25:50,510
+Based on the current thread ID, so if you
+look here it says what thread am I in?
+
+512
+00:25:50,510 --> 00:25:53,710
+I'm in the current thread and it goes and
+it looks up
+
+513
+00:25:53,710 --> 00:25:57,350
+in the current thread and it gives back
+this list of values.
+
+514
+00:25:57,350 --> 00:26:00,170
+And assuming it's not null, then it goes
+ahead and
+
+515
+00:26:00,170 --> 00:26:07,930
+it does a put operation on that
+particular, values array.
+
+516
+00:26:07,930 --> 00:26:11,940
+Storing the value that was passed in here
+under this for
+
+517
+00:26:11,940 --> 00:26:14,840
+this particular object that's its, it's
+going to be its key essentially.
+
+518
+00:26:15,870 --> 00:26:16,370
+All right?
+
+519
+00:26:16,370 --> 00:26:18,150
+And notice there's no synchronization.
+
+520
+00:26:18,150 --> 00:26:20,850
+If you look through this code, there's no
+locking in it, at all.
+
+521
+00:26:20,850 --> 00:26:23,200
+That's the beauty of thread-specific
+storage.
+
+522
+00:26:23,200 --> 00:26:24,880
+So let's go over here and take a look at
+the code.
+
+523
+00:26:27,770 --> 00:26:29,920
+It's somewhat instructive to do this.
+
+524
+00:26:34,480 --> 00:26:34,820
+All right.
+
+525
+00:26:34,820 --> 00:26:36,020
+So let's take a look at set.
+
+526
+00:26:37,640 --> 00:26:39,260
+So here's this is just the code we just
+looked at.
+
+527
+00:26:39,260 --> 00:26:40,970
+Here's the code for set.
+
+528
+00:26:40,970 --> 00:26:42,260
+You can see what it does.
+
+529
+00:26:42,260 --> 00:26:45,149
+If you take a look at things like what's
+values.
+
+530
+00:26:49,010 --> 00:26:52,160
+So what values does, oops, that's
+initialized values.
+
+531
+00:26:54,240 --> 00:26:56,580
+So what values does is it goes and it
+takes a
+
+532
+00:26:56,580 --> 00:27:01,650
+look at the thread and it says, give me
+your local values.
+
+533
+00:27:01,650 --> 00:27:02,940
+So if you take a look at thread.
+
+534
+00:27:04,916 --> 00:27:10,307
+[SOUND] So there's thread, the thread
+class's local
+
+535
+00:27:10,307 --> 00:27:16,074
+value's data member is a thread
+locals.value object.
+
+536
+00:27:16,074 --> 00:27:17,469
+And if you go back over here.
+
+537
+00:27:18,480 --> 00:27:22,320
+And you look for values, here is values.
+
+538
+00:27:22,320 --> 00:27:26,210
+So it's a per thread map of thread local
+
+539
+00:27:26,210 --> 00:27:29,650
+instance values, the whole thing is kind
+of strangely recursive.
+
+540
+00:27:29,650 --> 00:27:32,070
+And you can see that they start out
+picking an initial
+
+541
+00:27:32,070 --> 00:27:36,260
+size, sixteen always to the power of two,
+and there's something called.
+
+542
+00:27:36,260 --> 00:27:38,250
+Tombstone, which I think they use for
+deleted,
+
+543
+00:27:38,250 --> 00:27:41,800
+when items get deleted they, they,they
+recycle them.
+
+544
+00:27:41,800 --> 00:27:43,110
+And then if you look down here, there's
+
+545
+00:27:43,110 --> 00:27:45,500
+just a bunch of code that does various
+things.
+
+546
+00:27:45,500 --> 00:27:50,590
+But this is basically how all the
+different implementation parts work, and I
+
+547
+00:27:50,590 --> 00:27:54,930
+think if you take a look here there's a
+method called put or.
+
+548
+00:27:54,930 --> 00:27:55,210
+There we go.
+
+549
+00:27:55,210 --> 00:27:56,200
+Here's put.
+
+550
+00:27:56,200 --> 00:28:00,060
+So put takes a thread local key, which in
+this case was this.
+
+551
+00:28:00,060 --> 00:28:04,370
+And a value, which is whatever we're going
+to store like, the looper for example.
+
+552
+00:28:04,370 --> 00:28:07,830
+And it basically goes ahead and, does some
+
+553
+00:28:07,830 --> 00:28:10,650
+operations to store things into the, into
+the map.
+
+554
+00:28:10,650 --> 00:28:12,470
+And there's a whole bunch of different
+things
+
+555
+00:28:12,470 --> 00:28:14,000
+that they do and there's also stuff that
+
+556
+00:28:14,000 --> 00:28:18,170
+they do which you'll see in a second in
+the case of the other operations to find.
+
+557
+00:28:20,670 --> 00:28:25,570
+Okay, so that was set and then there's
+get.
+
+558
+00:28:25,570 --> 00:28:29,020
+So get's a little bit different it's a
+little bit more complicated.
+
+559
+00:28:29,020 --> 00:28:31,880
+It uses the same technique of basically
+you figure out
+
+560
+00:28:31,880 --> 00:28:34,439
+what thread it's in going and getting the
+thread local.
+
+561
+00:28:35,780 --> 00:28:38,060
+map, if you will from that particular
+thread.
+
+562
+00:28:38,060 --> 00:28:40,520
+And then it's got some more stuff that's
+going on.
+
+563
+00:28:40,520 --> 00:28:41,750
+Let's go take a quick look at that.
+
+564
+00:28:43,100 --> 00:28:44,890
+Basically, if you see here.
+
+565
+00:28:44,890 --> 00:28:48,352
+Let's take a look at, get.
+
+566
+00:28:48,352 --> 00:28:52,370
+So, get is optimized for the fast path.
+
+567
+00:28:52,370 --> 00:28:54,920
+As you can see, it tries to look some
+stuff up
+
+568
+00:28:54,920 --> 00:28:58,650
+and see if it's already available in some
+kind of cache.
+
+569
+00:28:58,650 --> 00:29:02,430
+And if it's there it just goes ahead and
+indexes to it so it's very fast.
+
+570
+00:29:02,430 --> 00:29:06,770
+If it's not there, then it's got this
+method called get after miss.
+
+571
+00:29:07,830 --> 00:29:11,410
+And this is more complicated it has to do
+more things.
+
+572
+00:29:11,410 --> 00:29:13,220
+So you can see this is going to search
+through
+
+573
+00:29:13,220 --> 00:29:15,130
+the table so it takes longer to do that.
+
+574
+00:29:15,130 --> 00:29:20,230
+So, basically it kind of has this optimize
+for the common case or the pattern
+
+575
+00:29:20,230 --> 00:29:22,220
+of, you know, trying of locality of
+
+576
+00:29:22,220 --> 00:29:24,610
+reference, or, things that have been
+accessed recently.
+
+577
+00:29:24,610 --> 00:29:26,980
+We want to cache those, we can get back
+and get them quickly.
+
+578
+00:29:26,980 --> 00:29:31,000
+So that's why you might find it you have
+lots and lots of thread-specific objects.
+
+579
+00:29:31,000 --> 00:29:33,500
+They might perform differently over time
+if you run.
+
+580
+00:29:35,900 --> 00:29:36,540
+Okay.
+
+581
+00:29:36,540 --> 00:29:39,810
+So that's the thread local implementation.
+
+582
+00:29:39,810 --> 00:29:42,730
+Now how does this stuff get used, well
+this
+
+583
+00:29:42,730 --> 00:29:44,150
+goes back to what we looked at before you
+can
+
+584
+00:29:44,150 --> 00:29:47,590
+see that the looper class uses a thread
+local object
+
+585
+00:29:47,590 --> 00:29:49,670
+in order to make sure that there's only
+one looper.
+
+586
+00:29:49,670 --> 00:29:51,310
+We looked at that before.
+
+587
+00:29:51,310 --> 00:29:53,520
+The locking overhead that goes on there.
+
+588
+00:29:53,520 --> 00:29:58,530
+There's also a bunch of helper methods
+that are part of this implementation.
+
+589
+00:29:58,530 --> 00:30:01,530
+That are used to get the tread-specific
+loopers.
+
+590
+00:30:01,530 --> 00:30:02,630
+So this is a kind of an interesting one.
+
+591
+00:30:02,630 --> 00:30:05,500
+This is one that's called myLooper.
+
+592
+00:30:05,500 --> 00:30:08,860
+And myLooper gets used in various places
+in the looper implementation.
+
+593
+00:30:08,860 --> 00:30:11,260
+So you can see in the looper
+implementation.
+
+594
+00:30:11,260 --> 00:30:13,940
+And this is odd, I think I know the reason
+why
+
+595
+00:30:13,940 --> 00:30:15,570
+they do this and we'll see if you guys
+know too.
+
+596
+00:30:15,570 --> 00:30:18,970
+They have something called message queue,
+which is a data
+
+597
+00:30:18,970 --> 00:30:21,890
+member in the looper you can see it right
+here.
+
+598
+00:30:21,890 --> 00:30:23,650
+And then the loop method, remember loop is
+
+599
+00:30:23,650 --> 00:30:25,530
+what actually runs the event loop that's
+the thing
+
+600
+00:30:25,530 --> 00:30:27,970
+that sits there and waits for incoming
+messages on
+
+601
+00:30:27,970 --> 00:30:30,530
+the message queue and dispatches them to
+their target.
+
+602
+00:30:30,530 --> 00:30:32,430
+The first thing it does is it goes ahead
+and says.
+
+603
+00:30:32,430 --> 00:30:33,740
+My looper.
+
+604
+00:30:33,740 --> 00:30:38,070
+Which goes and gets the thread specific
+looper that this guy's associates with.
+
+605
+00:30:38,070 --> 00:30:39,630
+And if it checks to see if you've even
+
+606
+00:30:39,630 --> 00:30:42,460
+been initialized, if you've never
+initialized a looper at
+
+607
+00:30:42,460 --> 00:30:45,730
+all, you haven't called prepare, for
+example, and then
+
+608
+00:30:45,730 --> 00:30:47,350
+you try to run loop, it's going to blow
+up.
+
+609
+00:30:48,460 --> 00:30:49,400
+And then look what it does.
+
+610
+00:30:49,400 --> 00:30:50,740
+It goes ahead and it takes the thread
+
+611
+00:30:50,740 --> 00:30:53,530
+specific looper, that fish out of thread
+specific
+
+612
+00:30:53,530 --> 00:30:57,250
+storage, and it grabs that guys messages
+queue
+
+613
+00:30:57,250 --> 00:31:02,100
+and stashes into this local message queue,
+all right.
+
+614
+00:31:02,100 --> 00:31:02,670
+So, this is weird.
+
+615
+00:31:02,670 --> 00:31:05,550
+This is message queue up here, that's
+whats being access here.
+
+616
+00:31:05,550 --> 00:31:10,770
+And then we go ahead and we cast that into
+a local message queue.
+
+617
+00:31:10,770 --> 00:31:12,310
+Does anyone speculate why we do that.
+
+618
+00:31:12,310 --> 00:31:16,020
+And then the rest of the looping
+operations are done after that.
+
+619
+00:31:18,315 --> 00:31:26,840
+[LAUGH]
+I think it just locality reference moving
+
+620
+00:31:26,840 --> 00:31:30,930
+things into closer variables that can be
+optimized better, and so on and so forth.
+
+621
+00:31:30,930 --> 00:31:39,935
+If we take a look over here at the code
+for this thing [SOUND].
+
+622
+00:31:39,935 --> 00:31:42,480
+So here's, here's the looper.
+
+623
+00:31:42,480 --> 00:31:44,420
+Here's the looper's loop methods.
+
+624
+00:31:44,420 --> 00:31:46,260
+It grabs that guy.
+
+625
+00:31:46,260 --> 00:31:47,780
+It goes and stashes it away.
+
+626
+00:31:48,780 --> 00:31:52,219
+And then it just sits there and blocks in
+that particular place.
+
+627
+00:31:53,420 --> 00:31:54,780
+Don't show me this message again.
+
+628
+00:31:54,780 --> 00:31:55,280
+Thank you.
+
+629
+00:31:56,580 --> 00:31:57,020
+Okay.
+
+630
+00:31:57,020 --> 00:31:58,710
+So this is the looper.
+
+631
+00:31:58,710 --> 00:32:01,330
+Take a look at my looper for example.
+
+632
+00:32:01,330 --> 00:32:02,810
+You can see where it gets used.
+
+633
+00:32:02,810 --> 00:32:07,900
+Basically, any time you want to refer to
+the looper then it calls my looper.
+
+634
+00:32:07,900 --> 00:32:10,420
+And my looper as you can see just goes
+
+635
+00:32:10,420 --> 00:32:13,860
+ahead and fishes the data out of
+thread-specific storage.
+
+636
+00:32:13,860 --> 00:32:15,500
+And we use that all the way though
+whatever we
+
+637
+00:32:15,500 --> 00:32:18,480
+have to refer to the current looper that's
+being accessed.
+
+638
+00:32:18,480 --> 00:32:21,900
+This also allows us of course to use
+static methods because we
+
+639
+00:32:21,900 --> 00:32:25,550
+can fish out the thread-specific looper
+because it doesn't live in an object.
+
+640
+00:32:25,550 --> 00:32:26,870
+It lives in a thread.
+
+641
+00:32:26,870 --> 00:32:28,810
+Not in a specific object.
+
+642
+00:32:28,810 --> 00:32:31,198
+I had mentioned earlier that there's also
+the handler stuff.
+
+643
+00:32:31,198 --> 00:32:37,400
+As well, Let's see.
+
+644
+00:32:37,400 --> 00:32:39,470
+I thought the constructor.
+
+645
+00:32:39,470 --> 00:32:40,220
+Yeah, check this out.
+
+646
+00:32:40,220 --> 00:32:43,891
+So, you can see here that the handler
+method-
+
+647
+00:32:43,891 --> 00:32:46,800
+Remember, that this goes back to what you
+were asking on.
+
+648
+00:32:46,800 --> 00:32:52,040
+So, handlers when they're created based on
+this constructor.
+
+649
+00:32:52,040 --> 00:32:53,910
+There's a couple of different constructors
+that they have.
+
+650
+00:32:53,910 --> 00:32:57,110
+But, like the, the default handler
+constructor.
+
+651
+00:32:57,110 --> 00:32:59,640
+Notice what it does, is if you don't do
+anything else, it
+
+652
+00:32:59,640 --> 00:33:04,510
+goes ahead and it says, hey looper, give
+me back my looper.
+
+653
+00:33:04,510 --> 00:33:06,930
+So that's going to get you back the thread
+specific looper.
+
+654
+00:33:06,930 --> 00:33:11,340
+So if you call, if you create an object
+handler in a thread.
+
+655
+00:33:11,340 --> 00:33:13,900
+It's going to live, it will be owned by
+that thread.
+
+656
+00:33:13,900 --> 00:33:16,760
+And its constructor makes sure that that
+happens.
+
+657
+00:33:16,760 --> 00:33:19,110
+So make sure you're careful where you
+create your handlers.
+
+658
+00:33:19,110 --> 00:33:25,350
+Make sure you create them where you want
+them to live and not some other place.
+
+659
+00:33:25,350 --> 00:33:25,790
+Okay.
+
+660
+00:33:25,790 --> 00:33:31,770
+So that's basically the way it's done in
+Android.
+
+661
+00:33:33,230 --> 00:33:35,340
+There's a source code so let's talk about
+
+662
+00:33:35,340 --> 00:33:37,140
+the pro's and con's of this particular
+pattern.
+
+663
+00:33:37,140 --> 00:33:40,120
+So the good news is, it's efficient in the
+sense that you
+
+664
+00:33:40,120 --> 00:33:44,190
+don't need to have locks in order to
+access the state, the data.
+
+665
+00:33:45,530 --> 00:33:46,830
+It's relatively easy to use.
+
+666
+00:33:46,830 --> 00:33:50,130
+As you can see here, it's pretty much like
+programming regular Java code.
+
+667
+00:33:51,380 --> 00:33:54,590
+It's instructive at some point in your
+life to try to figure out how to program
+
+668
+00:33:54,590 --> 00:33:57,650
+thread specific storage using the low
+level C
+
+669
+00:33:57,650 --> 00:34:00,450
+POSIX P thread API which is unbelievably
+convoluted.
+
+670
+00:34:00,450 --> 00:34:02,280
+We'll see a little snippet of it in a
+second.
+
+671
+00:34:02,280 --> 00:34:03,430
+And you'll see why it's much better to
+
+672
+00:34:03,430 --> 00:34:05,790
+have wrappers and proxies to save your
+life.
+
+673
+00:34:07,040 --> 00:34:11,370
+Speaking of wrappers, you can combine this
+pattern with wrapper facade, which is
+
+674
+00:34:11,370 --> 00:34:14,920
+a pattern, it's another post of two
+pattern, we'll talk about it later, in
+
+675
+00:34:14,920 --> 00:34:17,910
+order to be able to get portable access to
+low-level system call APIs, which
+
+676
+00:34:17,910 --> 00:34:23,570
+makes your code more portable, makes your
+code more reusable, so that's a benefit.
+
+677
+00:34:23,570 --> 00:34:24,250
+Java does that.
+
+678
+00:34:24,250 --> 00:34:26,970
+All the Java class libraries are wrapper
+facades.
+
+679
+00:34:28,610 --> 00:34:30,970
+There's some downsides, however, probably
+the main
+
+680
+00:34:30,970 --> 00:34:33,780
+downside with this approach is it ends up.
+
+681
+00:34:33,780 --> 00:34:36,130
+Encouraging people to use globals even
+though
+
+682
+00:34:36,130 --> 00:34:40,130
+their thread specific globals they're
+still globals.
+
+683
+00:34:40,130 --> 00:34:42,410
+And that has all the common down sides
+with globals.
+
+684
+00:34:42,410 --> 00:34:45,780
+What, what's a good example of a common
+down side with a global?
+
+685
+00:34:45,780 --> 00:34:48,040
+What are things why are globals considered
+bad?
+
+686
+00:34:49,430 --> 00:34:50,415
+Why do they make you go like this?
+
+687
+00:34:50,415 --> 00:34:52,006
+Coupling.
+
+688
+00:34:52,006 --> 00:34:56,010
+You end up being coupled to a particular
+context, and so, when
+
+689
+00:34:56,010 --> 00:34:58,010
+you try to move your code, you can't just
+move a piece of
+
+690
+00:34:58,010 --> 00:35:00,520
+it, you have to move the whole thing, and
+everything that the
+
+691
+00:35:00,520 --> 00:35:04,780
+globals, that accesses the globals, have
+to come along with the other parts.
+
+692
+00:35:04,780 --> 00:35:06,160
+So it makes things much more tightly
+coupled.
+
+693
+00:35:06,160 --> 00:35:09,680
+It also means that when you change stuff
+that's related to a global, you run the
+
+694
+00:35:09,680 --> 00:35:12,590
+risk of breaking a lot of things, because
+they depend on it in an implicit way.
+
+695
+00:35:14,600 --> 00:35:16,560
+It obscures the structure of the system.
+
+696
+00:35:16,560 --> 00:35:18,260
+So it hides things.
+
+697
+00:35:18,260 --> 00:35:22,190
+It's like fog or a smoke screen or
+pollution or something like that.
+
+698
+00:35:22,190 --> 00:35:24,610
+You can't see as clearly what's going on.
+
+699
+00:35:24,610 --> 00:35:26,384
+That's, that's kind of another way
+
+700
+00:35:26,384 --> 00:35:28,830
+of looking at coupling and unwanted
+dependencies.
+
+701
+00:35:29,900 --> 00:35:31,120
+And of course if you have a really
+
+702
+00:35:31,120 --> 00:35:35,480
+inefficient implementation of looking at
+your thread specific objects.
+
+703
+00:35:35,480 --> 00:35:38,380
+Then, it might not actually be any better
+than grabbing a lock.
+
+704
+00:35:38,380 --> 00:35:41,480
+Although, it might scale better if you had
+lots and lots of threads.
+
+705
+00:35:41,480 --> 00:35:43,740
+So that's, that's an implementation
+consideration.
+
+706
+00:35:43,740 --> 00:35:45,410
+But if you have really, really inefficient
+
+707
+00:35:45,410 --> 00:35:47,710
+things like you know, linear search
+through
+
+708
+00:35:47,710 --> 00:35:50,980
+the list of thread specific objects, that
+could slow you down quite a bit.
+
+709
+00:35:52,250 --> 00:35:52,470
+Okay.
+
+710
+00:35:52,470 --> 00:35:53,940
+So there's a bunch of known uses.
+
+711
+00:35:53,940 --> 00:35:57,388
+The best example of known use in my mind
+is errno.
+
+712
+00:35:57,388 --> 00:36:02,830
+Which once multi-threading became popular
+was, widely implemented as a
+
+713
+00:36:02,830 --> 00:36:08,260
+macro that caught, that turns into a call
+to thread-specific operations so that
+
+714
+00:36:08,260 --> 00:36:10,950
+you don't have to worry about the race
+conditions that would,
+
+715
+00:36:10,950 --> 00:36:14,669
+otherwise, occur if you were sharing
+global error no variables between threads.
+
+716
+00:36:15,940 --> 00:36:19,520
+And, you can read more the Wikipedia link
+about what error know is.
+
+717
+00:36:19,520 --> 00:36:21,840
+And, it's just interesting to know I
+should
+
+718
+00:36:21,840 --> 00:36:23,600
+probably show the implementation of it's
+kind of cool.
+
+719
+00:36:23,600 --> 00:36:26,957
+[SOUND] ACE has a really cool
+implementation of this pattern.
+
+720
+00:36:26,957 --> 00:36:29,339
+Not surprisingly, because we wrote the
+pattern
+
+721
+00:36:29,339 --> 00:36:31,600
+on originally what we were doing in Ace.
+
+722
+00:36:31,600 --> 00:36:34,270
+And, found other known uses to make a
+pattern.
+
+723
+00:36:34,270 --> 00:36:38,217
+So it defines a class called ACE_TSS.
+
+724
+00:36:38,217 --> 00:36:43,100
+And ACE_TSS converts, it's a template, and
+converts its parameter
+
+725
+00:36:43,100 --> 00:36:46,950
+into something that is easily accessible
+in a thread specific way.
+
+726
+00:36:46,950 --> 00:36:49,990
+And it also, of course, provides nice
+portability to different platforms.
+
+727
+00:36:49,990 --> 00:36:52,420
+If you read the paper here, it talks about
+the ace implementation.
+
+728
+00:36:52,420 --> 00:36:55,765
+The way it works under the hood, is it
+uses this really cool.
+
+729
+00:36:55,765 --> 00:37:00,840
+C plus, plus operator called operator
+arrow, the so called delegation operator.
+
+730
+00:37:00,840 --> 00:37:03,220
+Can anybody explain the delegation
+operator?
+
+731
+00:37:03,220 --> 00:37:07,150
+Does anybody know how it works?
+
+732
+00:37:07,150 --> 00:37:11,000
+So, anytime you say whatever on the left
+arrow some method.
+
+733
+00:37:11,000 --> 00:37:13,548
+It will actually go in and execute your
+code first.
+
+734
+00:37:13,548 --> 00:37:17,870
+If you can actually start training it if
+you
+
+735
+00:37:17,870 --> 00:37:23,470
+return something that's not [INAUDIBLE]
+but also over and operator.
+
+736
+00:37:23,470 --> 00:37:23,880
+Yep.
+
+737
+00:37:23,880 --> 00:37:25,100
+So, so it's really subtle.
+
+738
+00:37:25,100 --> 00:37:27,020
+And when you first see it it makes no
+sense
+
+739
+00:37:27,020 --> 00:37:28,900
+what so ever but I'll break it down and
+show you.
+
+740
+00:37:28,900 --> 00:37:32,900
+So here's a little snippet of code from
+the HTS class this is the
+
+741
+00:37:32,900 --> 00:37:35,080
+most important piece this is the operator
+
+742
+00:37:35,080 --> 00:37:37,460
+arrow method, this is the delegation
+operator.
+
+743
+00:37:37,460 --> 00:37:41,620
+You can see that this thing is a template
+class it returns a pointer to
+
+744
+00:37:41,620 --> 00:37:44,630
+the type it's parametrized with and what
+it's
+
+745
+00:37:44,630 --> 00:37:48,010
+called these are the those hideous low
+level.
+
+746
+00:37:49,090 --> 00:37:52,670
+See style thread specific storage APIs
+which nobody in
+
+747
+00:37:52,670 --> 00:37:55,400
+their right mind wants to program against
+by the way.
+
+748
+00:37:55,400 --> 00:37:58,470
+So what it does, is it comes along and it
+would have cached this key
+
+749
+00:37:58,470 --> 00:38:00,750
+underscore in its constructor somewhere
+that, that
+
+750
+00:38:00,750 --> 00:38:03,700
+uniquely identifies the specific object we
+care about.
+
+751
+00:38:03,700 --> 00:38:07,020
+And it says, hey, is there any data?
+
+752
+00:38:07,020 --> 00:38:09,370
+Is there a pointer that's previously been
+initialized
+
+753
+00:38:09,370 --> 00:38:11,880
+for this particular key in this particular
+thread before?
+
+754
+00:38:13,040 --> 00:38:17,600
+And if the answer is no, then it goes
+ahead and makes a new one.
+
+755
+00:38:17,600 --> 00:38:19,980
+It creates a new thread sp, specific,
+
+756
+00:38:19,980 --> 00:38:23,170
+a new thread-specific instance dynamically
+of type
+
+757
+00:38:23,170 --> 00:38:28,550
+type, and then it says go ahead and set
+that thing into thread-specific storage.
+
+758
+00:38:28,550 --> 00:38:30,150
+So it dynamically allocates the type if it
+
+759
+00:38:30,150 --> 00:38:32,630
+doesn't already exist, if the object
+doesn't already exist.
+
+760
+00:38:32,630 --> 00:38:36,880
+And it stores it in that thread in its
+thread specific object set.
+
+761
+00:38:36,880 --> 00:38:41,610
+And when it's all done, it returns the
+pointer to the allocated object.
+
+762
+00:38:41,610 --> 00:38:44,430
+So, either you allocated it this time or
+
+763
+00:38:44,430 --> 00:38:46,790
+this is the, a subsequent time through
+this
+
+764
+00:38:46,790 --> 00:38:48,430
+particular code and so it just returns a
+
+765
+00:38:48,430 --> 00:38:50,600
+reference or a pointer to it at that
+point.
+
+766
+00:38:50,600 --> 00:38:53,890
+So what comes back from operator arrow is
+a pointer.
+
+767
+00:38:53,890 --> 00:38:57,560
+To an object that resides in thread
+specific storage.
+
+768
+00:38:57,560 --> 00:39:01,530
+And then what you typically do is, as
+Kristof
+
+769
+00:39:01,530 --> 00:39:04,741
+correctly noted, when you call a method
+like this.
+
+770
+00:39:04,741 --> 00:39:08,070
+Let's say, that we have a class called
+request count, that's just
+
+771
+00:39:08,070 --> 00:39:12,110
+going to keep a count of something, and
+this is not thread safe code.
+
+772
+00:39:12,110 --> 00:39:15,320
+We create an instance of ACE_TSS called
+request
+
+773
+00:39:15,320 --> 00:39:17,950
+count, so that's a variable of type
+ACE_TSS.
+
+774
+00:39:17,950 --> 00:39:21,130
+Parameterized with this particular class.
+
+775
+00:39:21,130 --> 00:39:24,300
+And then we you say request_count arrow
+increment,
+
+776
+00:39:24,300 --> 00:39:27,780
+it first calls this method here which is
+the
+
+777
+00:39:27,780 --> 00:39:30,370
+delegation method which gets you a pointer
+by
+
+778
+00:39:30,370 --> 00:39:32,600
+hook or by crook to the thread specific
+data.
+
+779
+00:39:32,600 --> 00:39:34,510
+And then it returns it.
+
+780
+00:39:34,510 --> 00:39:37,243
+And then C plus, plus automatically
+delegates to the
+
+781
+00:39:37,243 --> 00:39:40,670
+increment method, and so that goes ahead
+and calls it.
+
+782
+00:39:40,670 --> 00:39:42,820
+So it looks like just a regular function
+call, but in
+
+783
+00:39:42,820 --> 00:39:46,880
+fact it's actually accessing data that's
+stored in a thread specific way.
+
+784
+00:39:46,880 --> 00:39:48,120
+So, it's very cool, very powerful.
+
+785
+00:39:49,580 --> 00:39:53,630
+All right, so to summarize this, Android
+implements Thread-Specific Storage
+
+786
+00:39:53,630 --> 00:39:57,430
+via the Java Thread-Local class which
+doesn't give you the whole
+
+787
+00:39:57,430 --> 00:40:01,100
+full blown mechanisms that you've got in
+the thread specific
+
+788
+00:40:01,100 --> 00:40:02,870
+storage pattern but it gets you most of
+the way there.
+
+789
+00:40:04,360 --> 00:40:07,390
+And Android uses this in order to get
+access
+
+790
+00:40:07,390 --> 00:40:09,830
+to in order to insure you only have one
+looper.
+
+791
+00:40:09,830 --> 00:40:12,838
+It also is used for the handlers as we
+were talking about before.
+
+792
+00:40:12,838 --> 00:40:14,376
+All right.
+
+793
+00:40:14,376 --> 00:40:16,761
+Any questions?
+
+794
+00:40:16,761 --> 00:40:25,389
+[MUSIC]
+
