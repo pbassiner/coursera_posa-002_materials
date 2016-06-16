@@ -1,0 +1,2577 @@
+1
+00:00:00,181 --> 00:00:08,713
+[MUSIC]
+
+2
+00:00:08,713 --> 00:00:12,283
+What we're going to talk about now, is
+something that, makes a lot more
+
+3
+00:00:12,283 --> 00:00:14,401
+sense, once we've gotten to the point,
+
+4
+00:00:14,401 --> 00:00:16,900
+where we're discussing, AIDL and Binder
+RPC.
+
+5
+00:00:16,900 --> 00:00:19,960
+Because it's something that really figures
+prominently in that context.
+
+6
+00:00:19,960 --> 00:00:21,959
+So, what we're going to talk about here,
+is
+
+7
+00:00:21,959 --> 00:00:24,580
+we're going to start talking about, the
+proxy pattern.
+
+8
+00:00:24,580 --> 00:00:26,790
+And as we'll see, the proxy pattern is a
+
+9
+00:00:26,790 --> 00:00:29,310
+pattern that appeared in a couple of
+different places.
+
+10
+00:00:29,310 --> 00:00:32,510
+It appeared in the Gang of Four book,
+where it's
+
+11
+00:00:32,510 --> 00:00:38,620
+focusing primarily on, a very simplistic,
+way of doing proxies.
+
+12
+00:00:38,620 --> 00:00:41,170
+And then later, we'll see it appeared in
+the POSA
+
+13
+00:00:41,170 --> 00:00:45,320
+1 book, where it was described a bit more
+generally.
+
+14
+00:00:45,320 --> 00:00:47,690
+Focusing on communication that occurs in,
+in
+
+15
+00:00:47,690 --> 00:00:50,450
+environments where you're going across
+address spaces.
+
+16
+00:00:50,450 --> 00:00:51,730
+So, we're going to kind of merge these two
+
+17
+00:00:51,730 --> 00:00:53,340
+things together and we'll talk first about
+the
+
+18
+00:00:53,340 --> 00:00:55,000
+pattern, and then we'll talk about how the
+
+19
+00:00:55,000 --> 00:00:58,070
+pattern gets applied in the context of
+Android.
+
+20
+00:00:59,120 --> 00:01:00,080
+So, what's the context?
+
+21
+00:01:00,080 --> 00:01:04,550
+Well, the context is, in most environments
+where you have to cross address
+
+22
+00:01:04,550 --> 00:01:07,850
+spaces, it's not really feasible to access
+
+23
+00:01:07,850 --> 00:01:10,400
+the, internal details of an object
+directly.
+
+24
+00:01:10,400 --> 00:01:12,430
+If, if it's in a server process.
+
+25
+00:01:12,430 --> 00:01:13,970
+You just can't get to it from the client.
+
+26
+00:01:13,970 --> 00:01:17,930
+You're, you're separated from an
+abstraction boundary that could be,
+
+27
+00:01:17,930 --> 00:01:20,370
+a logical boundary like you might have
+with, say, Java.
+
+28
+00:01:20,370 --> 00:01:24,660
+Or it might actually be a physical qua,
+physical boundary which is
+
+29
+00:01:24,660 --> 00:01:28,800
+protected by the hardware, where you have
+things running in separate processes.
+
+30
+00:01:28,800 --> 00:01:31,090
+But whatever the case is, you can't get to
+something directly.
+
+31
+00:01:33,050 --> 00:01:35,590
+And of course, Android provides this
+Binder RPC mechanism,
+
+32
+00:01:35,590 --> 00:01:39,050
+which we can use to communicate, across
+the, back plane
+
+33
+00:01:39,050 --> 00:01:42,010
+of the device, to talk between processes
+that are always,
+
+34
+00:01:42,010 --> 00:01:45,590
+on the same device but in, in different
+address spaces.
+
+35
+00:01:45,590 --> 00:01:47,730
+Another part of the context here, is that
+
+36
+00:01:47,730 --> 00:01:50,820
+as you start to develop your system over
+time,
+
+37
+00:01:50,820 --> 00:01:53,020
+it's often the case that, you change your
+
+38
+00:01:53,020 --> 00:01:56,310
+mind about where you want your objects to
+live.
+
+39
+00:01:56,310 --> 00:01:57,785
+Now, this is really easy to motivate,
+
+40
+00:01:57,785 --> 00:01:59,770
+when we start talking about a distributed
+system.
+
+41
+00:01:59,770 --> 00:02:02,340
+In a distributed system, where you've got
+networks involved.
+
+42
+00:02:02,340 --> 00:02:05,110
+You might start out with things perhaps
+co-located in the
+
+43
+00:02:05,110 --> 00:02:08,720
+same address base or on the same machine,
+for various reasons.
+
+44
+00:02:08,720 --> 00:02:11,270
+Simplicity of programming is the most
+obvious one.
+
+45
+00:02:11,270 --> 00:02:14,830
+And then as your, customers start to scale
+up or scale out, you
+
+46
+00:02:14,830 --> 00:02:19,490
+want to add more and more and more
+processing to your, to your solution.
+
+47
+00:02:19,490 --> 00:02:22,000
+So, rather than putting everything
+together in one address
+
+48
+00:02:22,000 --> 00:02:25,420
+space or in one machine, now you've got
+multiple machines.
+
+49
+00:02:25,420 --> 00:02:27,410
+And so, in that case, you may start
+changing where
+
+50
+00:02:27,410 --> 00:02:30,600
+things reside over time as your system has
+to grow
+
+51
+00:02:30,600 --> 00:02:33,425
+or as you do profiling to learn where the
+hotspots
+
+52
+00:02:33,425 --> 00:02:36,360
+are, where it slows down, and so on and so
+forth.
+
+53
+00:02:36,360 --> 00:02:38,190
+But the point is that things are going to
+change over time.
+
+54
+00:02:39,290 --> 00:02:40,120
+So what are the problems?
+
+55
+00:02:40,120 --> 00:02:45,120
+Well, one problem is that, manually
+writing code to marshal and de-marshal
+
+56
+00:02:45,120 --> 00:02:48,190
+communication between address spaces, is
+very
+
+57
+00:02:48,190 --> 00:02:51,610
+tedious, error prone, and just not
+portable.
+
+58
+00:02:51,610 --> 00:02:54,480
+It's just a real pain, nobody wants to
+write that code.
+
+59
+00:02:54,480 --> 00:02:56,640
+It's hard to maintain, and it's hard to
+optimize.
+
+60
+00:02:56,640 --> 00:02:59,070
+So, you'd really like that to have to do
+it yourself.
+
+61
+00:02:59,070 --> 00:03:03,360
+The second problem is, if you were able
+to, rewrite a lot of code every time they
+
+62
+00:03:03,360 --> 00:03:06,820
+reconfigure, or redeploy their software,
+to break things up
+
+63
+00:03:06,820 --> 00:03:09,785
+into different partitioning boundaries,
+that's a lot of work.
+
+64
+00:03:09,785 --> 00:03:15,850
+And, if you program with lower level IPC
+mechanisms, like sockets, for example.
+
+65
+00:03:15,850 --> 00:03:20,110
+The amount of work required to change,
+from communicating between
+
+66
+00:03:20,110 --> 00:03:22,660
+things in the same address space to things
+on, the
+
+67
+00:03:22,660 --> 00:03:25,110
+same machine to different processes, to
+different processes on different
+
+68
+00:03:25,110 --> 00:03:27,280
+machines, it's a lot of work to do that by
+hand.
+
+69
+00:03:27,280 --> 00:03:29,560
+And so, most people just give up very
+quickly, they say to
+
+70
+00:03:29,560 --> 00:03:32,130
+heck with it, it's good enough, I'm not
+going to worry about it.
+
+71
+00:03:32,130 --> 00:03:35,270
+So, these are they kinds of impediments
+that we run into.
+
+72
+00:03:35,270 --> 00:03:36,500
+When we start trying to build systems that
+
+73
+00:03:36,500 --> 00:03:38,790
+have to be broken up, across different
+address boundaries.
+
+74
+00:03:39,970 --> 00:03:41,100
+So, what's the solution?
+
+75
+00:03:41,100 --> 00:03:43,390
+Well, as you'll see there's a multi-part
+solution here but one
+
+76
+00:03:43,390 --> 00:03:46,340
+piece of the solution, is to define
+something called a proxy
+
+77
+00:03:46,340 --> 00:03:51,640
+and the proxy essentially acts as a
+surrogate or an ambassador,
+
+78
+00:03:51,640 --> 00:03:57,390
+that gives a particular interface,
+actually the same interface to the client.
+
+79
+00:03:57,390 --> 00:04:01,750
+And then, allows the implementation of the
+interface to be some place else.
+
+80
+00:04:01,750 --> 00:04:03,510
+And that some place else could be, in
+
+81
+00:04:03,510 --> 00:04:05,790
+a different address space on the same
+machine.
+
+82
+00:04:05,790 --> 00:04:08,280
+It might be, in the operating system
+canal,
+
+83
+00:04:08,280 --> 00:04:11,190
+being accessed by an application running
+in user level.
+
+84
+00:04:11,190 --> 00:04:13,810
+It might be another process on another
+machine.
+
+85
+00:04:13,810 --> 00:04:15,900
+We don't really know, we don't really
+care, all we
+
+86
+00:04:15,900 --> 00:04:19,140
+know is that, the proxy is allowing us to,
+abstract
+
+87
+00:04:19,140 --> 00:04:23,200
+and encapsulate the details of where
+things actually reside and
+
+88
+00:04:23,200 --> 00:04:26,460
+that'll allow us, a lot more flexibility
+to move things around.
+
+89
+00:04:26,460 --> 00:04:28,930
+So, here's how you might do this on
+Android.
+
+90
+00:04:28,930 --> 00:04:31,460
+You might go ahead and, and inherit a
+remote
+
+91
+00:04:31,460 --> 00:04:33,800
+object from a Binder as we've been talking
+about many
+
+92
+00:04:33,800 --> 00:04:36,770
+times and this Binder then allows you to
+be able
+
+93
+00:04:36,770 --> 00:04:40,360
+to export that object to the, to the
+receiver side.
+
+94
+00:04:40,360 --> 00:04:42,940
+Of course, the way in which you get a
+proxy to do this thing is to
+
+95
+00:04:42,940 --> 00:04:49,300
+describe the interface to this via an AIDL
+file, which says, what the methods are and
+
+96
+00:04:49,300 --> 00:04:53,710
+their signatures and so on, and then you
+run that through the compiler, you get the
+
+97
+00:04:53,710 --> 00:04:56,680
+proxy, which is generated automatically
+for you, and
+
+98
+00:04:56,680 --> 00:04:59,290
+then when a client invokes a method call.
+
+99
+00:04:59,290 --> 00:05:03,000
+On the proxy, it thinks, its accessing
+something that's local.
+
+100
+00:05:03,000 --> 00:05:08,420
+It says, you know, service.download image
+or download file or whatever.
+
+101
+00:05:08,420 --> 00:05:10,480
+It looks like it's making a local call,
+
+102
+00:05:10,480 --> 00:05:13,070
+when in fact it's actually calling
+something elsewhere.
+
+103
+00:05:13,070 --> 00:05:15,930
+Now, where that thing resides, you can
+control in
+
+104
+00:05:15,930 --> 00:05:19,320
+Android, by changing various directives in
+the manifest files.
+
+105
+00:05:19,320 --> 00:05:21,790
+So, you control, whether or not the thing
+is in the same
+
+106
+00:05:21,790 --> 00:05:24,280
+address space, or whether it's going to be
+in a different address space.
+
+107
+00:05:24,280 --> 00:05:26,930
+You get some control over that, but the
+point is that, whether it's in
+
+108
+00:05:26,930 --> 00:05:29,000
+the same or different, the proxy is
+
+109
+00:05:29,000 --> 00:05:31,490
+shielding you, from what's actually taking
+place.
+
+110
+00:05:31,490 --> 00:05:37,500
+Now, as we'll see later, the proxy
+pattern, is going to work together with,
+
+111
+00:05:38,510 --> 00:05:44,170
+the Android Binder RPC mechanism, in order
+to implement the Broker pattern.
+
+112
+00:05:44,170 --> 00:05:46,440
+And we're not going to talk about that
+quite yet.
+
+113
+00:05:46,440 --> 00:05:47,800
+That's going to come next.
+
+114
+00:05:47,800 --> 00:05:49,525
+But, be aware that, that's, that's kind of
+where we're
+
+115
+00:05:49,525 --> 00:05:52,190
+headed on this thing, it's to talk about
+Brokers.
+
+116
+00:05:52,190 --> 00:05:55,130
+The, the proxy is just piece of that.
+
+117
+00:05:55,130 --> 00:06:02,860
+If we were thinking about this in, broader
+pattern concepts, we would say that the
+
+118
+00:06:02,860 --> 00:06:05,800
+broker was a pattern language, and the
+proxy
+
+119
+00:06:05,800 --> 00:06:07,580
+was a, a piece of that pattern language.
+
+120
+00:06:07,580 --> 00:06:08,780
+And we'll, perhaps talk about that later.
+
+121
+00:06:10,410 --> 00:06:12,380
+Okay, so as always, these are not just
+
+122
+00:06:12,380 --> 00:06:17,150
+random assortments of classes thrown
+together for adhoc reasons.
+
+123
+00:06:17,150 --> 00:06:19,620
+They, they fit in some grander scheme.
+
+124
+00:06:19,620 --> 00:06:21,560
+This grander scheme has been around for
+quite a long time.
+
+125
+00:06:21,560 --> 00:06:25,900
+Some of the early work in this area, goes
+back to, to 19, probably
+
+126
+00:06:25,900 --> 00:06:29,950
+the 1980's so it's been, you know, what,
+30 plus years at this point.
+
+127
+00:06:29,950 --> 00:06:31,960
+For a lot of this stuff, it's has been
+around for awhile.
+
+128
+00:06:31,960 --> 00:06:34,350
+And the pattern, is called the broker
+pattern.
+
+129
+00:06:34,350 --> 00:06:36,980
+And the, I'm sorry, the pattern is called
+the proxy pattern.
+
+130
+00:06:36,980 --> 00:06:41,408
+And the, intent of this pattern is to be
+able to, provide a surrogate or place
+
+131
+00:06:41,408 --> 00:06:44,065
+holder for, an object to allow another
+object
+
+132
+00:06:44,065 --> 00:06:46,400
+to access it, and control access to it.
+
+133
+00:06:48,190 --> 00:06:50,760
+You take a look here, for more information
+about the proxy pattern.
+
+134
+00:06:50,760 --> 00:06:53,990
+There's a couple of different reasons why
+you would use this.
+
+135
+00:06:53,990 --> 00:06:56,830
+The typical reason why you would use this
+pattern is if you need to be able
+
+136
+00:06:56,830 --> 00:07:00,280
+to access, an object using something
+that's more
+
+137
+00:07:00,280 --> 00:07:04,550
+powerful, than a simple pointer or a
+simple reference.
+
+138
+00:07:04,550 --> 00:07:08,390
+Pointers and references that you find in
+C++ and Java are great,
+
+139
+00:07:08,390 --> 00:07:11,480
+when you're talking to objects that are in
+the same address base.
+
+140
+00:07:11,480 --> 00:07:13,020
+When you start having objects that reside
+in
+
+141
+00:07:13,020 --> 00:07:14,480
+other address spaces, they don't work so
+great
+
+142
+00:07:14,480 --> 00:07:17,360
+because they can't reach across those
+address spaces,
+
+143
+00:07:17,360 --> 00:07:19,670
+so that's when we need to have proxies.
+
+144
+00:07:19,670 --> 00:07:22,252
+Another motivation here is to make it easy
+to be
+
+145
+00:07:22,252 --> 00:07:26,040
+able to, change where the objects reside,
+local versus remote.
+
+146
+00:07:26,040 --> 00:07:29,410
+Or co-located versus remote, without
+changing the way that you
+
+147
+00:07:29,410 --> 00:07:33,350
+access them, so, those are the
+considerations that might help you.
+
+148
+00:07:34,550 --> 00:07:36,200
+Another thing you might want to do here,
+is if
+
+149
+00:07:36,200 --> 00:07:39,260
+you want to have some kind of strong type
+checking.
+
+150
+00:07:39,260 --> 00:07:40,610
+Let me add that one just for fun.
+
+151
+00:07:41,900 --> 00:07:47,221
+Say, if there's say, when
+
+152
+00:07:47,221 --> 00:07:52,544
+there's a, benefit from having
+
+153
+00:07:52,544 --> 00:07:57,298
+strong statically-typed,
+
+154
+00:07:57,298 --> 00:08:03,320
+typed method invocations.
+
+155
+00:08:03,320 --> 00:08:04,610
+And what I'm really talking about here,
+
+156
+00:08:04,610 --> 00:08:07,080
+what I'm really comparing and contrasting
+with, is
+
+157
+00:08:07,080 --> 00:08:10,710
+the approaches that use proxies, from
+other approaches
+
+158
+00:08:10,710 --> 00:08:12,380
+that are based on more message passing
+[COUGH].
+
+159
+00:08:12,380 --> 00:08:13,290
+We'll talk about those later.
+
+160
+00:08:15,070 --> 00:08:18,510
+Here's a quick synopsis of the structure
+and participants in this pattern.
+
+161
+00:08:18,510 --> 00:08:19,480
+It's, it's pretty straight forward.
+
+162
+00:08:19,480 --> 00:08:21,795
+This is the, diagram from the Gang of four
+
+163
+00:08:21,795 --> 00:08:24,940
+book, we have a subject which is really
+the
+
+164
+00:08:24,940 --> 00:08:28,660
+thing that's, that's the, defining an
+interface, obviously in,
+
+165
+00:08:28,660 --> 00:08:31,940
+in the Android that's the thing that's
+defined with AIDL.
+
+166
+00:08:31,940 --> 00:08:36,050
+We have the proxy, which is the guy that,
+is shown to the client, which does the
+
+167
+00:08:36,050 --> 00:08:37,520
+magic under the hood, we'll talk about in
+a
+
+168
+00:08:37,520 --> 00:08:40,440
+second, to get the, method turn it to
+something
+
+169
+00:08:40,440 --> 00:08:42,010
+that can go over to the receiver side, to
+
+170
+00:08:42,010 --> 00:08:44,890
+the real object, the real subject, and in
+Android,
+
+171
+00:08:44,890 --> 00:08:47,550
+that's of course handled by the, generated
+code at
+
+172
+00:08:47,550 --> 00:08:50,728
+the STUB dot proxy, nested inside the STUB
+class.
+
+173
+00:08:50,728 --> 00:08:55,070
+And then finally, we have the quote, real
+subject, and in this case the real
+
+174
+00:08:55,070 --> 00:08:57,730
+subject would be some combination of STUB,
+and
+
+175
+00:08:57,730 --> 00:09:00,850
+the actual implementation, in the context
+of Android.
+
+176
+00:09:00,850 --> 00:09:03,590
+We start looking at this in a distributed
+systems lens, or through a
+
+177
+00:09:03,590 --> 00:09:07,150
+distributed system lens, you'll see that
+the Gang of four descriptions in this
+
+178
+00:09:07,150 --> 00:09:10,750
+pattern are a little bit meagre, and
+there's other steps going on here,
+
+179
+00:09:10,750 --> 00:09:14,160
+to get to the other side, and turn it back
+into a method call.
+
+180
+00:09:14,160 --> 00:09:16,492
+But for the purposes of our discussion
+right
+
+181
+00:09:16,492 --> 00:09:18,850
+now, just think of the proxy being, the
+local
+
+182
+00:09:18,850 --> 00:09:22,520
+surrogate, or local place holder, or local
+ambassador,
+
+183
+00:09:22,520 --> 00:09:25,140
+to some object that may reside some place
+else.
+
+184
+00:09:25,140 --> 00:09:28,605
+And when you invoke an operation on the
+proxy, it does stuff, and
+
+185
+00:09:28,605 --> 00:09:32,010
+then it forwards the call, onto the real
+subject to do the work.
+
+186
+00:09:33,460 --> 00:09:36,350
+This set of dyn, dynamics, diagrams kind
+of illustrates
+
+187
+00:09:36,350 --> 00:09:39,060
+this point, in a little more detail so the
+clients
+
+188
+00:09:39,060 --> 00:09:42,310
+starts out by getting a proxy from some
+place, typically
+
+189
+00:09:42,310 --> 00:09:45,380
+from a factory of some kind, or the
+factory method.
+
+190
+00:09:45,380 --> 00:09:48,430
+Once it's got the proxy, it then invokes
+the method call on it.
+
+191
+00:09:48,430 --> 00:09:51,110
+As you can see here, most of the time,
+
+192
+00:09:51,110 --> 00:09:53,500
+you're using proxies to go across address
+space boundaries.
+
+193
+00:09:53,500 --> 00:09:55,060
+Not always, but mostly.
+
+194
+00:09:55,060 --> 00:09:58,674
+And so, what's happening in this case, is
+that the proxy, is turning
+
+195
+00:09:58,674 --> 00:10:02,291
+around and converting the method call that
+was invoked on it, into some
+
+196
+00:10:02,291 --> 00:10:05,787
+kind of message stripping out, or taking
+the bites that are coming in
+
+197
+00:10:05,787 --> 00:10:10,290
+as parameters, and turning of, the objects
+that are coming in as parameters.
+
+198
+00:10:10,290 --> 00:10:14,860
+And, serializing them into, linear byte
+sequences with a particular
+
+199
+00:10:14,860 --> 00:10:18,020
+encoding format and then somehow, and this
+is the part
+
+200
+00:10:18,020 --> 00:10:20,450
+that's not talked about by the proxy
+pattern, it's getting
+
+201
+00:10:20,450 --> 00:10:22,990
+it over to the real subject to do the
+work.
+
+202
+00:10:22,990 --> 00:10:26,440
+And when the real subject is done, the
+call returns.
+
+203
+00:10:26,440 --> 00:10:28,629
+Typically synchronously although you can
+
+204
+00:10:28,629 --> 00:10:31,330
+have various to do asynchronous
+interactions.
+
+205
+00:10:31,330 --> 00:10:33,620
+And then it, takes the results back, puts
+
+206
+00:10:33,620 --> 00:10:36,240
+it in the message format, turns it back
+into
+
+207
+00:10:36,240 --> 00:10:39,510
+whatever native format is responsible and
+expected by
+
+208
+00:10:39,510 --> 00:10:43,310
+the caller and then returns, back to the
+caller.
+
+209
+00:10:43,310 --> 00:10:45,430
+And so, either through return value, or
+
+210
+00:10:45,430 --> 00:10:48,310
+out parameters, or in out parameters or
+something.
+
+211
+00:10:48,310 --> 00:10:52,390
+The results are updated and the client
+gets the results back from the server.
+
+212
+00:10:52,390 --> 00:10:55,580
+So, it's basically method to message back
+to method again.
+
+213
+00:10:55,580 --> 00:10:58,510
+That's kind of the way it works.
+
+214
+00:10:58,510 --> 00:11:01,960
+Okay, any questions about the steps,
+either static or dynamic?
+
+215
+00:11:03,550 --> 00:11:07,540
+So, there's a number of interesting
+consequences of applying this pattern.
+
+216
+00:11:07,540 --> 00:11:11,750
+One of the key ones, and then why it gets
+used so much in distributed systems.
+
+217
+00:11:11,750 --> 00:11:15,200
+Is it allows you to, at least it, at least
+in theory,
+
+218
+00:11:15,200 --> 00:11:19,200
+decouple, the location of an object from
+the axis to that object.
+
+219
+00:11:19,200 --> 00:11:21,230
+So, you can change where that object
+resides, without
+
+220
+00:11:21,230 --> 00:11:23,270
+changing other things, you don't have to
+change the interface.
+
+221
+00:11:23,270 --> 00:11:24,980
+You don't have a lot of extra work to do
+on your
+
+222
+00:11:24,980 --> 00:11:28,880
+behalf as a client application developer,
+or as a server application developer.
+
+223
+00:11:29,950 --> 00:11:34,388
+You can also use it, to simplify tedious
+and error-prone details.
+
+224
+00:11:34,388 --> 00:11:37,343
+This is just a little snippet of the code
+that you would will see,
+
+225
+00:11:37,343 --> 00:11:41,090
+if you were to peek inside of the download
+image proxy that's generated for you.
+
+226
+00:11:41,090 --> 00:11:43,045
+And as we looked at this before, it's kind
+of messy and ugly.
+
+227
+00:11:43,045 --> 00:11:46,320
+Nobody in the right mind wants to write
+that code and maintain it by hand.
+
+228
+00:11:46,320 --> 00:11:47,920
+It's just, just awkward.
+
+229
+00:11:47,920 --> 00:11:50,697
+So we'd much rather have it, be done for
+you by the proxy writer [COUGH].
+
+230
+00:11:52,920 --> 00:11:58,320
+There are also, some potential overheads
+however,
+
+231
+00:11:58,320 --> 00:12:01,020
+there's some potential liabilities or
+downsides with this.
+
+232
+00:12:01,020 --> 00:12:07,040
+One of which is, you are at the mercy, of
+the writer of the proxy generator.
+
+233
+00:12:07,040 --> 00:12:08,560
+If the writer of the proxy generator does
+
+234
+00:12:08,560 --> 00:12:10,990
+a good job, then you're in pretty good
+shape.
+
+235
+00:12:10,990 --> 00:12:13,350
+It's probably equivalent to what you could
+do by hand.
+
+236
+00:12:13,350 --> 00:12:17,280
+If the writer of the, the generator of the
+proxy code does a bad job, you've
+
+237
+00:12:17,280 --> 00:12:20,210
+got lots and lots of overhead and there's
+not a whole lot you can do about it.
+
+238
+00:12:20,210 --> 00:12:25,430
+Unless your middleware, gives you the
+ability to, hand craft your own proxies
+
+239
+00:12:25,430 --> 00:12:29,010
+and plug them in, in place of the ones
+that are automatically generated.
+
+240
+00:12:29,010 --> 00:12:30,740
+So, this is one of those topics that has
+
+241
+00:12:30,740 --> 00:12:33,268
+gone back and forth, and back and forth
+for decades.
+
+242
+00:12:33,268 --> 00:12:36,500
+There was a time when, interface
+generators were really bad.
+
+243
+00:12:36,500 --> 00:12:37,630
+And so, people did a lot of work on
+
+244
+00:12:37,630 --> 00:12:40,890
+optimizing things either by hands or by
+writing better generators.
+
+245
+00:12:40,890 --> 00:12:43,870
+Just like everything else, over time
+people get smarter about this stuff, and
+
+246
+00:12:43,870 --> 00:12:47,090
+so a well-written generator should be,
+competitive
+
+247
+00:12:47,090 --> 00:12:48,700
+to code you would write by hand.
+
+248
+00:12:48,700 --> 00:12:53,100
+In fact, there was some interesting work
+done, maybe, gosh, 15 years
+
+249
+00:12:53,100 --> 00:12:56,600
+ago or so by some folks at University of
+Utah, on a.
+
+250
+00:12:56,600 --> 00:13:00,940
+Technique called flick, which was an IDL
+compiler that was heavily optimized
+
+251
+00:13:00,940 --> 00:13:05,000
+to generate code that would be very fast
+and it used programming language,
+
+252
+00:13:05,000 --> 00:13:09,300
+transformation and optimization techniques
+to, analyse the code that needed to be
+
+253
+00:13:09,300 --> 00:13:13,230
+generated and come up with optimized ways
+of generating the, the proxy code.
+
+254
+00:13:14,830 --> 00:13:15,330
+Interesting stuff.
+
+255
+00:13:16,870 --> 00:13:19,810
+Another potential downside, and this
+really comes back to the issue I, I
+
+256
+00:13:19,810 --> 00:13:24,770
+added to the slides a second ago, having
+to do with strong typing.
+
+257
+00:13:24,770 --> 00:13:29,050
+One of the other potential concerns with
+proxy is, it will overly
+
+258
+00:13:29,050 --> 00:13:33,830
+restrict the type system, that you have
+available, on the client side.
+
+259
+00:13:33,830 --> 00:13:36,750
+Now, this is a sort of subtle point and I
+want to have some
+
+260
+00:13:36,750 --> 00:13:37,940
+discussion about it, to see what other
+
+261
+00:13:37,940 --> 00:13:41,380
+people's insights and impressions are
+about this.
+
+262
+00:13:41,380 --> 00:13:46,350
+So, when you start using proxies, you're
+really saying ahead of time, these
+
+263
+00:13:46,350 --> 00:13:51,170
+are the valid types, that can be passed
+to, methods with a particular signature.
+
+264
+00:13:51,170 --> 00:13:53,340
+And here are the results that can come
+back.
+
+265
+00:13:53,340 --> 00:13:55,440
+You're, you're tightly coupling those
+things.
+
+266
+00:13:55,440 --> 00:13:57,920
+Now, when you write normal Java code, you
+write
+
+267
+00:13:57,920 --> 00:14:00,490
+normal C++ code, you do that all the time.
+
+268
+00:14:00,490 --> 00:14:02,880
+So, that's not really an unusual thing to
+do, at one level.
+
+269
+00:14:02,880 --> 00:14:05,220
+But when you start moving into, a
+
+270
+00:14:05,220 --> 00:14:07,400
+distributed environment, or an environment
+where you're
+
+271
+00:14:07,400 --> 00:14:09,390
+separating out client and server, so that
+
+272
+00:14:09,390 --> 00:14:13,660
+multiple clients, are accessing a common
+shared server.
+
+273
+00:14:13,660 --> 00:14:18,190
+All of a sudden, things get more
+interesting and there was a, a fair amount
+
+274
+00:14:18,190 --> 00:14:21,140
+of backlash a number of years ago against
+
+275
+00:14:21,140 --> 00:14:26,430
+strongly and statically typed proxies in
+middleware, for
+
+276
+00:14:26,430 --> 00:14:30,110
+distributing computing systems and the,
+the alternative approach,
+
+277
+00:14:30,110 --> 00:14:31,150
+which you see by the way all the
+
+278
+00:14:31,150 --> 00:14:35,490
+time in, Things like SOAP and other
+message
+
+279
+00:14:35,490 --> 00:14:38,830
+based or message oriented messaging
+systems, XML based
+
+280
+00:14:38,830 --> 00:14:42,780
+messaging systems, is stuff where it's
+more dynamically typed.
+
+281
+00:14:42,780 --> 00:14:45,583
+Where you actually create a message, you
+build up
+
+282
+00:14:45,583 --> 00:14:48,520
+a message piece by piece, usually using
+some kind of
+
+283
+00:14:48,520 --> 00:14:51,922
+internal coding, where you keep track of
+the type tag,
+
+284
+00:14:51,922 --> 00:14:54,790
+like, like a tag in XML, along with the
+data.
+
+285
+00:14:54,790 --> 00:14:56,346
+So they are self describing messages.
+
+286
+00:14:56,346 --> 00:14:58,860
+And you end up, instead of having an
+interface
+
+287
+00:14:58,860 --> 00:15:03,090
+with lots of different methods with very
+strongly typed signatures.
+
+288
+00:15:03,090 --> 00:15:07,730
+Instead, you have one interface called
+send, that takes a message.
+
+289
+00:15:07,730 --> 00:15:11,520
+And the message can be done in some
+arbitrary self describing way.
+
+290
+00:15:11,520 --> 00:15:12,867
+So, in fact if you take a look at the
+
+291
+00:15:12,867 --> 00:15:15,200
+messengers in Android, that's kind of the
+way it is right?
+
+292
+00:15:15,200 --> 00:15:16,690
+You create a messenger.
+
+293
+00:15:16,690 --> 00:15:19,830
+And it's got a send method, it takes a
+message and you
+
+294
+00:15:19,830 --> 00:15:23,533
+put bundles into the message, to put
+anything you want into that.
+
+295
+00:15:23,533 --> 00:15:26,490
+So, does anybody want a hazard, an opinion
+about,
+
+296
+00:15:26,490 --> 00:15:29,090
+the trade off and pros and cons between,
+the
+
+297
+00:15:29,090 --> 00:15:33,030
+proxy like approach, which is more
+statically typed and
+
+298
+00:15:33,030 --> 00:15:36,760
+the message based approache, which is more
+dynamically typed.
+
+299
+00:15:36,760 --> 00:15:39,080
+Why would you choose one versus the other?
+
+300
+00:15:39,080 --> 00:15:40,040
+What are the pros and cons?
+
+301
+00:15:44,950 --> 00:15:46,650
+>> I like the static typing, because you
+
+302
+00:15:46,650 --> 00:15:49,040
+get, most of URLs upfront from the
+compilers.
+
+303
+00:15:49,040 --> 00:15:52,370
+>> So, when you use a statically typed
+approach, you're
+
+304
+00:15:52,370 --> 00:15:55,600
+letting the compiler and the other tools,
+in the language
+
+305
+00:15:55,600 --> 00:15:59,930
+processing tool chain, determine early on
+when you have inconsistencies
+
+306
+00:15:59,930 --> 00:16:02,750
+between the types that you're creating on
+the client side.
+
+307
+00:16:02,750 --> 00:16:05,020
+And the things you're passing over to the
+server side.
+
+308
+00:16:05,020 --> 00:16:10,380
+So, so strong typing, removing errors,
+another thing
+
+309
+00:16:10,380 --> 00:16:12,280
+that comes along with that is often
+optimization.
+
+310
+00:16:12,280 --> 00:16:13,701
+The more typing information is available,
+you
+
+311
+00:16:13,701 --> 00:16:15,560
+could, the more you can optimize things.
+
+312
+00:16:15,560 --> 00:16:17,170
+With strong typing, you often don't have
+to
+
+313
+00:16:17,170 --> 00:16:21,100
+send over, the type information, you can
+basically have
+
+314
+00:16:21,100 --> 00:16:23,130
+the sender and receiver agree ahead of
+time and
+
+315
+00:16:23,130 --> 00:16:25,950
+so the type information isn't sent with
+the message.
+
+316
+00:16:25,950 --> 00:16:29,370
+Only the data is sent with the message, so
+that amount of data that's used on
+
+317
+00:16:29,370 --> 00:16:33,070
+the network goes down and the amount of
+data to be processed goes down and so on.
+
+318
+00:16:33,070 --> 00:16:35,860
+So those are, those are arguments in favor
+of the strongly typed approach.
+
+319
+00:16:37,430 --> 00:16:39,105
+But there's another point of view.
+
+320
+00:16:39,105 --> 00:16:41,070
+I'll never forget, when I first started
+programming back
+
+321
+00:16:41,070 --> 00:16:44,840
+in the mid 80s, I was reading about
+Fortran
+
+322
+00:16:44,840 --> 00:16:47,850
+Programmers and C Programmers who didn't
+like PASCAL and
+
+323
+00:16:47,850 --> 00:16:51,190
+they would always say, strong typing is
+for weak minds.
+
+324
+00:16:52,382 --> 00:16:55,670
+[LAUGH] So, so what's the downside with
+the,
+
+325
+00:16:55,670 --> 00:16:58,399
+with the proxy based approach, with the
+stronger typing.
+
+326
+00:16:59,900 --> 00:17:01,360
+>> It's less flexible.
+
+327
+00:17:01,360 --> 00:17:05,140
+>> Less flexible, so what that really
+means in this context is, as your
+
+328
+00:17:05,140 --> 00:17:11,760
+services evolve over time, if you have
+strong typing and as your service evolves.
+
+329
+00:17:11,760 --> 00:17:14,380
+All the clients that rely on that service
+have also
+
+330
+00:17:14,380 --> 00:17:19,470
+be evolved, to take advantage or to
+utilize new type information.
+
+331
+00:17:19,470 --> 00:17:23,720
+And so, as a result, it becomes quote,
+inflexible, because now you gotta go out
+
+332
+00:17:23,720 --> 00:17:26,660
+and change all the clients, and there
+could be a lot of clients, and a
+
+333
+00:17:26,660 --> 00:17:30,250
+lot of those clients, you may not have any
+control over, because they're belonging to
+
+334
+00:17:30,250 --> 00:17:33,100
+some other organization, some other
+development team, some
+
+335
+00:17:33,100 --> 00:17:35,600
+external group, you have no knowledge of
+whatsoever.
+
+336
+00:17:35,600 --> 00:17:37,880
+So, in those environments, especially if
+you try to
+
+337
+00:17:37,880 --> 00:17:43,160
+do things like, large scale enterprise
+system integration, its often
+
+338
+00:17:43,160 --> 00:17:45,940
+useful to have a, a model where you keep
+
+339
+00:17:45,940 --> 00:17:50,210
+the messages dynamically typed, so as you
+evolve your services,.
+
+340
+00:17:50,210 --> 00:17:53,350
+Then, you can simply have your new
+clients, new,
+
+341
+00:17:53,350 --> 00:17:55,430
+do new things, add new parts to the
+message.
+
+342
+00:17:55,430 --> 00:17:58,560
+And when they send to the service, the
+service will say, aha, I got
+
+343
+00:17:58,560 --> 00:18:01,570
+a message from a new, from a new client, I
+know how to process that.
+
+344
+00:18:01,570 --> 00:18:03,390
+But, the old messages for the old clients,
+will
+
+345
+00:18:03,390 --> 00:18:05,910
+still be handled without requiring changes
+to the clients.
+
+346
+00:18:05,910 --> 00:18:07,460
+So, there is a lot of issues there
+
+347
+00:18:07,460 --> 00:18:10,310
+about trade-offs between forcing changes
+to the edge
+
+348
+00:18:10,310 --> 00:18:11,640
+to the system, which is what you need
+
+349
+00:18:11,640 --> 00:18:13,948
+to do, if you have strong typing through
+proxies.
+
+350
+00:18:13,948 --> 00:18:16,630
+First is to having the, typing decisions
+done
+
+351
+00:18:16,630 --> 00:18:19,160
+by the service, which gives you more
+flexibility
+
+352
+00:18:19,160 --> 00:18:22,960
+and dynamism, but, is typically slower,
+has more
+
+353
+00:18:22,960 --> 00:18:26,800
+time and space overhead and also, leads to
+surprises.
+
+354
+00:18:26,800 --> 00:18:28,740
+As, as Christoph was just saying, you
+
+355
+00:18:28,740 --> 00:18:31,170
+often don't really realize until the
+system
+
+356
+00:18:31,170 --> 00:18:35,060
+is running, that people are sending you
+gobbledygook that makes no sense at all.
+
+357
+00:18:35,060 --> 00:18:36,860
+So, there's all these interesting
+tradeoffs.
+
+358
+00:18:36,860 --> 00:18:39,930
+So, that's a key thing to remember and
+probably a good quiz question, that what
+
+359
+00:18:39,930 --> 00:18:42,060
+are the trade offs between, the strong
+typing
+
+360
+00:18:42,060 --> 00:18:44,540
+and dynamic typing in the context of
+proxy.
+
+361
+00:18:44,540 --> 00:18:47,670
+We'll see, we might or might not see
+later, there, there's some use of this
+
+362
+00:18:47,670 --> 00:18:51,960
+in Android, but it's not, big enough to
+maybe warrant as a full blown pattern.
+
+363
+00:18:51,960 --> 00:18:55,660
+There's a pattern called extension
+interface which is widely used
+
+364
+00:18:55,660 --> 00:18:59,960
+in Microsoft Calm, and it some parts of
+Enterprise Jacobean,
+
+365
+00:18:59,960 --> 00:19:03,059
+where you, basically have these things
+called components and a
+
+366
+00:19:03,059 --> 00:19:03,920
+component is basically an object
+
+367
+00:19:03,920 --> 00:19:07,390
+on steroids, that exposes multiple
+interfaces.
+
+368
+00:19:07,390 --> 00:19:09,620
+And each of those interfaces exposed by
+the
+
+369
+00:19:09,620 --> 00:19:13,110
+component, are strongly tight and they
+have proxies.
+
+370
+00:19:13,110 --> 00:19:15,070
+And what you do, is you have this little
+
+371
+00:19:15,070 --> 00:19:18,786
+kind of 20 questions, negotiation takes
+place between the client
+
+372
+00:19:18,786 --> 00:19:21,430
+and the component, where the client goes
+out and it
+
+373
+00:19:21,430 --> 00:19:25,480
+queries the component and says, do you
+support this interface?
+
+374
+00:19:25,480 --> 00:19:27,740
+Oh, you don't okay, do you support this
+interface?
+
+375
+00:19:27,740 --> 00:19:28,770
+You do, okay, thank you.
+
+376
+00:19:28,770 --> 00:19:31,720
+And so it takes what it gets back, and
+then it makes method calls.
+
+377
+00:19:31,720 --> 00:19:33,467
+So, the, the so called extension
+
+378
+00:19:33,467 --> 00:19:36,059
+interface, is kind of this hybridization
+between
+
+379
+00:19:36,059 --> 00:19:39,618
+static typing you get with proxy and more
+flexibility that you get with
+
+380
+00:19:39,618 --> 00:19:43,052
+messaging, so it's, it kind of gives you
+the best of both worlds,
+
+381
+00:19:43,052 --> 00:19:46,039
+or the worst of both worlds depending on
+how you look at it.
+
+382
+00:19:48,010 --> 00:19:50,570
+Another problem you have with, with proxy
+is
+
+383
+00:19:50,570 --> 00:19:52,660
+the fact that it's very difficult to
+entirely
+
+384
+00:19:52,660 --> 00:19:55,690
+shield the application client, from the
+fact that
+
+385
+00:19:55,690 --> 00:19:58,260
+there is a boundary, between sender and
+receiver.
+
+386
+00:19:58,260 --> 00:20:02,160
+So, you might like to pretend as though,
+it's invisible.
+
+387
+00:20:02,160 --> 00:20:03,810
+But invariably it's not.
+
+388
+00:20:03,810 --> 00:20:06,150
+And when things go wrong, there, there are
+
+389
+00:20:06,150 --> 00:20:08,140
+errors that occur, when you start running
+things
+
+390
+00:20:08,140 --> 00:20:10,730
+in different address spaces, that do not
+occur,
+
+391
+00:20:10,730 --> 00:20:13,160
+if things are co-linked in the same
+address space.
+
+392
+00:20:13,160 --> 00:20:14,650
+If you make a method call on an object in
+
+393
+00:20:14,650 --> 00:20:19,810
+the same address space, network
+unreachable is unlikely to occur, right?
+
+394
+00:20:19,810 --> 00:20:21,480
+Whereas, if you're running in something
+that's
+
+395
+00:20:21,480 --> 00:20:23,420
+going across the Internet, then, you know,
+
+396
+00:20:23,420 --> 00:20:28,030
+someone might, cut the, network cable with
+a back hoe or something like that.
+
+397
+00:20:28,030 --> 00:20:30,640
+Or the storm might blow down a wireless
+
+398
+00:20:30,640 --> 00:20:32,900
+tower and you lose connectivity or
+whatever right?
+
+399
+00:20:32,900 --> 00:20:34,110
+So, these are things that you have to
+
+400
+00:20:34,110 --> 00:20:36,790
+be prepared for when you start programming
+clients
+
+401
+00:20:36,790 --> 00:20:38,670
+using proxies, that you wouldn't have to
+be
+
+402
+00:20:38,670 --> 00:20:41,730
+prepared for, if you were just making
+normal calls.
+
+403
+00:20:41,730 --> 00:20:44,770
+There is a number of known uses here.
+
+404
+00:20:44,770 --> 00:20:47,710
+Most of these known uses are actually much
+more interesting in the context of
+
+405
+00:20:47,710 --> 00:20:50,550
+the broker pattern, but they also use
+proxies, so I'm just mentioning them here.
+
+406
+00:20:50,550 --> 00:20:52,248
+We'll talk about them later.
+
+407
+00:20:52,248 --> 00:20:55,830
+These son-RPC or the so called
+open-network computing
+
+408
+00:20:55,830 --> 00:20:59,037
+RPC, or procedure call, model which
+started back
+
+409
+00:20:59,037 --> 00:21:01,274
+in the middle 80s, which was a, a
+
+410
+00:21:01,274 --> 00:21:05,160
+successor to something that came out of
+Xerox park.
+
+411
+00:21:05,160 --> 00:21:10,940
+On remote procedure calls by, Andrew
+Berell and Bruce Nelson.
+
+412
+00:21:10,940 --> 00:21:13,280
+There's also the distributing computing
+environment, DCE,
+
+413
+00:21:13,280 --> 00:21:16,350
+which came around the late 80's which was
+
+414
+00:21:16,350 --> 00:21:18,290
+kind of the, the end of the line,
+
+415
+00:21:18,290 --> 00:21:23,340
+a very convoluted, complicated C based,
+RPC mechanisms.
+
+416
+00:21:23,340 --> 00:21:27,480
+What came next, was the combination of the
+peanut butter of
+
+417
+00:21:27,480 --> 00:21:29,040
+distribution with the chocolate of
+
+418
+00:21:29,040 --> 00:21:32,060
+objects, to form distributed object
+computing.
+
+419
+00:21:32,060 --> 00:21:35,200
+And you get things like sun rp, sun remote
+method invocation,
+
+420
+00:21:35,200 --> 00:21:40,550
+or Microsoft's a decom, or the common
+object request broker architecture, there
+
+421
+00:21:40,550 --> 00:21:44,010
+is kinds of object request brokers, in
+this context CORBA and so
+
+422
+00:21:44,010 --> 00:21:47,460
+on, lot of stuff done there, they all use
+proxies very heavily.
+
+423
+00:21:47,460 --> 00:21:49,420
+And in now a days, now were, you know,
+
+424
+00:21:49,420 --> 00:21:53,650
+20, 30 years down the road this stuff
+resurfaces again,
+
+425
+00:21:53,650 --> 00:21:56,060
+but this time in the context of
+communication between
+
+426
+00:21:56,060 --> 00:22:01,020
+processes, using the Binder mechanisms for
+local inter process communication,.
+
+427
+00:22:01,020 --> 00:22:03,800
+On a, on the same device in Android
+[COUGH].
+
+428
+00:22:03,800 --> 00:22:06,400
+And it's worth also noticing, if you click
+on this link here you'll be
+
+429
+00:22:06,400 --> 00:22:09,600
+taken to, a little STUB that describes,
+
+430
+00:22:09,600 --> 00:22:12,400
+where the Android Binder framework came
+from.
+
+431
+00:22:12,400 --> 00:22:15,330
+It actually came from, an earlier work
+done
+
+432
+00:22:15,330 --> 00:22:19,410
+by BOS and I think maybe even Palm OS.
+
+433
+00:22:19,410 --> 00:22:23,080
+By a group of people led by Dianne
+Hackborn, who's got the
+
+434
+00:22:23,080 --> 00:22:27,722
+coolest name of the programmers in the
+world [LAUGH] born to hack, right?
+
+435
+00:22:27,722 --> 00:22:29,642
+We actually have a guy in ISIS named Doug
+
+436
+00:22:29,642 --> 00:22:32,960
+Hackworth, so he is a worthy hacker I
+guess [LAUGH].
+
+437
+00:22:32,960 --> 00:22:37,340
+And so, they basically wrote this Binder,
+and then that, they got bought, or they
+
+438
+00:22:37,340 --> 00:22:39,800
+conjoined the Android development some
+part later, and
+
+439
+00:22:39,800 --> 00:22:41,930
+that's what the Android binder is based
+on.
+
+440
+00:22:41,930 --> 00:22:44,040
+It's called something called the Open
+Binder.
+
+441
+00:22:44,040 --> 00:22:48,360
+As I wrap up this section, and then we'll,
+we'll migrate to the next topic.
+
+442
+00:22:48,360 --> 00:22:51,470
+I want to make some interesting
+observations about proxies.
+
+443
+00:22:51,470 --> 00:22:55,680
+So, proxies are a great microcosm, of a
+
+444
+00:22:55,680 --> 00:22:58,810
+trend that's been going on in computing
+for decades.
+
+445
+00:22:58,810 --> 00:23:01,360
+Ever since the very beginning of time and
+that
+
+446
+00:23:01,360 --> 00:23:06,760
+trend is that, useful patterns evolve over
+time into features
+
+447
+00:23:06,760 --> 00:23:10,090
+provided and supported automatically by
+various kinds of language processing
+
+448
+00:23:10,090 --> 00:23:15,279
+tools, either programming languages or by
+tools like AIDL components.
+
+449
+00:23:16,680 --> 00:23:17,690
+Here are some examples.
+
+450
+00:23:17,690 --> 00:23:19,770
+If you go back far enough in time, you'll
+see
+
+451
+00:23:19,770 --> 00:23:24,780
+that, the early developers of Assembly
+code, were using certain patterns
+
+452
+00:23:24,780 --> 00:23:28,070
+of writing Assembly code and those were
+things that later found
+
+453
+00:23:28,070 --> 00:23:32,180
+their way into the, second generation
+languages like FORTRAN and C.
+
+454
+00:23:32,180 --> 00:23:36,950
+Where they had things like, closed
+subroutines, or IF/ELSE statements,
+
+455
+00:23:36,950 --> 00:23:40,250
+or switch statements, or loops or various
+kinds of things.
+
+456
+00:23:40,250 --> 00:23:41,850
+Those things all started out by assembly
+
+457
+00:23:41,850 --> 00:23:44,170
+lines which programmers were saying, gosh,
+if we
+
+458
+00:23:44,170 --> 00:23:46,090
+organize our assembly codes in these
+patterns,
+
+459
+00:23:46,090 --> 00:23:47,650
+it will be easier for us to maintain.
+
+460
+00:23:48,780 --> 00:23:51,889
+And smart people like, John Backus who
+invented the first
+
+461
+00:23:51,889 --> 00:23:55,570
+FORTRAN compiler, said, you know, we could
+actually automate that.
+
+462
+00:23:55,570 --> 00:23:57,690
+We can build a tool, that does that for
+us.
+
+463
+00:23:57,690 --> 00:23:58,850
+It's kind of funny if you go back in,
+
+464
+00:23:58,850 --> 00:24:02,940
+in the early days of compilation and
+second generation languages.
+
+465
+00:24:02,940 --> 00:24:06,110
+There was all kinds of controversy between
+
+466
+00:24:06,110 --> 00:24:08,890
+the super duper assembler language
+programmers, who
+
+467
+00:24:08,890 --> 00:24:11,270
+knew how to write really tight assembly
+
+468
+00:24:11,270 --> 00:24:13,960
+code and register, do register allocation
+by hand.
+
+469
+00:24:13,960 --> 00:24:16,570
+And all these new fangled developers who
+were
+
+470
+00:24:16,570 --> 00:24:19,140
+trying to write compilers to automate that
+stuff.
+
+471
+00:24:19,140 --> 00:24:21,310
+There was a lot of controversy, people
+said, you'll never be
+
+472
+00:24:21,310 --> 00:24:24,370
+able to write, a compiler that can
+generate code, you know,
+
+473
+00:24:24,370 --> 00:24:26,230
+better than I can write in Assembly and so
+on and
+
+474
+00:24:26,230 --> 00:24:29,340
+so forth, which always amazes me and
+amuses me to no end.
+
+475
+00:24:29,340 --> 00:24:32,670
+Whenever new technology comes along,
+that's threatening
+
+476
+00:24:32,670 --> 00:24:34,000
+to the status Quo, people always start
+
+477
+00:24:34,000 --> 00:24:38,450
+out up by, by downplaying its relevance
+and then later on they go oh, well.
+
+478
+00:24:38,450 --> 00:24:40,650
+You know maybe, maybe it solves a few
+problems but it
+
+479
+00:24:40,650 --> 00:24:43,680
+doesn't solve all the problems, and then
+at some point, they've been
+
+480
+00:24:43,680 --> 00:24:46,720
+completely overwhelmed and overtaken, and
+you don't even think twice you just,
+
+481
+00:24:46,720 --> 00:24:49,600
+you just do it without even, even stopping
+to think about it.
+
+482
+00:24:49,600 --> 00:24:55,470
+By the way that meta pattern or mega
+pattern is described very nicely in
+
+483
+00:24:55,470 --> 00:25:00,460
+a series of books by, Clayton Christenson,
+who writes about the innovators dilemma
+
+484
+00:25:00,460 --> 00:25:03,800
+and the so called disruptive technologies,
+that come along, I won't go into
+
+485
+00:25:03,800 --> 00:25:07,380
+it in detail right now, but, it's worth
+looking into because it's great stuff.
+
+486
+00:25:07,380 --> 00:25:09,010
+So the point there is that, what was
+
+487
+00:25:09,010 --> 00:25:12,680
+once patterns then find their way, into
+language features.
+
+488
+00:25:12,680 --> 00:25:14,850
+Another set of examples, if you go back to
+the,
+
+489
+00:25:14,850 --> 00:25:17,180
+so what I just described was from the
+early 60's.
+
+490
+00:25:17,180 --> 00:25:18,540
+You go back into the early 70's.
+
+491
+00:25:18,540 --> 00:25:21,380
+There were still a lot of people writing
+code in Assembly language,
+
+492
+00:25:21,380 --> 00:25:23,800
+and a lot of people writing code in C at
+that time.
+
+493
+00:25:23,800 --> 00:25:26,140
+And they were beginning to write bigger
+systems.
+
+494
+00:25:26,140 --> 00:25:30,950
+And they had to figure out some way, of
+hiding information, so that
+
+495
+00:25:30,950 --> 00:25:33,570
+their application developers, which were
+using themselves,
+
+496
+00:25:33,570 --> 00:25:35,700
+because the programs weren't all that big.
+
+497
+00:25:35,700 --> 00:25:38,570
+They wouldn't end up making tight
+coupling, on
+
+498
+00:25:38,570 --> 00:25:42,970
+implementation details that were likely to
+change over time.
+
+499
+00:25:42,970 --> 00:25:45,155
+So, if you recall when we, when we do
+
+500
+00:25:45,155 --> 00:25:47,650
+2-51, we talk about stacks, and we talk
+about
+
+501
+00:25:47,650 --> 00:25:50,400
+different ways of hiding the
+representation of the stack
+
+502
+00:25:50,400 --> 00:25:53,840
+to avoid writing code that relies on
+particular implementation.
+
+503
+00:25:53,840 --> 00:25:55,790
+So, what happened there, is people began
+to come
+
+504
+00:25:55,790 --> 00:25:58,570
+up with patterns for hiding information,
+so like in
+
+505
+00:25:58,570 --> 00:26:01,120
+C, you make stuff static, or you could
+find
+
+506
+00:26:01,120 --> 00:26:03,390
+header file with a bunch of functions and
+so on.
+
+507
+00:26:03,390 --> 00:26:06,510
+And what grew out of that, information
+hiding approach.
+
+508
+00:26:06,510 --> 00:26:11,860
+The patterns of information hiding, really
+turned into the language features
+
+509
+00:26:11,860 --> 00:26:16,800
+for things like classes, packages, and
+other ways of being able to.
+
+510
+00:26:16,800 --> 00:26:20,120
+Automatically and with, through automation
+
+511
+00:26:20,120 --> 00:26:22,050
+and through automatic checking and
+language
+
+512
+00:26:22,050 --> 00:26:24,860
+tools, be able to make sure that things
+really do stay private.
+
+513
+00:26:24,860 --> 00:26:26,280
+You can't access stuff, you can make
+
+514
+00:26:26,280 --> 00:26:28,160
+access control checks, to keep things from
+happening.
+
+515
+00:26:30,090 --> 00:26:33,050
+When C++ first started out and for
+actually at
+
+516
+00:26:33,050 --> 00:26:35,410
+least a decade or so after it started out.
+
+517
+00:26:35,410 --> 00:26:38,790
+It didn't have any support for
+premoridized types.
+
+518
+00:26:38,790 --> 00:26:41,150
+Which was, uncomfortable and inconvenient.
+
+519
+00:26:41,150 --> 00:26:43,200
+Java was the same way for a long time by
+the way.
+
+520
+00:26:43,200 --> 00:26:44,390
+So, back in those days, people
+
+521
+00:26:44,390 --> 00:26:48,370
+would, follow patterns of preprocessor
+directives.
+
+522
+00:26:48,370 --> 00:26:52,910
+Or writing little tools with said and oc
+and so on, in order to, annotate
+
+523
+00:26:52,910 --> 00:26:55,810
+their code with, template-like syntax that
+would
+
+524
+00:26:55,810 --> 00:26:59,010
+then be, pre-processed and turned into
+actual code.
+
+525
+00:26:59,010 --> 00:27:02,600
+That experience with Mac or these other
+tools, led to people
+
+526
+00:27:02,600 --> 00:27:06,052
+writing, templates and adding them to C ++
+as a template feature.
+
+527
+00:27:06,052 --> 00:27:09,980
+There's lots and lots and lots more
+examples, so, people doing things like the
+
+528
+00:27:09,980 --> 00:27:14,450
+iterator pattern that we learned in 251,
+we've talked about here a little bit.
+
+529
+00:27:14,450 --> 00:27:17,700
+The iterator pattern is something that
+used to be done by convention.
+
+530
+00:27:17,700 --> 00:27:20,550
+Nowadays, you take a look at Java, you
+take
+
+531
+00:27:20,550 --> 00:27:22,980
+a look at C++ 11, they've baked the
+iterator pattern
+
+532
+00:27:22,980 --> 00:27:26,260
+into the language, with things like range
+based for loops,
+
+533
+00:27:26,260 --> 00:27:28,440
+or the for each loop in Java, and so on.
+
+534
+00:27:28,440 --> 00:27:30,690
+So once again, you see this never-ending
+
+535
+00:27:30,690 --> 00:27:35,620
+trend, towards moving stuff from,
+convention into automation.
+
+536
+00:27:35,620 --> 00:27:39,453
+And there's pros and cons, for that of
+course.
+
+537
+00:27:39,453 --> 00:27:46,519
+[MUSIC]
+

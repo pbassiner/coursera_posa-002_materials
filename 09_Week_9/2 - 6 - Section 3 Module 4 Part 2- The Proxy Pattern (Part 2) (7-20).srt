@@ -1,0 +1,625 @@
+1
+00:00:00,758 --> 00:00:08,671
+[MUSIC]
+
+2
+00:00:08,671 --> 00:00:13,170
+Okay, any questions about any of that
+stuff?
+
+3
+00:00:13,170 --> 00:00:15,270
+So what I'll do next is talk about how
+
+4
+00:00:15,270 --> 00:00:18,260
+the pattern, the proxy pattern has applied
+an android.
+
+5
+00:00:18,260 --> 00:00:20,210
+Some this is a recap so I'll go through it
+quickly.
+
+6
+00:00:20,210 --> 00:00:23,300
+I just wanted to put it here for
+completeness but I won't spend time on it.
+
+7
+00:00:24,370 --> 00:00:27,310
+So, in Android, they basically, you
+
+8
+00:00:27,310 --> 00:00:30,820
+know, implement this by automatically
+generated code.
+
+9
+00:00:30,820 --> 00:00:34,200
+And, here are some of the implementation
+considerations
+
+10
+00:00:34,200 --> 00:00:36,550
+you have to think about when you're using
+proxy.
+
+11
+00:00:36,550 --> 00:00:40,310
+So one is, are the proxies automatically
+generated like, like
+
+12
+00:00:40,310 --> 00:00:45,270
+a robotic assembly line, or are they
+something that's hand crafted?
+
+13
+00:00:45,270 --> 00:00:49,650
+And they're trade offs for the most part,
+people rely on auto generation now.
+
+14
+00:00:49,650 --> 00:00:54,100
+Another question is you can potentially
+use a proxy
+
+15
+00:00:54,100 --> 00:00:59,170
+to cache certain information that is
+stable or immutable.
+
+16
+00:00:59,170 --> 00:01:02,930
+Things that don't change, item potent as
+they sometimes say.
+
+17
+00:01:02,930 --> 00:01:06,550
+If you get the same result if you call an
+operation many times.
+
+18
+00:01:06,550 --> 00:01:10,080
+You can actually have the proxy cache that
+information
+
+19
+00:01:10,080 --> 00:01:13,160
+locally so when you need it it's right
+there.
+
+20
+00:01:13,160 --> 00:01:16,900
+You don't have to actually make a remote
+call to the other side.
+
+21
+00:01:16,900 --> 00:01:19,440
+I kind of think of, any time I think of
+cashing, I
+
+22
+00:01:19,440 --> 00:01:24,430
+think of hamburgers at a fast food
+restaurant in a heat lamp, right?
+
+23
+00:01:24,430 --> 00:01:28,330
+So when someone comes in and says I want,
+you know, a Big Mac.
+
+24
+00:01:28,330 --> 00:01:29,050
+You don't have to cook one.
+
+25
+00:01:29,050 --> 00:01:30,550
+You just reach back to the heat lamp and
+
+26
+00:01:30,550 --> 00:01:32,770
+the cache and say, here it is, it's right
+there.
+
+27
+00:01:32,770 --> 00:01:35,180
+There's no need to go back and talk to the
+cook.
+
+28
+00:01:35,180 --> 00:01:36,560
+You've got it in the cache.
+
+29
+00:01:36,560 --> 00:01:39,150
+So, for things that are stable, things
+that are cooked frequently, things that
+
+30
+00:01:39,150 --> 00:01:44,340
+are worth being precooked, then a proxy
+can give you access to that.
+
+31
+00:01:44,340 --> 00:01:47,100
+Another implementation consideration some
+languages give you some
+
+32
+00:01:47,100 --> 00:01:50,325
+pretty cool support built into the
+language for proxys.
+
+33
+00:01:50,325 --> 00:01:55,120
+C++ for example has this interesting
+feature called delegation
+
+34
+00:01:55,120 --> 00:01:59,270
+operator or operator arrow, sometimes
+called the smart pointer operator.
+
+35
+00:01:59,270 --> 00:02:00,960
+And basically what you can do with the
+operator
+
+36
+00:02:00,960 --> 00:02:03,670
+is you can use it in such a way where.
+
+37
+00:02:03,670 --> 00:02:07,240
+You can invoke something, through a proxy
+using operator
+
+38
+00:02:07,240 --> 00:02:11,160
+arrow that looks like it's actually making
+a method call.
+
+39
+00:02:11,160 --> 00:02:13,540
+But in fact what the operator arrow is
+doing is
+
+40
+00:02:13,540 --> 00:02:18,490
+it's basically intercepting the original
+call, doing something else, and
+
+41
+00:02:18,490 --> 00:02:21,360
+then returning a result, and then the
+compiler generates code
+
+42
+00:02:21,360 --> 00:02:26,160
+to redelegate that call to that object
+returned to the proxy.
+
+43
+00:02:26,160 --> 00:02:27,890
+And there's lots of cool use cases of
+this.
+
+44
+00:02:27,890 --> 00:02:30,490
+It's used in thread specific storage, it
+can
+
+45
+00:02:30,490 --> 00:02:33,020
+be used by a variety of other techniques
+for
+
+46
+00:02:33,020 --> 00:02:35,280
+being able to make proxies look like
+pointer
+
+47
+00:02:35,280 --> 00:02:38,810
+access, thereby hiding the details from
+the application developers.
+
+48
+00:02:40,830 --> 00:02:42,040
+So lets take a look at how you might
+
+49
+00:02:42,040 --> 00:02:46,520
+implement this particular pattern in the
+context of Android.
+
+50
+00:02:46,520 --> 00:02:49,170
+So this is an Android example using Java.
+
+51
+00:02:49,170 --> 00:02:51,560
+We've seen this already, so I won't spend
+a lot of time on it.
+
+52
+00:02:51,560 --> 00:02:56,800
+So you run your IDL compiler on your IDL
+interface and you get stubs and proxies.
+
+53
+00:02:56,800 --> 00:02:59,750
+The stub is basically the thing that
+you're going to inherit from,
+
+54
+00:02:59,750 --> 00:03:05,550
+and fill in the details to implement later
+through extension through sub classing.
+
+55
+00:03:05,550 --> 00:03:08,470
+There are a bunch of helper methods that a
+stub has things that are used
+
+56
+00:03:08,470 --> 00:03:10,830
+to register the stub object or the
+
+57
+00:03:10,830 --> 00:03:14,240
+binder object with the underlying binder
+frame work.
+
+58
+00:03:15,240 --> 00:03:20,120
+There is also something that can be used
+to convert a binder object
+
+59
+00:03:20,120 --> 00:03:24,090
+into a proxy so you get a proxy back when
+you call that.
+
+60
+00:03:24,090 --> 00:03:26,710
+The proxy is something that's also
+automatically generated, and
+
+61
+00:03:26,710 --> 00:03:28,610
+you can use this in order to be able to
+
+62
+00:03:31,970 --> 00:03:33,610
+indicate who the binder is that you want
+to
+
+63
+00:03:33,610 --> 00:03:35,530
+talk to the binder option you want to talk
+to.
+
+64
+00:03:35,530 --> 00:03:38,230
+And also has the code that marshalls and
+demarshalls,
+
+65
+00:03:38,230 --> 00:03:40,819
+the parameters and sends them across the
+other side.
+
+66
+00:03:40,819 --> 00:03:45,850
+The other side of course ends up being
+call back on a method called on transact.
+
+67
+00:03:45,850 --> 00:03:49,150
+And that's the guy that does the inverse
+operation from the proxy.
+
+68
+00:03:49,150 --> 00:03:51,250
+That's the guy that pulls all the various
+pieces out
+
+69
+00:03:51,250 --> 00:03:56,110
+of the message, turns it back into
+strongly-typed data types
+
+70
+00:03:56,110 --> 00:04:00,070
+and then passes it as an upcall to the
+implementation
+
+71
+00:04:00,070 --> 00:04:03,609
+method that you define in your subclass of
+the stub class.
+
+72
+00:04:04,680 --> 00:04:07,542
+So, we've talked about that stuff before
+so I went through that quickly.
+
+73
+00:04:07,542 --> 00:04:11,870
+So, in a nut shell, android defines the
+proxy pattern
+
+74
+00:04:11,870 --> 00:04:16,480
+and it implements the proxy pattern using
+it's generated proxies.
+
+75
+00:04:16,480 --> 00:04:18,800
+It allows you to do various kinds of
+remote method
+
+76
+00:04:18,800 --> 00:04:23,140
+implication using the broker mechanism
+we're going to talk about later.
+
+77
+00:04:23,140 --> 00:04:29,270
+By using this mechanism there's no API
+difference between
+
+78
+00:04:29,270 --> 00:04:31,870
+talking to something local and talking to
+something remote.
+
+79
+00:04:31,870 --> 00:04:35,110
+There may actually be a semantic
+difference
+
+80
+00:04:35,110 --> 00:04:36,640
+if you're talking to an object that
+
+81
+00:04:36,640 --> 00:04:41,220
+is co located it will wind up running in
+the same thread as the caller.
+
+82
+00:04:41,220 --> 00:04:42,340
+Whereas if you're talking to an object
+
+83
+00:04:42,340 --> 00:04:44,800
+that's running remotely in another
+process, that will
+
+84
+00:04:44,800 --> 00:04:46,330
+be running in a different address space
+
+85
+00:04:46,330 --> 00:04:48,140
+and that'll be running in a different
+thread.
+
+86
+00:04:48,140 --> 00:04:50,360
+So there's some different, semantic
+differences to
+
+87
+00:04:50,360 --> 00:04:52,210
+some extent in terms of where things run.
+
+88
+00:04:52,210 --> 00:04:54,570
+But from an API perspective they look the
+same.
+
+89
+00:04:54,570 --> 00:04:55,050
+Yes?
+
+90
+00:04:55,050 --> 00:04:59,482
+>> So when you're writing a proxy, do you
+assume that you know
+
+91
+00:04:59,482 --> 00:05:05,230
+where that resources that you're going to
+be interacting with.
+
+92
+00:05:05,230 --> 00:05:09,330
+Like, do you write a proxy such that it's
+going to always
+
+93
+00:05:09,330 --> 00:05:13,280
+be communicating with like, a remote, like
+off you know what I mean?
+
+94
+00:05:13,280 --> 00:05:13,380
+>> Yep.
+
+95
+00:05:13,380 --> 00:05:14,090
+Great question.
+
+96
+00:05:14,090 --> 00:05:17,530
+So the question basically is does whoever
+create the
+
+97
+00:05:17,530 --> 00:05:20,060
+proxy which could be a person or a
+generator right?
+
+98
+00:05:20,060 --> 00:05:23,440
+Whoever makes the proxy what assumptions
+should they
+
+99
+00:05:23,440 --> 00:05:26,930
+make about where the target object
+actually resides.
+
+100
+00:05:26,930 --> 00:05:30,070
+And it turns out that there are actually
+two answers to that question.
+
+101
+00:05:30,070 --> 00:05:33,550
+The naive approach makes everything just
+go through the proxy
+
+102
+00:05:33,550 --> 00:05:36,340
+even if youre co located in the same
+address space.
+
+103
+00:05:36,340 --> 00:05:39,190
+And I should say naive approach and or the
+approach that want
+
+104
+00:05:39,190 --> 00:05:45,480
+to has, wants to have semantic consistency
+of behavior even when colocation occurs.
+
+105
+00:05:45,480 --> 00:05:48,850
+So that's, in that case, you don't
+differentiate.
+
+106
+00:05:48,850 --> 00:05:52,700
+The optimized approach, which potentially
+is more intelligent, but may also
+
+107
+00:05:52,700 --> 00:05:57,610
+be semantically different with respect to
+what thread contacts you run in.
+
+108
+00:05:57,610 --> 00:06:00,810
+In that case, what the, what the proxy
+typically does,
+
+109
+00:06:00,810 --> 00:06:03,220
+is it takes a look when the call is made.
+
+110
+00:06:03,220 --> 00:06:09,000
+And it asks the question, is this object,
+target object, in my address space or not?
+
+111
+00:06:09,000 --> 00:06:12,820
+If it's not in the same address space then
+it goes ahead does
+
+112
+00:06:12,820 --> 00:06:15,830
+all the normal things and sends it own its
+merry way using a broker.
+
+113
+00:06:15,830 --> 00:06:18,570
+If it is in the same address space, it
+does a short circuit.
+
+114
+00:06:18,570 --> 00:06:20,650
+And it goes ahead and just makes a direct
+call.
+
+115
+00:06:20,650 --> 00:06:25,020
+So you could imagine that would be way
+faster than doing all this other overhead.
+
+116
+00:06:25,020 --> 00:06:29,070
+But it also requires, you know, a little
+bit more checking to take place.
+
+117
+00:06:29,070 --> 00:06:29,870
+Yeah, that's a great question.
+
+118
+00:06:32,350 --> 00:06:35,330
+And of course the other benefit you get
+with proxies are that you can
+
+119
+00:06:35,330 --> 00:06:37,090
+make some changes in the way in
+
+120
+00:06:37,090 --> 00:06:40,800
+which you've configured and deployed into
+your system.
+
+121
+00:06:40,800 --> 00:06:45,620
+You partition your system into pieces and
+screw them around through the processes
+
+122
+00:06:45,620 --> 00:06:48,520
+in the system without really changing the
+
+123
+00:06:48,520 --> 00:06:51,240
+way things are really designed and
+implemented.
+
+124
+00:06:51,240 --> 00:06:57,942
+So what you're doing is you're differing
+until deployment time where things preside
+
+125
+00:06:57,942 --> 00:07:04,565
+as opposed to having to prematurely commit
+yourself to one deployment over another.
+
+126
+00:07:04,565 --> 00:07:06,436
+And that's another such a great
+flexibility
+
+127
+00:07:06,436 --> 00:07:07,764
+if you want to build systems that
+
+128
+00:07:07,764 --> 00:07:09,141
+can be sort of auto scaled without
+
+129
+00:07:09,141 --> 00:07:11,666
+making radical changes to the underlying
+implementation.
+
+130
+00:07:11,666 --> 00:07:18,050
+[MUSIC]
+

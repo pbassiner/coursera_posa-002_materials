@@ -1,0 +1,2052 @@
+1
+00:00:00,000 --> 00:00:08,019
+[MUSIC]
+
+2
+00:00:08,019 --> 00:00:10,662
+We're going to start talking about one of
+the patterns
+
+3
+00:00:10,662 --> 00:00:14,060
+that's very heavily used in the context of
+started services.
+
+4
+00:00:14,060 --> 00:00:16,510
+We'll talk about a number of other
+patterns later as
+
+5
+00:00:16,510 --> 00:00:19,560
+we cover other parts of the material
+related to services.
+
+6
+00:00:19,560 --> 00:00:21,230
+And after we cover this pattern were then
+going
+
+7
+00:00:21,230 --> 00:00:26,490
+to start talking about more detail, around
+the bound services.
+
+8
+00:00:26,490 --> 00:00:29,520
+Keep in mind, up to this point, we've only
+talked about the started services.
+
+9
+00:00:29,520 --> 00:00:32,650
+Now, we're going to go ahead and start
+talking about bound services as well.
+
+10
+00:00:32,650 --> 00:00:33,930
+But before we do that, let's start talking
+
+11
+00:00:33,930 --> 00:00:37,000
+about the pattern, that we've been
+covering here implicitly.
+
+12
+00:00:37,000 --> 00:00:38,960
+I've, I've mentioned this a couple of
+times, but we
+
+13
+00:00:38,960 --> 00:00:42,620
+haven't talked about it as a pattern in
+any detail yet.
+
+14
+00:00:42,620 --> 00:00:45,330
+So, the particular pattern we're going to
+be covering is called the Command
+
+15
+00:00:45,330 --> 00:00:49,890
+Processor pattern, and this pattern
+appears in a number of different places.
+
+16
+00:00:49,890 --> 00:00:54,840
+The original pattern with the name Command
+Processor appeared in the book,
+
+17
+00:00:54,840 --> 00:00:57,530
+Pattern Oriented Software Architecture
+Volume I,
+
+18
+00:00:57,530 --> 00:01:00,030
+which was about systems of patterns.
+
+19
+00:01:00,030 --> 00:01:02,600
+And it talked about a lot of different
+architectural patterns.
+
+20
+00:01:02,600 --> 00:01:05,942
+There's another pattern that appeared in
+the Gang of Four book.
+
+21
+00:01:05,942 --> 00:01:08,269
+It's called the Command Pattern, which is
+related to
+
+22
+00:01:08,269 --> 00:01:11,700
+the Command Processor pattern, but it's
+not quite identical.
+
+23
+00:01:11,700 --> 00:01:13,836
+The actual particular implementation of
+this
+
+24
+00:01:13,836 --> 00:01:15,588
+pattern I'm going to be describing came
+
+25
+00:01:15,588 --> 00:01:18,950
+from yet another paper, which was written
+by a couple of other folks.
+
+26
+00:01:18,950 --> 00:01:22,340
+And this is called Command Revisited.
+
+27
+00:01:22,340 --> 00:01:24,120
+And they attempted to take the, the best
+of
+
+28
+00:01:24,120 --> 00:01:26,360
+the command pattern from the Gang of Four
+book, the
+
+29
+00:01:26,360 --> 00:01:30,500
+command processor pattern from the Post of
+One book, and
+
+30
+00:01:30,500 --> 00:01:32,430
+then they added a few new things and that
+appeared.
+
+31
+00:01:32,430 --> 00:01:35,540
+And it's kind of interesting to think
+about how this all occurred.
+
+32
+00:01:35,540 --> 00:01:37,700
+Why do we need to keep rewriting these
+patterns?
+
+33
+00:01:37,700 --> 00:01:41,510
+And what happens, of course, is as people
+get more experience trying to
+
+34
+00:01:41,510 --> 00:01:43,990
+apply patterns to a broader range of
+
+35
+00:01:43,990 --> 00:01:46,910
+context, to a broader range of
+applicability
+
+36
+00:01:46,910 --> 00:01:51,280
+domains, then you get to realize how the
+initial attempts at describing the pattern
+
+37
+00:01:51,280 --> 00:01:55,020
+were probably over constrained by the
+original
+
+38
+00:01:55,020 --> 00:01:58,390
+context in which the pattern was
+identified.
+
+39
+00:01:58,390 --> 00:02:00,580
+So, the folks who were doing the original
+Gang of Four
+
+40
+00:02:00,580 --> 00:02:02,836
+book, were largely thinking about user
+
+41
+00:02:02,836 --> 00:02:06,680
+interface environments, graphical user
+interface environments.
+
+42
+00:02:06,680 --> 00:02:09,580
+Where commands are largely used to run
+various
+
+43
+00:02:09,580 --> 00:02:12,540
+kinds of actions when a user clicks a
+button
+
+44
+00:02:12,540 --> 00:02:15,270
+or touches a screen or uses some other
+type
+
+45
+00:02:15,270 --> 00:02:18,480
+of modality to interact with the, the user
+interface.
+
+46
+00:02:18,480 --> 00:02:21,840
+So, in that case, the commands were really
+sort of self contained objects
+
+47
+00:02:21,840 --> 00:02:26,220
+that were used to encapsulate a request to
+a service as an object.
+
+48
+00:02:26,220 --> 00:02:30,820
+Like, open this file or delete this file
+or something like that.
+
+49
+00:02:30,820 --> 00:02:34,020
+As people got more experience applying
+patterns
+
+50
+00:02:34,020 --> 00:02:36,210
+to other context like distributed systems
+for
+
+51
+00:02:36,210 --> 00:02:38,920
+example, or concurrent systems, it became
+clear
+
+52
+00:02:38,920 --> 00:02:41,600
+that that original context was too narrow.
+
+53
+00:02:41,600 --> 00:02:44,450
+And so, from there grew the Command
+Processor pattern, and
+
+54
+00:02:44,450 --> 00:02:48,390
+the Command Processor pattern is more
+about taking commands and
+
+55
+00:02:48,390 --> 00:02:51,840
+passing them over to some kind of command
+processor where
+
+56
+00:02:51,840 --> 00:02:55,920
+they're executed, typically in a different
+thread or a different process.
+
+57
+00:02:55,920 --> 00:02:59,750
+You'd be pretty darn hard pressed to
+extract that particular use
+
+58
+00:02:59,750 --> 00:03:03,370
+case out of the original Gang of Four
+pattern for command.
+
+59
+00:03:03,370 --> 00:03:06,659
+The Gang, the Post of One pattern of
+Command Processor did
+
+60
+00:03:06,659 --> 00:03:10,040
+a nice job, but it also was deficient in
+certain ways.
+
+61
+00:03:10,040 --> 00:03:11,570
+And so, as people got more experienced
+they
+
+62
+00:03:11,570 --> 00:03:13,102
+took shots at trying to write this stuff
+down.
+
+63
+00:03:13,102 --> 00:03:16,020
+So, what I'll be talking about today is
+kind of
+
+64
+00:03:16,020 --> 00:03:19,800
+an amalgamation of a number of different
+perspectives on command.
+
+65
+00:03:19,800 --> 00:03:22,610
+And I think it turns out that the one
+we're talking about here is very
+
+66
+00:03:22,610 --> 00:03:24,770
+nicely related to what we see in
+
+67
+00:03:24,770 --> 00:03:28,490
+Android, especially the intense, the
+intense service framework.
+
+68
+00:03:29,960 --> 00:03:33,430
+First, let's talk over about the context,
+though, in which this appears.
+
+69
+00:03:33,430 --> 00:03:37,330
+So, we're going to want to be able to
+process some long-running action.
+
+70
+00:03:37,330 --> 00:03:39,930
+Where long-running in this context means
+something
+
+71
+00:03:39,930 --> 00:03:42,520
+that would take, potentially, too long and
+
+72
+00:03:42,520 --> 00:03:47,340
+would end up blocking the UI thread such
+that you would get an ANR call.
+
+73
+00:03:47,340 --> 00:03:50,660
+So, if we're going to download some kind
+of image
+
+74
+00:03:50,660 --> 00:03:53,270
+from some place, from a, from a server
+somewhere, that
+
+75
+00:03:53,270 --> 00:03:54,880
+might take a while depending on how big
+the
+
+76
+00:03:54,880 --> 00:03:58,510
+image is, depending on how heavily loaded
+the device is.
+
+77
+00:03:58,510 --> 00:04:01,210
+Depending, depending on how heavily loaded
+the
+
+78
+00:04:01,210 --> 00:04:03,920
+network or the server, the server cloud,
+the
+
+79
+00:04:03,920 --> 00:04:07,970
+storage, whatever it is, depending on the
+load, it might take a while to download.
+
+80
+00:04:07,970 --> 00:04:12,452
+So, as a result, if we're not careful, we
+can end up blocking in that download call.
+
+81
+00:04:12,452 --> 00:04:16,470
+The problem, as you all know, is if you do
+blocking calls from the main thread of
+
+82
+00:04:16,470 --> 00:04:19,400
+control, the UI thread, that's going to
+run
+
+83
+00:04:19,400 --> 00:04:23,820
+the risk of triggering the application not
+responding dialogue.
+
+84
+00:04:23,820 --> 00:04:26,060
+So, something will go wrong, it will say
+this is not
+
+85
+00:04:26,060 --> 00:04:28,306
+working do you want to shut it down and so
+on.
+
+86
+00:04:28,306 --> 00:04:30,620
+So, that would be problematic, we don't
+want that to happen.
+
+87
+00:04:32,000 --> 00:04:35,020
+Take a look here at this website for more
+information about the, the
+
+88
+00:04:35,020 --> 00:04:38,660
+perils of ANRs and when they occur and
+what to do about them.
+
+89
+00:04:38,660 --> 00:04:40,330
+So, the solution here, which we have
+already talked
+
+90
+00:04:40,330 --> 00:04:42,050
+about, but not we are going to start
+talking about
+
+91
+00:04:42,050 --> 00:04:44,890
+it more from a pattern oriented
+perspective, is to
+
+92
+00:04:44,890 --> 00:04:48,800
+implement some kind of command processor
+in order to encapsulate
+
+93
+00:04:48,800 --> 00:04:52,490
+a download request as an object that you
+can
+
+94
+00:04:52,490 --> 00:04:56,300
+pass from an activity, that you don't want
+to block,
+
+95
+00:04:56,300 --> 00:04:58,890
+to a service where that thing can run in
+
+96
+00:04:58,890 --> 00:05:01,290
+some kind of background thread and run at
+its leisure.
+
+97
+00:05:02,550 --> 00:05:06,510
+So, this particular set of steps, this
+process might work as follows.
+
+98
+00:05:06,510 --> 00:05:09,110
+You'd go ahead and implement a download
+service, that would inherit
+
+99
+00:05:09,110 --> 00:05:14,150
+from intent service, and you'd have the
+activity then creating an
+
+100
+00:05:14,150 --> 00:05:17,980
+intent, and into that intent, it would,
+make the target of
+
+101
+00:05:17,980 --> 00:05:21,040
+the in, the intent be the download
+service, its class file.
+
+102
+00:05:21,040 --> 00:05:24,660
+You could add in stuff like, the URI, that
+you wanted, and the
+
+103
+00:05:24,660 --> 00:05:27,660
+call back messenger, if that's how you
+want to communicate back, or the pending
+
+104
+00:05:27,660 --> 00:05:30,740
+intent, or the broadcast receiver, you
+know, however you want to get the
+
+105
+00:05:30,740 --> 00:05:32,500
+information back, you could stick those
+
+106
+00:05:32,500 --> 00:05:35,590
+things as extras into the particular
+intent.
+
+107
+00:05:36,770 --> 00:05:40,097
+Then, you go ahead and call StartService
+with the intent of all
+
+108
+00:05:40,097 --> 00:05:43,720
+that stuff that's bundled in there, it's
+target, it's extras and so on.
+
+109
+00:05:45,030 --> 00:05:47,329
+That will cause the Android Activity
+Manager Service,
+
+110
+00:05:47,329 --> 00:05:49,482
+that we've talked about recently, to go
+ahead and
+
+111
+00:05:49,482 --> 00:05:51,890
+spawn off the, the Service to start the
+
+112
+00:05:51,890 --> 00:05:54,320
+Service, the download survey if it's not
+already running.
+
+113
+00:05:55,610 --> 00:05:59,090
+Since that thing is implemented as an
+IntentService that will go ahead and start
+
+114
+00:05:59,090 --> 00:06:01,290
+a thread in the background using the,
+
+115
+00:06:01,290 --> 00:06:05,230
+the Service handler model we've looked at
+before.
+
+116
+00:06:05,230 --> 00:06:07,235
+And then, of course, under the hood,
+that'll end up calling the
+
+117
+00:06:07,235 --> 00:06:11,450
+on-handle intent method which will
+download the image in a separate thread.
+
+118
+00:06:11,450 --> 00:06:12,780
+By the way, we had an interesting
+discussion
+
+119
+00:06:12,780 --> 00:06:15,718
+on the mailing list about the thread pool
+executor,
+
+120
+00:06:15,718 --> 00:06:18,062
+which is part of your current assignment,
+and,
+
+121
+00:06:18,062 --> 00:06:20,330
+and what might be the benefit of using
+that.
+
+122
+00:06:20,330 --> 00:06:25,530
+So, if you think about the IntentService,
+the IntentService only lets there be one
+
+123
+00:06:25,530 --> 00:06:28,110
+thread at a time, the, the background
+
+124
+00:06:28,110 --> 00:06:30,350
+thread, that's being used to download the
+image.
+
+125
+00:06:30,350 --> 00:06:33,650
+And that works for the very simple use
+case we just described here.
+
+126
+00:06:33,650 --> 00:06:38,270
+You have one activity talking to one
+service, which is downloading one file.
+
+127
+00:06:38,270 --> 00:06:40,170
+What might be the motivation for wanting
+to
+
+128
+00:06:40,170 --> 00:06:43,684
+use some kind of thread pool executor
+instead?
+
+129
+00:06:43,684 --> 00:06:46,214
+Anyone except Shawn.
+
+130
+00:06:46,214 --> 00:06:48,890
+[LAUGH] Christoph.
+
+131
+00:06:48,890 --> 00:06:51,296
+>> A list view filled with images so we
+won't
+
+132
+00:06:51,296 --> 00:06:53,918
+have to go down as fast as your CPU
+[INAUDIBLE].
+
+133
+00:06:53,918 --> 00:06:56,818
+>> Great, so, so one example would be that
+you've actually
+
+134
+00:06:56,818 --> 00:06:59,910
+passed over a, a, a batch worth of things
+to download.
+
+135
+00:06:59,910 --> 00:07:02,080
+And rather than doing them sequentially in
+that one thread you want
+
+136
+00:07:02,080 --> 00:07:06,800
+to go ahead and maximize the potential
+concurrency or parallelism in the system.
+
+137
+00:07:06,800 --> 00:07:09,720
+Modern Android devices often have
+quad-core
+
+138
+00:07:09,720 --> 00:07:11,750
+processors, so why not take advantage
+
+139
+00:07:11,750 --> 00:07:14,620
+of all that processing power to go ahead
+and do things in parallel.
+
+140
+00:07:14,620 --> 00:07:16,750
+That would be one example, another example
+
+141
+00:07:16,750 --> 00:07:18,780
+might be a situation where you're trying
+to
+
+142
+00:07:18,780 --> 00:07:20,880
+write some kind of download service and
+you
+
+143
+00:07:20,880 --> 00:07:23,110
+were going to have multiple things
+connecting to it.
+
+144
+00:07:23,110 --> 00:07:25,470
+Some of which might be triggered from
+background
+
+145
+00:07:25,470 --> 00:07:27,740
+tasks, some of which might be triggered by
+user
+
+146
+00:07:27,740 --> 00:07:29,670
+interface interactions, some of which
+might be triggered by
+
+147
+00:07:29,670 --> 00:07:32,370
+the list view thing that Chris [UNKNOWN]
+talked about.
+
+148
+00:07:32,370 --> 00:07:35,760
+So, in any case, you have the potential
+for multiple things to happen.
+
+149
+00:07:35,760 --> 00:07:37,680
+So, that would provide a good example of
+why you would
+
+150
+00:07:37,680 --> 00:07:42,240
+want to have multiple threads running in
+a, in a Service.
+
+151
+00:07:42,240 --> 00:07:45,290
+Be it in a separate process or in the same
+process as the original client.
+
+152
+00:07:47,240 --> 00:07:49,940
+Okay, you can take a look here, of course,
+for more information on IntentService.
+
+153
+00:07:49,940 --> 00:07:52,510
+We'll look at IntentService in more detail
+later.
+
+154
+00:07:52,510 --> 00:07:57,020
+So, it turns out that this particular way
+of arranging things is, as often is the
+
+155
+00:07:57,020 --> 00:07:59,650
+case, not just a random set of classes
+
+156
+00:07:59,650 --> 00:08:02,340
+thrown together just for the, the fun of
+it.
+
+157
+00:08:02,340 --> 00:08:05,330
+But, this is actually an implementation of
+a pattern, and the
+
+158
+00:08:05,330 --> 00:08:09,250
+pattern is the Command Processor pattern
+as described in those resources.
+
+159
+00:08:09,250 --> 00:08:13,390
+POSA1, that paper I showed you, the Gang
+of Four book.
+
+160
+00:08:13,390 --> 00:08:15,210
+And the intent of this pattern, and I'm
+
+161
+00:08:15,210 --> 00:08:17,300
+using, this is the, from the paper I
+pointed
+
+162
+00:08:17,300 --> 00:08:20,050
+you to, is to package a piece of
+application
+
+163
+00:08:20,050 --> 00:08:24,302
+functionality as well as its
+parameterization as an object.
+
+164
+00:08:24,302 --> 00:08:27,800
+The ability to take the functionality in
+and objectify it, if
+
+165
+00:08:27,800 --> 00:08:32,740
+you will, or encapsulate it and make it
+usable in another context.
+
+166
+00:08:32,740 --> 00:08:35,280
+The word context here is meant to be used
+loosely it doesn't mean
+
+167
+00:08:35,280 --> 00:08:40,130
+an Android context, such as in, a later
+point in time, you might
+
+168
+00:08:40,130 --> 00:08:42,720
+put it in the queue and run it later or
+you might use
+
+169
+00:08:42,720 --> 00:08:47,690
+it for example, to run in a different
+thread or a different process.
+
+170
+00:08:47,690 --> 00:08:50,570
+So, you want to be able to defer what you
+want to have
+
+171
+00:08:50,570 --> 00:08:54,590
+done from when it gets done and how it's
+going to be done.
+
+172
+00:08:54,590 --> 00:08:57,870
+So, those things become different
+orthogonal dimensions,
+
+173
+00:08:57,870 --> 00:09:00,419
+largely orthogonal dimensions in the
+design space.
+
+174
+00:09:02,050 --> 00:09:04,820
+So, here's a picture of the pattern from
+the
+
+175
+00:09:04,820 --> 00:09:08,230
+POSA4 book, which is a distillation of
+various things.
+
+176
+00:09:08,230 --> 00:09:10,240
+We'll talk a bit more about the structure
+in a second.
+
+177
+00:09:10,240 --> 00:09:12,000
+And there's a good link to go find
+
+178
+00:09:12,000 --> 00:09:15,060
+out more about this particular pattern,
+the commandrevisited.pdf file.
+
+179
+00:09:16,790 --> 00:09:18,910
+So, when would you go ahead, when would
+you want to apply this pattern?
+
+180
+00:09:18,910 --> 00:09:22,090
+Well there's a number of circumstances
+where it would become useful.
+
+181
+00:09:22,090 --> 00:09:25,400
+One is a situation where you want to be
+able to decouple the decision
+
+182
+00:09:25,400 --> 00:09:30,550
+of what code to execute from the decision
+of when this code should be run.
+
+183
+00:09:30,550 --> 00:09:33,480
+So, you might want to be able to specify
+what to run and the
+
+184
+00:09:33,480 --> 00:09:37,740
+be able to queue it and then execute it
+later in some other context.
+
+185
+00:09:38,990 --> 00:09:40,910
+You also might want to be able to do
+things in such
+
+186
+00:09:40,910 --> 00:09:46,400
+a way where you can change the
+implementation of your Service without
+
+187
+00:09:46,400 --> 00:09:49,160
+breaking the client code that relies on it
+you don't want to
+
+188
+00:09:49,160 --> 00:09:53,120
+have to go and change the interface for
+example and recompile the client.
+
+189
+00:09:53,120 --> 00:09:54,380
+You want to be able to pass some kind
+
+190
+00:09:54,380 --> 00:09:59,020
+of more loosely coupled, loosely bound
+message like abstraction that's
+
+191
+00:09:59,020 --> 00:10:01,710
+a bit more pliable, a bit more flexible, a
+
+192
+00:10:01,710 --> 00:10:05,140
+bit more adaptable to the particular needs
+of your environment.
+
+193
+00:10:05,140 --> 00:10:05,450
+So you don't tightly couple things.
+
+194
+00:10:05,450 --> 00:10:08,920
+The key here is tight coupling you want to
+avoid that.
+
+195
+00:10:10,100 --> 00:10:14,300
+Another reason which, not, is not commonly
+used for our
+
+196
+00:10:14,300 --> 00:10:17,930
+use case, but is commonly used for user
+interface things
+
+197
+00:10:17,930 --> 00:10:22,800
+like editors and document processors as
+well as transaction oriented
+
+198
+00:10:22,800 --> 00:10:27,910
+systems, is the ability to undo or redo
+various commands.
+
+199
+00:10:27,910 --> 00:10:30,270
+So, if you are a Microsoft Word user,
+
+200
+00:10:30,270 --> 00:10:32,740
+and you're typing along and you make a
+mistake,
+
+201
+00:10:32,740 --> 00:10:34,330
+then you can go ahead and undo what you
+
+202
+00:10:34,330 --> 00:10:36,390
+just did, and it'll reverse what you just
+did.
+
+203
+00:10:36,390 --> 00:10:40,090
+And then if you realize oh, I really
+wanted to do that after all, you can
+
+204
+00:10:40,090 --> 00:10:45,120
+then go ahead and redo it, so undo and
+redo work at the level of commands.
+
+205
+00:10:45,120 --> 00:10:46,080
+You can go even further with
+
+206
+00:10:46,080 --> 00:10:49,096
+this with various kinds of transactional
+capabilities.
+
+207
+00:10:49,096 --> 00:10:53,750
+Things like the ability to roll back a set
+of changes to a database in some way.
+
+208
+00:10:53,750 --> 00:10:55,610
+And those are all examples of how you
+might use
+
+209
+00:10:55,610 --> 00:10:59,490
+commands as things that you can execute to
+accomplish something,
+
+210
+00:10:59,490 --> 00:11:02,680
+as well as unexecute to undo it if for
+some
+
+211
+00:11:02,680 --> 00:11:06,780
+reason you discover that the results were
+not to your liking.
+
+212
+00:11:06,780 --> 00:11:11,180
+Some systems like GNU Emacs gives you
+arbitrary
+
+213
+00:11:11,180 --> 00:11:13,510
+levels of undo and redo, you could have
+
+214
+00:11:13,510 --> 00:11:15,040
+those things go back to the beginning of
+
+215
+00:11:15,040 --> 00:11:17,810
+your editing session which could have been
+days before.
+
+216
+00:11:17,810 --> 00:11:20,900
+It gets a little crazy after a while, mind
+you but it's possible to do.
+
+217
+00:11:20,900 --> 00:11:23,040
+Other environments give you very little
+undo.
+
+218
+00:11:23,040 --> 00:11:25,460
+For example, in PowerPoint, I think you
+could
+
+219
+00:11:25,460 --> 00:11:28,890
+typically undo up to your last save, for
+example.
+
+220
+00:11:28,890 --> 00:11:31,420
+So, you can't do arbitrary levels of undo.
+
+221
+00:11:31,420 --> 00:11:34,070
+Other systems I've worked on in the past,
+like Frame Maker way
+
+222
+00:11:34,070 --> 00:11:37,950
+back in the day, you could undo the last
+thing that you did.
+
+223
+00:11:37,950 --> 00:11:39,550
+So, people are obviously trying to figure
+out
+
+224
+00:11:39,550 --> 00:11:42,220
+a trade off between devoting large amounts
+of memory
+
+225
+00:11:42,220 --> 00:11:44,050
+to do something, versus giving you lots of
+
+226
+00:11:44,050 --> 00:11:47,320
+flexibility to undo and redo things at
+your convenience.
+
+227
+00:11:48,810 --> 00:11:50,490
+Here's a picture that illustrates the
+
+228
+00:11:50,490 --> 00:11:53,320
+structure and participants in this
+pattern.
+
+229
+00:11:53,320 --> 00:11:57,020
+Again, keep in mind, this is the, the
+revisited, the command revisited version.
+
+230
+00:11:57,020 --> 00:11:59,751
+This is not exactly what you'll see if you
+read the Gang of Four
+
+231
+00:11:59,751 --> 00:12:02,520
+book or the Post of One book, but I think
+this is a good job.
+
+232
+00:12:02,520 --> 00:12:04,890
+So, you have something that you call a
+command which
+
+233
+00:12:04,890 --> 00:12:07,550
+has an, a, an a bunch of operations on it.
+
+234
+00:12:07,550 --> 00:12:10,310
+And, typically in some way being able to
+execute the command.
+
+235
+00:12:11,500 --> 00:12:13,980
+And then, you often have a way of being
+able to customize
+
+236
+00:12:13,980 --> 00:12:18,910
+or subclass or somehow specialize the
+
+237
+00:12:18,910 --> 00:12:21,070
+original command to make a concrete
+command.
+
+238
+00:12:21,070 --> 00:12:24,740
+Now, we'll see in Android that the
+commands we're going to be passing around
+
+239
+00:12:24,740 --> 00:12:27,790
+in this particular environment are
+intents, and
+
+240
+00:12:27,790 --> 00:12:29,960
+you typically don't inherit from an
+intent.
+
+241
+00:12:29,960 --> 00:12:33,900
+Instead, what you do is you take an intent
+and you add extras to it to add additional
+
+242
+00:12:33,900 --> 00:12:37,230
+fields and information that will be used
+and stored
+
+243
+00:12:37,230 --> 00:12:39,930
+along with the intent when you send it
+some place.
+
+244
+00:12:39,930 --> 00:12:41,850
+And we'll show some examples of this in
+just a second.
+
+245
+00:12:41,850 --> 00:12:46,600
+You then have some kind of creator, which
+is used to create these
+
+246
+00:12:46,600 --> 00:12:50,110
+commands as well as to pass them to
+something to do the work.
+
+247
+00:12:50,110 --> 00:12:53,060
+In our particular context, the creator is
+going to
+
+248
+00:12:53,060 --> 00:12:55,880
+be an activity of some kind, like a
+download activity.
+
+249
+00:12:57,330 --> 00:13:02,280
+Then, we have an executor, or an executor,
+it depends on whether your someone who
+
+250
+00:13:02,280 --> 00:13:04,440
+play first person shooter games or whether
+
+251
+00:13:04,440 --> 00:13:07,650
+you're someone who works as a bank
+accountant.
+
+252
+00:13:07,650 --> 00:13:09,604
+And so in this particular case, the
+
+253
+00:13:09,604 --> 00:13:12,018
+executor is going to be the IntentService,
+it's
+
+254
+00:13:12,018 --> 00:13:14,144
+going to be the thing that actually
+executes
+
+255
+00:13:14,144 --> 00:13:16,634
+the work associated with the command it
+receives.
+
+256
+00:13:16,634 --> 00:13:18,874
+And then, there's an execution context
+which
+
+257
+00:13:18,874 --> 00:13:21,165
+could be a variety of different things.
+
+258
+00:13:21,165 --> 00:13:23,660
+I've chosen to map that to the context
+that you get with
+
+259
+00:13:23,660 --> 00:13:25,860
+Android, but there are other things you
+can map that to as well.
+
+260
+00:13:27,580 --> 00:13:31,320
+Okay, so that's the static view, so you
+get from a structural perspective, you
+
+261
+00:13:31,320 --> 00:13:35,770
+get the key participants who are involved
+and a brief description of what they do.
+
+262
+00:13:35,770 --> 00:13:39,970
+Keep in mind, as is always the case with
+patterns, there's subtle variations
+
+263
+00:13:39,970 --> 00:13:43,870
+quite possible, and they may not line up
+exactly what we're talking about here.
+
+264
+00:13:43,870 --> 00:13:46,930
+But it still may be the very same pattern,
+and that's perfectly okay.
+
+265
+00:13:47,950 --> 00:13:49,750
+Let's now talk a little bit about the
+dynamics.
+
+266
+00:13:49,750 --> 00:13:52,810
+That's how the structural participants
+interact with each other.
+
+267
+00:13:52,810 --> 00:13:54,350
+So, in this case we have creator, like an
+
+268
+00:13:54,350 --> 00:13:57,472
+activity, that goes ahead and creates the
+intent, and calls
+
+269
+00:13:57,472 --> 00:14:00,490
+StartService, well, it creates the intent
+puts a bunch
+
+270
+00:14:00,490 --> 00:14:03,600
+of things into the intent, extras, data
+and so on.
+
+271
+00:14:03,600 --> 00:14:05,246
+And then, it goes ahead and it calls
+
+272
+00:14:05,246 --> 00:14:09,710
+StartService, and that StartService call
+causes the executor
+
+273
+00:14:09,710 --> 00:14:12,510
+to wake up and the executor then goes
+
+274
+00:14:12,510 --> 00:14:16,145
+ahead and runs the on handle intent
+method.
+
+275
+00:14:16,145 --> 00:14:21,120
+And the on handle intent method is what's
+going to be used to actually execute and
+
+276
+00:14:21,120 --> 00:14:24,260
+process the intent that was sent over to
+
+277
+00:14:24,260 --> 00:14:27,850
+the IntentService as a command from the
+activity.
+
+278
+00:14:27,850 --> 00:14:32,010
+So, you can see how there's a pretty nice
+mapping kind of one to one on the
+
+279
+00:14:32,010 --> 00:14:34,870
+various parts from the pattern description
+in the
+
+280
+00:14:34,870 --> 00:14:38,060
+book into the parts that you find in
+Android.
+
+281
+00:14:38,060 --> 00:14:40,700
+And as, as we've gone through this class,
+I've been
+
+282
+00:14:40,700 --> 00:14:44,230
+amazed as I've looked more deeply into
+what Android's doing.
+
+283
+00:14:44,230 --> 00:14:46,660
+The number of places in Android that map
+
+284
+00:14:46,660 --> 00:14:50,220
+pretty much almost perfectly onto patterns
+that you commonly
+
+285
+00:14:50,220 --> 00:14:53,301
+find in the Gang of Four book and the Post
+of books, and other books as well.
+
+286
+00:14:53,301 --> 00:14:55,069
+And that's, that's a good thing, because
+
+287
+00:14:55,069 --> 00:14:57,720
+it means that Android has high pattern
+density.
+
+288
+00:14:57,720 --> 00:14:59,800
+It means people who designed it, either
+
+289
+00:14:59,800 --> 00:15:03,800
+intentionally or accidentally,
+serendipitously figured out how
+
+290
+00:15:03,800 --> 00:15:08,240
+to tap into some really good time honored
+ways of building these kinds of systems.
+
+291
+00:15:08,240 --> 00:15:11,590
+It also means that once you understand
+these patterns, learning Android is
+
+292
+00:15:11,590 --> 00:15:14,610
+a lot easier and as you move to other
+environments that are not
+
+293
+00:15:14,610 --> 00:15:18,870
+Android but also implement those patterns,
+you'll be well disposed to be able
+
+294
+00:15:18,870 --> 00:15:20,820
+to port your knowledge of design
+
+295
+00:15:20,820 --> 00:15:23,130
+and architecture in much more interesting
+ways.
+
+296
+00:15:23,130 --> 00:15:26,810
+By the way, it would be absolutely
+fascinating to take a look and
+
+297
+00:15:26,810 --> 00:15:32,940
+see, what architectural patterns went awry
+in the roll out of the Obamacare website.
+
+298
+00:15:32,940 --> 00:15:35,210
+I think that'd be really fun, somebody go
+in there
+
+299
+00:15:35,210 --> 00:15:38,240
+and do some forensics and see what's
+lurking under the hood.
+
+300
+00:15:38,240 --> 00:15:41,126
+I suspect you might find more anti
+patterns than patterns, but
+
+301
+00:15:41,126 --> 00:15:44,175
+you'd still learn a lot of other stuff
+like regression, load
+
+302
+00:15:44,175 --> 00:15:46,353
+testing is a good thing to do before you
+go live,
+
+303
+00:15:46,353 --> 00:15:49,910
+that, that's that's a pattern that they
+probably should of applied.
+
+304
+00:15:51,090 --> 00:15:54,820
+I think the anti pattern is, cross your
+fingers and hope for the best, right?
+
+305
+00:15:54,820 --> 00:15:56,040
+That doesn't always work so well.
+
+306
+00:15:56,040 --> 00:15:59,840
+Okay, so there is a lot of different
+consequences
+
+307
+00:15:59,840 --> 00:16:04,410
+of using this particular pattern, some of
+the good things.
+
+308
+00:16:04,410 --> 00:16:08,820
+The client is not blocked for a long
+duration of time.
+
+309
+00:16:08,820 --> 00:16:11,160
+So, if you take a look here you can see
+here
+
+310
+00:16:11,160 --> 00:16:13,960
+just a little snippet of code we might
+have that's going to go
+
+311
+00:16:13,960 --> 00:16:18,670
+ahead and start up an IntentService which
+is going to handle
+
+312
+00:16:18,670 --> 00:16:21,850
+the request and then maybe reply via a
+messenger, who knows what.
+
+313
+00:16:21,850 --> 00:16:24,340
+And the way we do this as you can see is
+we, whoops, we
+
+314
+00:16:24,340 --> 00:16:28,560
+create the intent, we say we want it to
+run with the download class, we
+
+315
+00:16:28,560 --> 00:16:31,720
+set the data, we create a messenger, we
+stick that in as an extra,
+
+316
+00:16:31,720 --> 00:16:34,070
+and then we call StartService, and the
+
+317
+00:16:34,070 --> 00:16:37,570
+call to StartService does not block the
+client.
+
+318
+00:16:37,570 --> 00:16:39,580
+It's not going to wait for that thing to
+start.
+
+319
+00:16:39,580 --> 00:16:42,760
+It's just going to sort of fire it over
+there and go
+
+320
+00:16:42,760 --> 00:16:45,410
+on it's merry way to be driven by further
+call backs.
+
+321
+00:16:46,870 --> 00:16:48,370
+Another thing you can do with this
+
+322
+00:16:48,370 --> 00:16:50,240
+particular approach is you can allow
+different
+
+323
+00:16:50,240 --> 00:16:51,720
+users to work with the service in
+
+324
+00:16:51,720 --> 00:16:54,340
+different way, via the commands that they
+pass.
+
+325
+00:16:54,340 --> 00:16:57,250
+So, here's an example actually not too
+dissimilar from some of the stuff that
+
+326
+00:16:57,250 --> 00:16:59,280
+you're doing for the latest programming
+assignment
+
+327
+00:16:59,280 --> 00:17:02,250
+that's due tonight, where you might pass,
+you
+
+328
+00:17:02,250 --> 00:17:04,380
+might have one implementation, maybe you
+would
+
+329
+00:17:04,380 --> 00:17:07,070
+have an IntentService, maybe you'd have a
+regular
+
+330
+00:17:07,070 --> 00:17:09,640
+service with the art, the OnStart command
+
+331
+00:17:09,640 --> 00:17:12,480
+hook method and you're going to get an
+intent.
+
+332
+00:17:12,480 --> 00:17:16,490
+And that intent could contain extra
+information that
+
+333
+00:17:16,490 --> 00:17:18,860
+could be used by the service
+implementation in
+
+334
+00:17:18,860 --> 00:17:21,700
+order to figure out what concrete service
+request
+
+335
+00:17:21,700 --> 00:17:26,020
+was actually being made by this particular
+intent command.
+
+336
+00:17:26,020 --> 00:17:29,240
+So, for example, if we get a messenger
+that might say, ha we're going to do a
+
+337
+00:17:29,240 --> 00:17:31,700
+messenger download, if we don't get a
+messenger
+
+338
+00:17:31,700 --> 00:17:33,810
+than maybe we're going to do a broadcast
+download.
+
+339
+00:17:33,810 --> 00:17:36,270
+We're going to download it then broadcast
+it.
+
+340
+00:17:36,270 --> 00:17:37,570
+And, so on and so forth.
+
+341
+00:17:37,570 --> 00:17:39,900
+And, the cool part about this, if you
+really think carefully about
+
+342
+00:17:39,900 --> 00:17:43,700
+what this pattern is allowing you to do,
+it's giving you a common
+
+343
+00:17:43,700 --> 00:17:47,860
+interface, namely StartService, which
+always looks
+
+344
+00:17:47,860 --> 00:17:50,180
+exactly the same and you're using that
+
+345
+00:17:50,180 --> 00:17:54,430
+common interface in order to be able to do
+a variety of things.
+
+346
+00:17:54,430 --> 00:17:58,995
+And if you want to add more things to do,
+you don't actually have to change the
+
+347
+00:17:58,995 --> 00:18:04,330
+StartService interface, you just change
+the way in which you set up the intent
+
+348
+00:18:04,330 --> 00:18:10,400
+command that'll be passed to that
+StartService interface.
+
+349
+00:18:10,400 --> 00:18:11,390
+Any questions about that?
+
+350
+00:18:11,390 --> 00:18:14,460
+So, that's a good example of a pretty wide
+interface.
+
+351
+00:18:14,460 --> 00:18:16,170
+You can pass a lot of different kinds of
+things
+
+352
+00:18:16,170 --> 00:18:19,570
+through there because you're essentially
+passing a command object, and the
+
+353
+00:18:19,570 --> 00:18:23,230
+command object can have extras that go
+with it to direct
+
+354
+00:18:23,230 --> 00:18:26,940
+what the receiving service does when it
+actually gets the command.
+
+355
+00:18:28,530 --> 00:18:33,690
+There are some downsides of course in the
+same way that it's nice that we can
+
+356
+00:18:33,690 --> 00:18:37,880
+have a wide interface where we can pass
+all kinds of things through, it also means
+
+357
+00:18:37,880 --> 00:18:40,160
+that you as the implementer, the
+implementer of
+
+358
+00:18:40,160 --> 00:18:43,280
+the service have additional work to do in
+
+359
+00:18:43,280 --> 00:18:48,260
+order to go about figuring out what it is
+you need to handle to write that service.
+
+360
+00:18:48,260 --> 00:18:51,970
+In fact, if it's really open-ended, people
+can pass
+
+361
+00:18:51,970 --> 00:18:55,310
+you intents that have extras that you
+don't understand.
+
+362
+00:18:55,310 --> 00:18:59,800
+They could just throw various stuff in
+there and either you ignore it because you
+
+363
+00:18:59,800 --> 00:19:03,450
+didn't know to look for it or if you get
+it, you're like what's this thing?
+
+364
+00:19:03,450 --> 00:19:04,980
+I don't know what to do with this.
+
+365
+00:19:04,980 --> 00:19:08,510
+So, that's one of the downsides of a very
+wide interface even though it
+
+366
+00:19:08,510 --> 00:19:11,290
+doesn't require many changes to the
+interface
+
+367
+00:19:11,290 --> 00:19:15,090
+when you enhance and extend the service
+capability.
+
+368
+00:19:15,090 --> 00:19:18,440
+The services over time become difficult to
+understand,
+
+369
+00:19:18,440 --> 00:19:19,770
+because you don't really know what they
+do.
+
+370
+00:19:20,820 --> 00:19:22,530
+Keep that thought in mind when talk
+
+371
+00:19:22,530 --> 00:19:25,790
+later about bound services, because bound
+services,
+
+372
+00:19:25,790 --> 00:19:27,710
+as you see, are often, not always,
+
+373
+00:19:27,710 --> 00:19:31,160
+but often used with we're strongly typed
+interfaces.
+
+374
+00:19:31,160 --> 00:19:33,440
+Where you know ahead of time what you're
+passing.
+
+375
+00:19:33,440 --> 00:19:37,325
+And the writer of the implementation knows
+precisely what it's getting.
+
+376
+00:19:37,325 --> 00:19:39,349
+That allows you to be a bit more strongly
+typed.
+
+377
+00:19:40,780 --> 00:19:43,330
+And so we'll compare and contrast this
+later with, with the broker pattern.
+
+378
+00:19:44,820 --> 00:19:46,930
+The other thing that you don't really get
+with command,
+
+379
+00:19:46,930 --> 00:19:50,480
+is you don't get two way operations
+without some additional work.
+
+380
+00:19:50,480 --> 00:19:53,190
+So, for our particular case and, in fact,
+you
+
+381
+00:19:53,190 --> 00:19:55,670
+guys are seeing this in the current
+programming assignment,
+
+382
+00:19:55,670 --> 00:19:57,710
+in our particular case, where you do need
+to
+
+383
+00:19:57,710 --> 00:20:00,410
+get the result back you have to do
+something else.
+
+384
+00:20:00,410 --> 00:20:02,360
+You have to create a messenger, and sen,
+you
+
+385
+00:20:02,360 --> 00:20:05,850
+know, send or send back the reply to the
+messenger.
+
+386
+00:20:05,850 --> 00:20:09,160
+You have to create a broadcast receiver
+and then broadcast back to that thing.
+
+387
+00:20:09,160 --> 00:20:11,670
+You have to create a pending intent and
+get that back, etc.
+
+388
+00:20:11,670 --> 00:20:13,640
+There's lots of different ways to do this,
+but
+
+389
+00:20:13,640 --> 00:20:17,650
+you, the application developer, are
+responsible for working these protocols.
+
+390
+00:20:17,650 --> 00:20:22,530
+It doesn't come pre baked into the
+communication abstraction.
+
+391
+00:20:22,530 --> 00:20:24,620
+And think about that too, because when we
+talk about
+
+392
+00:20:24,620 --> 00:20:28,940
+bound services and the Android interface
+definition language could see
+
+393
+00:20:28,940 --> 00:20:32,640
+how those services give you additional
+capability and additional ways
+
+394
+00:20:32,640 --> 00:20:35,640
+to do this that requires, less work at
+face value.
+
+395
+00:20:35,640 --> 00:20:37,570
+There's some subtleties we'll talk about
+when we get to
+
+396
+00:20:37,570 --> 00:20:41,030
+it, but at one level two way communication
+becomes somewhat easier.
+
+397
+00:20:41,030 --> 00:20:43,760
+So, what are someones of the known uses?
+
+398
+00:20:43,760 --> 00:20:47,110
+Well the IntentService, of course, is a
+great sample of the known use.
+
+399
+00:20:47,110 --> 00:20:50,090
+There's also other things you get in
+Android that behave much like this.
+
+400
+00:20:50,090 --> 00:20:53,280
+So, the Runnable interface you get is kind
+of a command, you kind
+
+401
+00:20:53,280 --> 00:20:57,400
+of make a Runnable and you can pass that
+thing through to be processed
+
+402
+00:20:57,400 --> 00:21:01,220
+in another thread of control by the, the
+message loop that's the looper that's
+
+403
+00:21:01,220 --> 00:21:03,260
+in that thread of control that's
+associated
+
+404
+00:21:03,260 --> 00:21:04,920
+with the handle that you talk to.
+
+405
+00:21:04,920 --> 00:21:07,245
+Many user interface tool kits provide some
+support for,
+
+406
+00:21:07,245 --> 00:21:13,190
+for commands in various ways, interpreters
+for command line, programs
+
+407
+00:21:13,190 --> 00:21:15,510
+often do this, it can do Emacs, we talked
+
+408
+00:21:15,510 --> 00:21:18,160
+about before uses commands and so on and
+so forth.
+
+409
+00:21:18,160 --> 00:21:21,060
+So, it's a pretty common pattern used in a
+lot of different places.
+
+410
+00:21:22,650 --> 00:21:24,890
+So, to wrap up, the command processor
+pattern gives
+
+411
+00:21:24,890 --> 00:21:27,800
+us a nice way to be able to communicate
+information
+
+412
+00:21:27,800 --> 00:21:30,630
+between a sender and a receiver and to do
+it
+
+413
+00:21:30,630 --> 00:21:34,630
+in a way that makes it easy to accomplish
+asynchrony.
+
+414
+00:21:34,630 --> 00:21:36,400
+And of course, that's because you aren't
+
+415
+00:21:36,400 --> 00:21:38,960
+blocking, waiting for the response to come
+back.
+
+416
+00:21:40,330 --> 00:21:43,650
+And you can have things be concurrent,
+they can be networked and so on.
+
+417
+00:21:43,650 --> 00:21:46,750
+Obviously, in Android, you get kind of
+concurrency that
+
+418
+00:21:46,750 --> 00:21:51,572
+goes between threads or between threads in
+different processes.
+
+419
+00:21:51,572 --> 00:21:54,200
+Android doesn't, out of the box, give you
+the command
+
+420
+00:21:54,200 --> 00:21:58,390
+pattern implementation for network
+communication that goes to a server.
+
+421
+00:21:58,390 --> 00:22:02,029
+You'd have to use some other means like
+the Apache libraries or something
+
+422
+00:22:02,029 --> 00:22:04,916
+like that in order to be able to do that
+kind of communique.
+
+423
+00:22:04,916 --> 00:22:12,479
+[MUSIC]
+

@@ -1,0 +1,388 @@
+1
+00:00:00,000 --> 00:00:06,884
+[MUSIC]
+
+2
+00:00:06,884 --> 00:00:08,084
+[BLANK_AUDIO]
+
+3
+00:00:08,084 --> 00:00:10,419
+What I'd like to do now is give you a
+little bit
+
+4
+00:00:10,419 --> 00:00:14,700
+more detail about how the command
+processor pattern is applied in Android.
+
+5
+00:00:14,700 --> 00:00:16,520
+And this is going to be somewhat a review,
+
+6
+00:00:16,520 --> 00:00:18,180
+but we're just going to look a little bit
+more
+
+7
+00:00:18,180 --> 00:00:20,220
+in terms of the steps involved and kind of
+map
+
+8
+00:00:20,220 --> 00:00:22,800
+this for the pattern on to what's an
+Android.
+
+9
+00:00:22,800 --> 00:00:23,790
+And it'll also give you a chance to
+
+10
+00:00:23,790 --> 00:00:25,790
+see another visualization of how these
+things work.
+
+11
+00:00:27,450 --> 00:00:31,470
+So the implementation steps, so step
+number one is to define
+
+12
+00:00:31,470 --> 00:00:37,150
+an abstract class that will give you the
+interface for passing commands.
+
+13
+00:00:37,150 --> 00:00:39,400
+In many environments you have some kind of
+execute
+
+14
+00:00:39,400 --> 00:00:42,932
+method that you're going to use to do the
+work.
+
+15
+00:00:42,932 --> 00:00:46,690
+And Android, it doesn't quite work that
+way, but it's along those lines.
+
+16
+00:00:46,690 --> 00:00:50,330
+There's an intent and the intent is
+parcelable, which
+
+17
+00:00:50,330 --> 00:00:52,010
+means you can turn it into something that
+can
+
+18
+00:00:52,010 --> 00:00:53,750
+be sent across a network and reconstitute
+on the
+
+19
+00:00:53,750 --> 00:00:57,920
+other, or across, the processes between
+different processes on Android.
+
+20
+00:00:57,920 --> 00:00:59,879
+And then reconstitute it on the other
+side.
+
+21
+00:01:01,870 --> 00:01:04,520
+We then have, the need to be able to add
+
+22
+00:01:04,520 --> 00:01:10,130
+state so you can pass, information, data,
+along with the command.
+
+23
+00:01:10,130 --> 00:01:15,650
+In many cases that's used by sub-classing
+from a command interface and
+
+24
+00:01:15,650 --> 00:01:19,730
+filling in a bunch of fields to do the
+bidding of the sub-class.
+
+25
+00:01:19,730 --> 00:01:21,340
+In the context of Android it's a little
+
+26
+00:01:21,340 --> 00:01:23,550
+different, but it's along the same sort of
+lines.
+
+27
+00:01:23,550 --> 00:01:28,760
+We have a bunch of operations to set data,
+and get data, which work on URIs.
+
+28
+00:01:28,760 --> 00:01:32,910
+As well as be able to put extras, and get
+extras to be able to work on other kinds
+
+29
+00:01:32,910 --> 00:01:39,080
+of, of data, strings, ints, bundles,
+things like that.
+
+30
+00:01:39,080 --> 00:01:41,591
+We also then have to define and implement
+the creator, the thing
+
+31
+00:01:41,591 --> 00:01:44,940
+that actually creates the stuff that we're
+going to use with the commands.
+
+32
+00:01:44,940 --> 00:01:47,300
+So in our particular case, that's
+typically done by an
+
+33
+00:01:47,300 --> 00:01:50,880
+activity where we might have some kind of
+click handler.
+
+34
+00:01:50,880 --> 00:01:53,382
+Which when you click on it, it will go
+ahead and make an intent.
+
+35
+00:01:53,382 --> 00:01:56,960
+Connect it either, implicitly, or
+explicitly to some
+
+36
+00:01:56,960 --> 00:01:58,830
+kind of service, or other, or other
+component.
+
+37
+00:01:58,830 --> 00:02:01,490
+And then you stuff the various extras into
+the intent.
+
+38
+00:02:01,490 --> 00:02:03,600
+And then you call start service.
+
+39
+00:02:03,600 --> 00:02:05,900
+Which as we've seen, doesn't block.
+
+40
+00:02:05,900 --> 00:02:09,210
+We then have to define the context.
+
+41
+00:02:09,210 --> 00:02:11,070
+In this particular case, we'll just grab
+the
+
+42
+00:02:11,070 --> 00:02:14,720
+context that we get from the Android
+context, which
+
+43
+00:02:14,720 --> 00:02:17,640
+on the activity side of the world, gives
+
+44
+00:02:17,640 --> 00:02:19,160
+you operations to do a whole bunch of
+things.
+
+45
+00:02:19,160 --> 00:02:21,490
+On the service side of the world, gives
+you some other things.
+
+46
+00:02:21,490 --> 00:02:24,960
+You can do things like send broadcasts.
+
+47
+00:02:24,960 --> 00:02:27,860
+Or be able to register receivers for
+broadcasts, start
+
+48
+00:02:27,860 --> 00:02:30,660
+activities, start services, and so on and
+so forth.
+
+49
+00:02:30,660 --> 00:02:33,040
+Those are various things you can do in the
+context.
+
+50
+00:02:34,420 --> 00:02:35,760
+And then the final thing, of course, is
+
+51
+00:02:35,760 --> 00:02:40,630
+to implement specific command
+functionality in sub classes.
+
+52
+00:02:40,630 --> 00:02:43,590
+So in the context of, of our pattern,
+
+53
+00:02:43,590 --> 00:02:46,430
+implementation in Android, what that's
+going to relate
+
+54
+00:02:46,430 --> 00:02:50,430
+to is inheriting from intense service and
+then
+
+55
+00:02:50,430 --> 00:02:53,150
+filling in the on handle intent hook
+method.
+
+56
+00:02:53,150 --> 00:02:54,450
+Which as you all know when it gets called
+
+57
+00:02:54,450 --> 00:02:59,330
+back, will be running in a separate thread
+of control.
+
+58
+00:02:59,330 --> 00:03:00,620
+Here's another way to look at this stuff.
+
+59
+00:03:00,620 --> 00:03:05,850
+This is how this might be applied in the
+context of your programming assignment.
+
+60
+00:03:05,850 --> 00:03:11,440
+So, we might have a, a download activity
+process which has a download activity.
+
+61
+00:03:11,440 --> 00:03:15,330
+And we'll, let's assume we're using the
+messenger variant of things here.
+
+62
+00:03:15,330 --> 00:03:20,740
+And we go ahead and send the service to
+the Activity Manager service.
+
+63
+00:03:20,740 --> 00:03:24,230
+It starts up this particular thing, and
+
+64
+00:03:24,230 --> 00:03:26,650
+the intent service will then, unhandle
+intent method.
+
+65
+00:03:26,650 --> 00:03:31,410
+We'll go ahead and grab that information
+and then reply back to the messenger.
+
+66
+00:03:31,410 --> 00:03:33,354
+As you can see in this particular
+
+67
+00:03:33,354 --> 00:03:36,527
+case, the service connection portion is
+not used.
+
+68
+00:03:36,527 --> 00:03:41,160
+So I'm going to go ahead and just zap that
+from the picture here.
+
+69
+00:03:41,160 --> 00:03:44,197
+We'll talk about this just, in just a
+second when we start talking
+
+70
+00:03:44,197 --> 00:03:47,680
+about, bounded services because they end
+up actually using this kind of stuff.
+
+71
+00:03:49,300 --> 00:03:52,417
+Here's a little bit of the code, just to
+illustrate this.
+
+72
+00:03:52,417 --> 00:03:53,913
+So you can see we go ahead and
+
+73
+00:03:53,913 --> 00:03:57,120
+create an intent, put some information
+into the intent.
+
+74
+00:03:58,700 --> 00:04:00,259
+And here's the receiver.
+
+75
+00:04:00,259 --> 00:04:04,471
+We go ahead in this particular case, get
+the bundle of extras out
+
+76
+00:04:04,471 --> 00:04:08,380
+of the intent, go ahead and look up the
+URI, get that back.
+
+77
+00:04:08,380 --> 00:04:13,247
+And then we go ahead and, and get the
+messenger, that was also bundled
+
+78
+00:04:13,247 --> 00:04:18,211
+in there, download the file, and then send
+the message back to the client.
+
+79
+00:04:18,211 --> 00:04:22,573
+Okay, so that's basically the coverage of
+the intent service.
+
+80
+00:04:22,573 --> 00:04:24,673
+Are there any questions about that stuff?
+
+81
+00:04:24,673 --> 00:04:31,353
+[MUSIC]
+
+82
+00:04:31,353 --> 00:04:32,459
+[BLANK_AUDIO]
+

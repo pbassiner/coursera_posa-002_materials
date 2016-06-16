@@ -1,0 +1,1368 @@
+1
+00:00:00,000 --> 00:00:08,425
+[MUSIC]
+
+2
+00:00:08,425 --> 00:00:11,704
+So, we have one more pattern here.
+
+3
+00:00:11,704 --> 00:00:14,236
+I think we can probably cover this first
+part
+
+4
+00:00:14,236 --> 00:00:16,910
+of this pattern in the next 15 minutes or
+so.
+
+5
+00:00:16,910 --> 00:00:20,310
+And that'll leave for us for next time the
+
+6
+00:00:20,310 --> 00:00:23,340
+second half of this pattern we'll talk
+about the implementation.
+
+7
+00:00:23,340 --> 00:00:27,730
+Artifacts of this pattern and will also
+talk about a couple more patents.
+
+8
+00:00:27,730 --> 00:00:30,040
+And then we'll get ready to move on to
+something new.
+
+9
+00:00:30,040 --> 00:00:33,980
+So what we're going to do now is we're
+going to kind of take the proxy
+
+10
+00:00:33,980 --> 00:00:37,060
+and stretch it out a little bit and put
+something in the middle.
+
+11
+00:00:37,060 --> 00:00:39,390
+And that something is called the broker.
+
+12
+00:00:39,390 --> 00:00:42,545
+The broker pattern is a pattern that
+appeared in the
+
+13
+00:00:42,545 --> 00:00:46,110
+[UNKNOWN] one book, and then it's been
+revised various times
+
+14
+00:00:46,110 --> 00:00:49,670
+along the way because the original
+description needed to be
+
+15
+00:00:49,670 --> 00:00:53,632
+enhanced as people got better insight
+about what brokers really were.
+
+16
+00:00:53,632 --> 00:00:57,660
+And so we learned a lot about what brokers
+were over the years.
+
+17
+00:00:57,660 --> 00:01:01,140
+So the context for this is some kind of
+system with.
+
+18
+00:01:01,140 --> 00:01:04,590
+Multiple objects that are potentially
+remote, they may be remote, they may not
+
+19
+00:01:04,590 --> 00:01:06,320
+be remote, and these objects have to
+
+20
+00:01:06,320 --> 00:01:08,280
+interact with each other, synchronously or
+asynchronously.
+
+21
+00:01:09,780 --> 00:01:13,900
+And in the case of Android, of course,
+this would be over binder RPC.
+
+22
+00:01:13,900 --> 00:01:16,360
+The problems here is we don't want
+application developers to
+
+23
+00:01:16,360 --> 00:01:20,940
+have to think about a number of accidental
+and inherent complexities.
+
+24
+00:01:20,940 --> 00:01:25,260
+We'd like them to not have to worry about
+these details to the extent possible.
+
+25
+00:01:25,260 --> 00:01:29,090
+We don't want them to have to think about
+low level message passing, in other words
+
+26
+00:01:29,090 --> 00:01:32,040
+taking their native data types and
+manually encoding
+
+27
+00:01:32,040 --> 00:01:34,020
+them linearizing them, doing all the
+things proxy do.
+
+28
+00:01:34,020 --> 00:01:36,000
+They don't, they shouldn't have to worry
+about that.
+
+29
+00:01:36,000 --> 00:01:37,990
+That's basically what proxy does by the
+way.
+
+30
+00:01:37,990 --> 00:01:40,540
+But there's some other things we'd like
+them not to worry about either.
+
+31
+00:01:40,540 --> 00:01:43,290
+We'd like them to have to not worry about
+various types
+
+32
+00:01:43,290 --> 00:01:48,040
+of diversity or heterogeneity that pop up
+In the underlying infrastructure.
+
+33
+00:01:48,040 --> 00:01:51,160
+They shouldn't have to worry that the
+client side and the server side
+
+34
+00:01:51,160 --> 00:01:52,670
+are written in different programming
+languages,
+
+35
+00:01:52,670 --> 00:01:56,740
+Java versus C++ versus prolog versus C.
+
+36
+00:01:56,740 --> 00:02:00,020
+We shouldn't require them to worry about
+what operating systems
+
+37
+00:02:00,020 --> 00:02:03,580
+these platforms are, these applications,
+clients and servers are running on.
+
+38
+00:02:03,580 --> 00:02:05,290
+They shouldn't have to worry about the
+networking
+
+39
+00:02:05,290 --> 00:02:07,300
+protocols, the type of the hardware and so
+on.
+
+40
+00:02:07,300 --> 00:02:08,930
+That should all be shielded
+
+41
+00:02:08,930 --> 00:02:10,960
+and encapsulated from application-level
+concern.
+
+42
+00:02:11,990 --> 00:02:13,730
+We'd also like to try to shield them
+
+43
+00:02:13,730 --> 00:02:16,790
+as much as possible from other more
+inherent complexities.
+
+44
+00:02:16,790 --> 00:02:19,740
+Things like partial failure, security
+
+45
+00:02:19,740 --> 00:02:22,560
+implications, maybe latency, other kinds
+of
+
+46
+00:02:22,560 --> 00:02:25,310
+things that may be issues in a system
+that's getting bigger.
+
+47
+00:02:25,310 --> 00:02:27,850
+We'd like to try to shield them as much as
+possible.
+
+48
+00:02:27,850 --> 00:02:29,600
+You can't always shield people from these
+things.
+
+49
+00:02:29,600 --> 00:02:32,850
+If the network gets cut by a backhoe, you
+may just have an outage, right?
+
+50
+00:02:32,850 --> 00:02:34,840
+You just may not be a way to get around
+it.
+
+51
+00:02:34,840 --> 00:02:39,020
+But often there's ways of taking
+alternative paths or being able
+
+52
+00:02:39,020 --> 00:02:43,010
+to have replicas, or redundancy, or so on
+built into the system.
+
+53
+00:02:43,010 --> 00:02:46,230
+And it shouldn't be the application
+developer's job to think about this.
+
+54
+00:02:46,230 --> 00:02:48,870
+I've written a lot of stuff about this
+topic over the years, and you can
+
+55
+00:02:48,870 --> 00:02:51,910
+take a look at those many, many sources of
+information on my website about it.
+
+56
+00:02:53,370 --> 00:02:54,380
+So, what's the solution?
+
+57
+00:02:54,380 --> 00:02:59,830
+The solution is to basically separate out
+the communication concerns
+
+58
+00:02:59,830 --> 00:03:03,470
+that are sort of in the infrastructure
+from the application concerns.
+
+59
+00:03:03,470 --> 00:03:07,270
+And use a broker in order to kind of
+mediate between those two roles.
+
+60
+00:03:07,270 --> 00:03:12,170
+The systems the infrastructure kind of
+stuff and the application kind stuff.
+
+61
+00:03:13,320 --> 00:03:14,650
+Now, how is that done in the Android?
+
+62
+00:03:14,650 --> 00:03:20,100
+Well, you probably know by now it's done
+by using the binder and the AIL mechanism.
+
+63
+00:03:20,100 --> 00:03:24,710
+So we implement a binder object, the
+client's can't get to directly.
+
+64
+00:03:24,710 --> 00:03:27,280
+We get a proxy back to that via
+
+65
+00:03:27,280 --> 00:03:30,770
+the various means we've talked about using
+on-service connected
+
+66
+00:03:30,770 --> 00:03:33,960
+and so on and that client proxy is
+
+67
+00:03:33,960 --> 00:03:38,370
+then used by clients, like activities, to
+invoke operations.
+
+68
+00:03:38,370 --> 00:03:41,180
+And those operations then travel through
+the system,
+
+69
+00:03:41,180 --> 00:03:45,970
+after first being converted into parcels
+by the underlying.
+
+70
+00:03:45,970 --> 00:03:48,300
+A proxy, and they travel through the
+
+71
+00:03:48,300 --> 00:03:50,650
+binder framework and pop out the other
+side
+
+72
+00:03:50,650 --> 00:03:55,829
+to the stub, where they're converted back
+into data types and passed to an up-call.
+
+73
+00:03:55,829 --> 00:03:59,260
+And that up-call is what actually does the
+real work to
+
+74
+00:03:59,260 --> 00:04:05,480
+do the logic that's defined by the service
+binder implementor developer.
+
+75
+00:04:05,480 --> 00:04:07,520
+And then they can pass the results back if
+it's a two way call.
+
+76
+00:04:08,670 --> 00:04:11,510
+So the key thing here is that the binder
+is combining a bunch of things.
+
+77
+00:04:11,510 --> 00:04:14,180
+It's combining proxy, it's combining
+broker,
+
+78
+00:04:14,180 --> 00:04:17,070
+it's combining activator, it's combining
+adaptor.
+
+79
+00:04:17,070 --> 00:04:20,010
+It's about, you know, eight different
+patterns, we're just talking about broker.
+
+80
+00:04:20,010 --> 00:04:22,900
+As we'll see later, broker is actually a
+pattern language, it's just
+
+81
+00:04:22,900 --> 00:04:25,670
+a bunch of other things that come along
+with it for the ride.
+
+82
+00:04:26,840 --> 00:04:32,130
+So, the intent of the broker pattern is to
+try to connect clients with remote objects
+
+83
+00:04:32,130 --> 00:04:34,650
+in a way that allows broker to mediate
+
+84
+00:04:34,650 --> 00:04:38,020
+the interactions with the clients to the
+remote objects.
+
+85
+00:04:38,020 --> 00:04:40,970
+Without requiring the client or server
+
+86
+00:04:40,970 --> 00:04:44,180
+developer, application developers, or
+service developers
+
+87
+00:04:44,180 --> 00:04:47,530
+to have to know anything about how this
+works underneath the hood.
+
+88
+00:04:47,530 --> 00:04:51,060
+So you would typically end up applying
+this pattern if you want
+
+89
+00:04:51,060 --> 00:04:55,640
+to be able to support local or remote
+communication in a consistent way.
+
+90
+00:04:55,640 --> 00:04:59,940
+You want to be able to make the handling
+of various fault issues.
+
+91
+00:04:59,940 --> 00:05:01,300
+Shielded from the application developer.
+
+92
+00:05:01,300 --> 00:05:02,610
+We want to shield the application
+
+93
+00:05:02,610 --> 00:05:05,750
+developer from things like, memory
+management,
+
+94
+00:05:05,750 --> 00:05:11,030
+connection management, data transfer,
+synchronization, concurrency
+
+95
+00:05:11,030 --> 00:05:12,800
+control, so on and so forth.
+
+96
+00:05:12,800 --> 00:05:15,430
+I should probably list some of these thing
+out.
+
+97
+00:05:15,430 --> 00:05:20,164
+Low, low, level system details
+
+98
+00:05:20,164 --> 00:05:25,574
+such as memory, management, data,
+
+99
+00:05:25,574 --> 00:05:30,477
+lets see connection management,
+
+100
+00:05:30,477 --> 00:05:35,730
+synchronization, and threading.
+
+101
+00:05:35,730 --> 00:05:37,540
+You know, you think about it, there's a
+whole
+
+102
+00:05:37,540 --> 00:05:40,110
+pile of things that you gotta think about
+if you
+
+103
+00:05:40,110 --> 00:05:41,640
+write all these pieces of code and you'd
+like
+
+104
+00:05:41,640 --> 00:05:44,060
+to all be hidden from you as much as
+possible.
+
+105
+00:05:44,060 --> 00:05:46,540
+Different implementations of brokers by
+the way go to
+
+106
+00:05:46,540 --> 00:05:48,390
+different extents to hide you from some of
+these things.
+
+107
+00:05:49,950 --> 00:05:52,100
+So here's basically the structure of this
+pattern, and
+
+108
+00:05:52,100 --> 00:05:55,440
+I'm pulling this particular structure from
+a couple different places.
+
+109
+00:05:55,440 --> 00:05:57,690
+I wasn't really happy with any one
+description
+
+110
+00:05:57,690 --> 00:05:59,950
+of this stuff from the literature out
+there.
+
+111
+00:05:59,950 --> 00:06:03,030
+So here's one I kind of came up with based
+on a few things.
+
+112
+00:06:03,030 --> 00:06:05,220
+So basically you have a client, which is
+like
+
+113
+00:06:05,220 --> 00:06:07,990
+an activity in Android, the guy making the
+call.
+
+114
+00:06:07,990 --> 00:06:10,030
+You have some kind of infrastructure like
+
+115
+00:06:10,030 --> 00:06:12,470
+the binder RPC framework, which is broken
+up
+
+116
+00:06:12,470 --> 00:06:17,100
+into requesters that send things and
+dispatchers that
+
+117
+00:06:17,100 --> 00:06:19,877
+receive them and process them and upcall
+them.
+
+118
+00:06:21,000 --> 00:06:23,610
+You then have DeMarshalers, De.
+
+119
+00:06:23,610 --> 00:06:25,700
+Marshalers, de-marshaling and marshaling.
+
+120
+00:06:25,700 --> 00:06:27,910
+And they do the serialization and
+de-serialization.
+
+121
+00:06:27,910 --> 00:06:30,660
+That's what typically think of as being
+the proxy.
+
+122
+00:06:30,660 --> 00:06:32,420
+And then you finally have the guy that
+does the
+
+123
+00:06:32,420 --> 00:06:35,560
+real work, which is called a servant in
+this particular context.
+
+124
+00:06:35,560 --> 00:06:37,350
+Sometimes people call these things
+executors,
+
+125
+00:06:37,350 --> 00:06:38,650
+but we'll call them servants for now.
+
+126
+00:06:38,650 --> 00:06:42,080
+So those are the, the main components that
+you would typically find in a broker.
+
+127
+00:06:43,270 --> 00:06:46,770
+And if you take a look at this paper it
+gives you a flavor of this.
+
+128
+00:06:46,770 --> 00:06:49,060
+It uses slightly different names, but its
+the basic idea.
+
+129
+00:06:50,210 --> 00:06:53,072
+Here's a picture that kind of illustrates
+how all this stuff works.
+
+130
+00:06:53,072 --> 00:06:57,850
+A client, sorry a server registers an
+object either through some kind of
+
+131
+00:06:57,850 --> 00:07:00,450
+configuration script, like a manifest
+file,
+
+132
+00:07:00,450 --> 00:07:03,060
+or dynamically through some kind of API.
+
+133
+00:07:03,060 --> 00:07:07,110
+It says you know, here's an object that
+needs to be accessed remotely.
+
+134
+00:07:07,110 --> 00:07:10,890
+That's what the starts out, so everybody
+knows that exists.
+
+135
+00:07:10,890 --> 00:07:14,390
+Then a client is going to get back an
+object reference or some kind of service
+
+136
+00:07:14,390 --> 00:07:17,510
+identifier to this object and it's
+going to
+
+137
+00:07:17,510 --> 00:07:19,450
+go ahead and invoke an operation on it.
+
+138
+00:07:19,450 --> 00:07:23,070
+Via a proxy and it'll call this on the
+requestor.
+
+139
+00:07:23,070 --> 00:07:25,950
+The requestor will set up a connection if
+it doesn't exist already, do
+
+140
+00:07:25,950 --> 00:07:31,120
+the marshalling, send the data over the
+data goes over via the broker.
+
+141
+00:07:31,120 --> 00:07:36,110
+The broker might or might not be a
+separate process or separate thread.
+
+142
+00:07:36,110 --> 00:07:38,490
+These might be libraries that are linked
+together,
+
+143
+00:07:38,490 --> 00:07:41,260
+there might be some intermediate, mediator
+that's separate
+
+144
+00:07:41,260 --> 00:07:44,180
+from the client process and the receiver
+process
+
+145
+00:07:44,180 --> 00:07:46,510
+really depends on a lot of different
+things.
+
+146
+00:07:46,510 --> 00:07:50,960
+Scalability, fault tolerance, memory
+utilization, battery power.
+
+147
+00:07:50,960 --> 00:07:52,660
+All kinds of different considerations come
+into play.
+
+148
+00:07:52,660 --> 00:07:58,100
+The dispatcher takes the request,
+basically works with the
+
+149
+00:07:58,100 --> 00:08:01,780
+demarshaller part to crack open the data,
+extract out
+
+150
+00:08:01,780 --> 00:08:04,810
+the message fields, turn them into data
+types, and
+
+151
+00:08:04,810 --> 00:08:07,570
+then make an up call back to the object.
+
+152
+00:08:07,570 --> 00:08:09,710
+The object does its work, the method on
+the
+
+153
+00:08:09,710 --> 00:08:12,210
+object does its work, and then it sends a
+response
+
+154
+00:08:12,210 --> 00:08:14,770
+back, which goes back by the inverse path
+of
+
+155
+00:08:14,770 --> 00:08:17,180
+how it got there, in the first place, most
+typically.
+
+156
+00:08:17,180 --> 00:08:21,610
+So those are essentially the dynamic steps
+with the broker.
+
+157
+00:08:21,610 --> 00:08:24,820
+This obviously maps very nicely onto
+what's going on in
+
+158
+00:08:24,820 --> 00:08:27,810
+the context of Android for a whole bunch
+of different reasons.
+
+159
+00:08:27,810 --> 00:08:30,290
+And we'll talk about those next time, when
+we
+
+160
+00:08:30,290 --> 00:08:33,220
+talk about implementing this pattern in
+the context of Android.
+
+161
+00:08:33,220 --> 00:08:34,700
+We'll look at the steps and interactions.
+
+162
+00:08:35,760 --> 00:08:37,810
+There's a whole bunch of different
+consequences
+
+163
+00:08:37,810 --> 00:08:40,790
+of using this particular pattern a bunch
+of
+
+164
+00:08:40,790 --> 00:08:42,820
+good things, location and dependence, you
+don't
+
+165
+00:08:42,820 --> 00:08:45,650
+really know or care where the objects
+reside.
+
+166
+00:08:45,650 --> 00:08:48,310
+They might be in your address space, they
+might be some place
+
+167
+00:08:48,310 --> 00:08:52,910
+else, as Nolan was talking about, so that
+gives you more flexibility.
+
+168
+00:08:52,910 --> 00:08:53,900
+There's a clear separation of
+
+169
+00:08:53,900 --> 00:08:57,660
+concerns, the infrastructure, the broker
+implementations.
+
+170
+00:08:57,660 --> 00:08:59,850
+Doing all this heavy lifting for you, so
+you don't have to worry about
+
+171
+00:08:59,850 --> 00:09:01,900
+it in your application, unless there's a
+
+172
+00:09:01,900 --> 00:09:04,520
+bug in the broker but that's another
+story.
+
+173
+00:09:04,520 --> 00:09:06,670
+And if you make changes to the
+implementations,
+
+174
+00:09:06,670 --> 00:09:08,440
+the clients typically shouldn't be
+effected by that.
+
+175
+00:09:08,440 --> 00:09:11,600
+And then there's also a whole part of
+other benefits.
+
+176
+00:09:11,600 --> 00:09:16,520
+If you implement brokers using standards
+like CORBA for example,
+
+177
+00:09:16,520 --> 00:09:20,020
+or other technologies in that space like
+SOAP and so on.
+
+178
+00:09:20,020 --> 00:09:22,680
+Then what you'll end up with are ways of
+being
+
+179
+00:09:22,680 --> 00:09:25,830
+able to get portability, you'll be able to
+get modularity.
+
+180
+00:09:25,830 --> 00:09:27,730
+You get portability because you'll have
+
+181
+00:09:27,730 --> 00:09:31,410
+common interfaces, you're standardized to
+open specifications.
+
+182
+00:09:31,410 --> 00:09:33,480
+You will get modularity because you can
+break your
+
+183
+00:09:33,480 --> 00:09:37,440
+system up into pieces and you can test
+them individually.
+
+184
+00:09:37,440 --> 00:09:41,430
+You get reusability because you can reuse
+both the broker infrastructure, as well as
+
+185
+00:09:41,430 --> 00:09:44,390
+services you build on top of it and
+objects you build on top of it.
+
+186
+00:09:44,390 --> 00:09:48,320
+And all of this stuff has many, many, many
+patterns galore to make it all work.
+
+187
+00:09:49,330 --> 00:09:50,430
+There are some downsides.
+
+188
+00:09:50,430 --> 00:09:54,155
+For many years, especially in
+performance-critical
+
+189
+00:09:54,155 --> 00:09:57,440
+environments, requirements, environments
+where the wrong
+
+190
+00:09:57,440 --> 00:09:59,080
+answer delivered, the right answer
+delivered
+
+191
+00:09:59,080 --> 00:10:00,380
+too late becomes the wrong answer.
+
+192
+00:10:00,380 --> 00:10:03,440
+Those kinds of mission-critical or
+safety-critical environments.
+
+193
+00:10:03,440 --> 00:10:05,210
+People had a perception that brokers added
+
+194
+00:10:05,210 --> 00:10:08,550
+too much overhead relative to hand coated
+solutions.
+
+195
+00:10:08,550 --> 00:10:10,120
+That has changed over the years, people
+have
+
+196
+00:10:10,120 --> 00:10:12,510
+gotten really good at implementing very
+high performance brokers.
+
+197
+00:10:12,510 --> 00:10:14,310
+But sometimes if you're in certain
+
+198
+00:10:14,310 --> 00:10:15,790
+environments, there may be too much
+overhead.
+
+199
+00:10:17,470 --> 00:10:21,400
+Potential issues with reliability,
+reliability is something that's very often
+
+200
+00:10:21,400 --> 00:10:25,600
+hard to define in a completely generic and
+common way.
+
+201
+00:10:25,600 --> 00:10:29,580
+Because different applications have
+different reliability needs that are often
+
+202
+00:10:29,580 --> 00:10:32,430
+not well served by a one size fits all
+solution.
+
+203
+00:10:32,430 --> 00:10:34,820
+So if you're not careful, you might end up
+
+204
+00:10:34,820 --> 00:10:38,760
+compromising your reliability requirements
+to use something that's defined off
+
+205
+00:10:38,760 --> 00:10:41,080
+the shelf by a broker and it might not
+
+206
+00:10:41,080 --> 00:10:44,420
+work as well as something you might hand
+craft yourself.
+
+207
+00:10:44,420 --> 00:10:45,980
+Having said that, you know, it takes a
+
+208
+00:10:45,980 --> 00:10:47,399
+lot of work to hand craft these things
+yourself.
+
+209
+00:10:49,410 --> 00:10:51,400
+And of course anytime you start having
+layers
+
+210
+00:10:51,400 --> 00:10:54,150
+of stuff involved and many of the
+different
+
+211
+00:10:54,150 --> 00:10:56,880
+components you quickly realize you got a
+big
+
+212
+00:10:56,880 --> 00:10:59,550
+issue as far as you know, debugging and
+testing.
+
+213
+00:10:59,550 --> 00:11:02,030
+The minute you got distribute anything or
+concur
+
+214
+00:11:02,030 --> 00:11:04,170
+anything there's a lot more stuff running
+around.
+
+215
+00:11:04,170 --> 00:11:08,130
+And you probably already seen that as
+you're trying to debug your programs here.
+
+216
+00:11:08,130 --> 00:11:10,170
+If something goes wrong, you know, is it
+because the
+
+217
+00:11:10,170 --> 00:11:13,000
+service didn't work right, is it because
+the client work right.
+
+218
+00:11:13,000 --> 00:11:16,070
+Is the, you know, God help us if, if
+Android's not working right.
+
+219
+00:11:16,070 --> 00:11:18,390
+You know, that might happen once in a blue
+moon.
+
+220
+00:11:18,390 --> 00:11:21,550
+But you just have to be very thoughtful
+about where things are going wrong.
+
+221
+00:11:23,120 --> 00:11:25,130
+There's a number of known uses of Broker.
+
+222
+00:11:25,130 --> 00:11:30,280
+Once again, the early days were the
+procedural, procedure call base brokers,
+
+223
+00:11:30,280 --> 00:11:36,730
+DCE, ONC or some RPC, CORBA probably the
+predominant example of a broker.
+
+224
+00:11:37,830 --> 00:11:39,950
+CORBA so much a broker, it brokers its
+middle name.
+
+225
+00:11:39,950 --> 00:11:42,850
+it's the common object request broker
+architecture, it's right there.
+
+226
+00:11:42,850 --> 00:11:47,380
+And the name and then of course nowadays
+we get Android.
+
+227
+00:11:47,380 --> 00:11:49,140
+I want to talk briefly about this whole
+
+228
+00:11:49,140 --> 00:11:54,410
+issue of manually doing things, versus
+automatically doing things.
+
+229
+00:11:54,410 --> 00:11:55,960
+And as I kind of alluded to before,
+there's
+
+230
+00:11:55,960 --> 00:12:00,110
+always this paradigm shift that occurs in
+any, any domain.
+
+231
+00:12:00,110 --> 00:12:02,850
+Any field as things that used to require
+
+232
+00:12:02,850 --> 00:12:06,980
+human expertise are gradually over taken
+by automation.
+
+233
+00:12:06,980 --> 00:12:10,480
+I was just reading the other day that
+apparently, it used to be the case
+
+234
+00:12:10,480 --> 00:12:16,299
+a couple of years ago that humans aided by
+computers could beat computers at chess.
+
+235
+00:12:17,410 --> 00:12:19,380
+And now it's probably no longer the case.
+
+236
+00:12:19,380 --> 00:12:23,840
+Computers are so good at playing chess
+that you don't need humans to help
+
+237
+00:12:23,840 --> 00:12:27,860
+them play a better job than a human
+playing with a computer can do.
+
+238
+00:12:27,860 --> 00:12:30,130
+So I thought that was interesting you know
+one
+
+239
+00:12:30,130 --> 00:12:33,430
+more thing humans aren't good at, right
+compared to machines.
+
+240
+00:12:33,430 --> 00:12:35,360
+I would argue there's an awful lot of
+things humans aren't as
+
+241
+00:12:35,360 --> 00:12:38,040
+good as machines are, but there was a time
+when they were.
+
+242
+00:12:38,040 --> 00:12:40,310
+And whenever people tell me the, those
+things and
+
+243
+00:12:40,310 --> 00:12:42,100
+by the way as you go through your
+technology
+
+244
+00:12:42,100 --> 00:12:45,050
+career, you will see the following mean
+pop up
+
+245
+00:12:45,050 --> 00:12:46,745
+over and over again as new stuff comes
+along.
+
+246
+00:12:46,745 --> 00:12:50,390
+Cause at first it won't be that good and
+people will proof it.
+
+247
+00:12:50,390 --> 00:12:52,390
+And over time it'll get better and better
+and better.
+
+248
+00:12:52,390 --> 00:12:54,440
+So my favorite example of this phenomena
+which
+
+249
+00:12:54,440 --> 00:12:56,570
+is really at the heart of the innovator's
+dilemma.
+
+250
+00:12:56,570 --> 00:13:01,670
+The claimed Christians don't like talk
+about is the famous story of John Henry.
+
+251
+00:13:01,670 --> 00:13:03,850
+Does anybody remember who John Henry was?
+
+252
+00:13:03,850 --> 00:13:06,640
+What was John Henry's like great feat?
+
+253
+00:13:06,640 --> 00:13:08,290
+>> He laid down railroad.
+
+254
+00:13:08,290 --> 00:13:12,280
+>> He was a railroad worker and his great
+thing was he was a big strong guy.
+
+255
+00:13:12,280 --> 00:13:15,230
+And he could take like a sledge hammer or
+an ax and he could
+
+256
+00:13:15,230 --> 00:13:17,600
+sort of single handedly chiseled through
+massive
+
+257
+00:13:17,600 --> 00:13:20,200
+amounts of rock to make railroad tunnels.
+
+258
+00:13:20,200 --> 00:13:23,370
+And so there's a great story where John
+Henry goes out and he
+
+259
+00:13:23,370 --> 00:13:25,830
+competes against the steam drill and in
+
+260
+00:13:25,830 --> 00:13:28,490
+those days, the technology wasn't very
+good.
+
+261
+00:13:28,490 --> 00:13:30,590
+And so you know, they have this contest
+
+262
+00:13:30,590 --> 00:13:33,300
+they start, the steamed drilling and John
+Henry starts.
+
+263
+00:13:33,300 --> 00:13:35,440
+You know, chopping away with his, with his
+sledge
+
+264
+00:13:35,440 --> 00:13:38,490
+hammer and the steam drill keeps, you
+know, breaking down.
+
+265
+00:13:38,490 --> 00:13:41,820
+And they have an army of technicians
+running around trying to fix it.
+
+266
+00:13:41,820 --> 00:13:45,460
+It sounds a lot like software sometimes
+and so
+
+267
+00:13:45,460 --> 00:13:47,482
+what happens, anybody know what happens in
+the story.
+
+268
+00:13:47,482 --> 00:13:50,780
+Who wins?
+
+269
+00:13:50,780 --> 00:13:51,790
+John Henry wins, right?
+
+270
+00:13:51,790 --> 00:13:55,590
+He gets through that mountain first, but
+what happens to John Henry?
+
+271
+00:13:55,590 --> 00:13:55,880
+>> He dies.
+
+272
+00:13:55,880 --> 00:13:56,700
+>> He dies, right?
+
+273
+00:13:56,700 --> 00:14:00,270
+So, there's a metaphor there that says
+through superhuman
+
+274
+00:14:00,270 --> 00:14:03,590
+effort you can sometimes beat the machine
+at certain points.
+
+275
+00:14:03,590 --> 00:14:07,400
+But it's often not worth it, right, you
+may pay a big price for doing that.
+
+276
+00:14:07,400 --> 00:14:09,580
+So the, the real thing to do of course is
+not to try to beat
+
+277
+00:14:09,580 --> 00:14:14,220
+machines, it's to write better machines,
+right that's how you make it, make it big.
+
+278
+00:14:14,220 --> 00:14:17,192
+Be you know, wealthy, popular and famous.
+
+279
+00:14:17,192 --> 00:14:22,580
+Okay, so that's it for the lecture for
+today.
+
+280
+00:14:22,580 --> 00:14:24,590
+What we'll do next time is finish off
+Broker
+
+281
+00:14:24,590 --> 00:14:28,180
+implementation and we're also going to
+talk about observer, cause that's
+
+282
+00:14:28,180 --> 00:14:30,040
+the last, I think that's maybe the last
+big
+
+283
+00:14:30,040 --> 00:14:32,240
+pattern that we've been talking about in
+all this stuff.
+
+284
+00:14:32,240 --> 00:14:34,906
+And then we'll be get ready to start
+talking about content providers.
+
+285
+00:14:34,906 --> 00:14:43,119
+[MUSIC]
+

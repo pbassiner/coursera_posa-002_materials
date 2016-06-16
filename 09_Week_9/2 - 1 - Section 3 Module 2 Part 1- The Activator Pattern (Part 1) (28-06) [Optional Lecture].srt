@@ -1,0 +1,2568 @@
+1
+00:00:00,000 --> 00:00:07,901
+[MUSIC]
+
+2
+00:00:07,901 --> 00:00:09,696
+So what we're going to do today is
+
+3
+00:00:09,696 --> 00:00:12,805
+we're going to start talking about various
+patterns
+
+4
+00:00:12,805 --> 00:00:16,121
+that are associated with different binder
+mechanisms,
+
+5
+00:00:16,121 --> 00:00:20,213
+different AIDL mechanisms, different bound
+and unbound services.
+
+6
+00:00:20,213 --> 00:00:22,690
+If you recall, we talked about the command
+processor
+
+7
+00:00:22,690 --> 00:00:25,444
+pattern in the context of started
+services, and now we're
+
+8
+00:00:25,444 --> 00:00:28,417
+going to start talking about some of the
+other patterns associated
+
+9
+00:00:28,417 --> 00:00:31,700
+with both started services as well as with
+bound services.
+
+10
+00:00:31,700 --> 00:00:33,840
+The first pattern we're going to talk
+about
+
+11
+00:00:33,840 --> 00:00:36,290
+is a pattern called the activator pattern.
+
+12
+00:00:36,290 --> 00:00:38,810
+As you'll see, this pattern appear in a
+couple of places.
+
+13
+00:00:38,810 --> 00:00:41,960
+It appears in a paper, that I wrote, that
+has
+
+14
+00:00:41,960 --> 00:00:44,750
+appeared in a couple of different venues
+over the years,
+
+15
+00:00:44,750 --> 00:00:47,760
+that I was a coauthor on, and a small
+snippet
+
+16
+00:00:47,760 --> 00:00:51,740
+of this particular pattern appears in the
+POSA four book.
+
+17
+00:00:51,740 --> 00:00:54,980
+When we redo the POSA two book next
+summer, this pattern
+
+18
+00:00:54,980 --> 00:00:57,311
+will appear as a full blown pattern in the
+POSA two book.
+
+19
+00:00:58,650 --> 00:01:00,680
+So here's the context of this pattern.
+
+20
+00:01:00,680 --> 00:01:03,130
+It's often the case when you're building
+software
+
+21
+00:01:03,130 --> 00:01:07,560
+that you run in, in a resource constrained
+environment.
+
+22
+00:01:07,560 --> 00:01:13,420
+Where, it's not necessarily appropriate to
+preallocate a lot of resources.
+
+23
+00:01:13,420 --> 00:01:16,374
+For example, in many smartphone
+environments random
+
+24
+00:01:16,374 --> 00:01:20,070
+access memory, RAM, is a fairly precious
+commodity.
+
+25
+00:01:20,070 --> 00:01:24,070
+And even though we've got a lot of memory
+now in Android and iPhone, you
+
+26
+00:01:24,070 --> 00:01:28,810
+never can have enough, so you have to be
+careful to, to over-allocate this stuff.
+
+27
+00:01:28,810 --> 00:01:31,590
+In older versions of Android particularly,
+they
+
+28
+00:01:31,590 --> 00:01:33,410
+were much more memory constrained, they
+only
+
+29
+00:01:33,410 --> 00:01:35,620
+had, you know, hundreds of megabytes, not
+
+30
+00:01:35,620 --> 00:01:37,780
+gigabytes worth of memory back in those
+days.
+
+31
+00:01:37,780 --> 00:01:39,810
+And so as a result, it was even more
+
+32
+00:01:39,810 --> 00:01:42,750
+important to think carefully about how
+many resources were available.
+
+33
+00:01:44,400 --> 00:01:46,190
+The problem of course is if you're in
+
+34
+00:01:46,190 --> 00:01:49,540
+a memory constrained environment it's not
+really appropriate to
+
+35
+00:01:49,540 --> 00:01:52,660
+have all your services running all the
+time,
+
+36
+00:01:52,660 --> 00:01:55,780
+if they're not actually being accessed by
+the clients.
+
+37
+00:01:55,780 --> 00:01:57,560
+Because if they're running and nobody is
+
+38
+00:01:57,560 --> 00:01:59,970
+using them, then you're chewing up
+resources, and
+
+39
+00:01:59,970 --> 00:02:04,620
+if resources are precious, in other words
+you don't have a, a large amount of them.
+
+40
+00:02:04,620 --> 00:02:06,480
+Then when someone comes along to run the
+next
+
+41
+00:02:06,480 --> 00:02:09,170
+application and there is already a bunch
+of services that
+
+42
+00:02:09,170 --> 00:02:12,540
+is taking up memory but are not being
+used, then
+
+43
+00:02:12,540 --> 00:02:16,120
+the next service to be launched may very
+well fail.
+
+44
+00:02:16,120 --> 00:02:19,220
+Even though there's plenty of available
+space, if you were to reclaim
+
+45
+00:02:19,220 --> 00:02:23,380
+the stuff that isn't being accessed on a,
+on a regular basis.
+
+46
+00:02:23,380 --> 00:02:24,590
+So you can see here, we have a couple
+
+47
+00:02:24,590 --> 00:02:27,070
+of different services that are running,
+and when the
+
+48
+00:02:27,070 --> 00:02:29,390
+next service comes along, there's not
+enough room, even
+
+49
+00:02:29,390 --> 00:02:32,110
+though they're not all being accessed at
+the same time.
+
+50
+00:02:32,110 --> 00:02:35,740
+There's more discussion about memory
+management on Android.
+
+51
+00:02:35,740 --> 00:02:38,320
+Here, at this particular link, and
+there's, specifically, some
+
+52
+00:02:38,320 --> 00:02:41,950
+discussions about services that we'll talk
+about in a second.
+
+53
+00:02:41,950 --> 00:02:44,010
+So, what's the solution to this particular
+problem.
+
+54
+00:02:44,010 --> 00:02:45,320
+Well, it turns out to be pretty
+
+55
+00:02:45,320 --> 00:02:48,040
+straightforward, and it's something that
+Android does.
+
+56
+00:02:48,040 --> 00:02:50,190
+It's something that a lot of environments
+do,
+
+57
+00:02:50,190 --> 00:02:52,240
+a lot of middleware does this kind of
+stuff.
+
+58
+00:02:52,240 --> 00:02:56,560
+A lot of networking programming, toolkits
+and environments do this kind of thing.
+
+59
+00:02:56,560 --> 00:02:58,590
+It's something called the Activator
+pattern.
+
+60
+00:02:58,590 --> 00:03:03,960
+And is used to activate and deactivate
+services on demand.
+
+61
+00:03:03,960 --> 00:03:07,296
+So basically if you have service that, to
+do work, don't
+
+62
+00:03:07,296 --> 00:03:11,090
+bother running it if there is nobody there
+to access it.
+
+63
+00:03:11,090 --> 00:03:13,410
+And that's pretty much how the android
+services work.
+
+64
+00:03:13,410 --> 00:03:14,040
+If you think about it.
+
+65
+00:03:14,040 --> 00:03:17,350
+Started services, get started when someone
+evokes
+
+66
+00:03:17,350 --> 00:03:19,830
+start service, it passes it in an intent.
+
+67
+00:03:19,830 --> 00:03:22,370
+Bound services get started the first time
+they're
+
+68
+00:03:22,370 --> 00:03:24,360
+accessed, and they run as long as the
+
+69
+00:03:24,360 --> 00:03:27,290
+client has a binding to them, and once
+
+70
+00:03:27,290 --> 00:03:29,430
+that binding goes away, they evaporate
+into thin air.
+
+71
+00:03:31,220 --> 00:03:34,240
+naturally, somebody, either you, or the
+
+72
+00:03:34,240 --> 00:03:36,870
+middleware has to be responsible for
+keeping
+
+73
+00:03:36,870 --> 00:03:41,180
+track of these services, to make sure that
+they get shut down appropriately.
+
+74
+00:03:41,180 --> 00:03:45,620
+So they don't end up leaking resources
+when when nobody's using them.
+
+75
+00:03:45,620 --> 00:03:48,460
+Or you don't end up you know, keeping them
+around and leaking resources.
+
+76
+00:03:48,460 --> 00:03:52,660
+And doing silly things that make it
+difficult to reclaim the, the memory.
+
+77
+00:03:52,660 --> 00:03:57,340
+And we'll go through this particular
+diagram a little bit more detail later.
+
+78
+00:03:57,340 --> 00:04:01,022
+As you can see here basically what happens
+in android is whenever
+
+79
+00:04:01,022 --> 00:04:05,610
+you evoke bind service, be it a starting
+service or a bound service.
+
+80
+00:04:05,610 --> 00:04:08,980
+It'll go ahead and check to see if the
+service is running.
+
+81
+00:04:08,980 --> 00:04:10,900
+And if it's not, it does this by
+
+82
+00:04:10,900 --> 00:04:13,870
+talking to something call the activity
+manager service.
+
+83
+00:04:13,870 --> 00:04:16,160
+And the activity manager service act,
+plays the role of the
+
+84
+00:04:16,160 --> 00:04:19,470
+activator, and it's got some other stuff
+we'll talk about shortly.
+
+85
+00:04:19,470 --> 00:04:21,330
+And what it does is it goes out and checks
+to
+
+86
+00:04:21,330 --> 00:04:24,430
+see if there's a process running that is
+running this service already.
+
+87
+00:04:24,430 --> 00:04:28,110
+If so, it goes ahead and basically says,
+you're it do your thing.
+
+88
+00:04:28,110 --> 00:04:31,110
+If it's not the one, if there's not one
+running it goes ahead
+
+89
+00:04:31,110 --> 00:04:34,790
+and starts it up, and then at some point
+later, say we're doing
+
+90
+00:04:34,790 --> 00:04:40,910
+a 2-way communication with AIGL on the
+binder, then when the invocation takes
+
+91
+00:04:40,910 --> 00:04:44,560
+place it gets routed to the service that's
+up and running at that point.
+
+92
+00:04:44,560 --> 00:04:46,790
+But Android has started that service
+on-demand.
+
+93
+00:04:46,790 --> 00:04:52,520
+And, there's some more information here at
+this URL that talks about,
+
+94
+00:04:52,520 --> 00:04:54,270
+how to manage service life cycles
+
+95
+00:04:54,270 --> 00:04:56,590
+appropriately in Android to conserve
+memory.
+
+96
+00:04:57,690 --> 00:04:59,900
+Now, is always the case when we start
+talking
+
+97
+00:04:59,900 --> 00:05:02,410
+about these kinds of arrangements of
+software, this is not
+
+98
+00:05:02,410 --> 00:05:05,990
+just a random collection of classes, put
+there for some
+
+99
+00:05:05,990 --> 00:05:09,070
+arbitrary reason, there is some thinking
+that went behind it.
+
+100
+00:05:09,070 --> 00:05:10,700
+And that thinking is something that's been
+something
+
+101
+00:05:10,700 --> 00:05:14,880
+documented in the literature, called the
+activator pattern.
+
+102
+00:05:14,880 --> 00:05:20,000
+And the activator patterns intent is
+essentially to automate the scalable on
+
+103
+00:05:20,000 --> 00:05:24,090
+demand activation and deactivation of
+service
+
+104
+00:05:24,090 --> 00:05:26,550
+execution contexts, which is just a fancy
+
+105
+00:05:26,550 --> 00:05:32,530
+name that means, a process, a thread, a
+container or something, to run
+
+106
+00:05:32,530 --> 00:05:35,560
+services that are accessed by clients
+
+107
+00:05:35,560 --> 00:05:38,505
+without requiring the consumption of
+excessive resources.
+
+108
+00:05:38,505 --> 00:05:41,250
+'Cause things aren't actually running
+unless they're used.
+
+109
+00:05:41,250 --> 00:05:43,890
+So you take a look at this link, you'll
+get a paper that talks
+
+110
+00:05:43,890 --> 00:05:46,889
+about activator, and as I've said there's
+other places to learn more about it.
+
+111
+00:05:48,010 --> 00:05:49,810
+So when would you apply this pattern?
+
+112
+00:05:49,810 --> 00:05:51,810
+Well, you typically apply this pattern in
+
+113
+00:05:51,810 --> 00:05:55,390
+situations where you have services in a
+system
+
+114
+00:05:55,390 --> 00:05:58,180
+that really don't need to run, unless
+somebody
+
+115
+00:05:58,180 --> 00:06:01,890
+is actually accessing them at that
+particular time.
+
+116
+00:06:01,890 --> 00:06:03,670
+Now, here's an interesting question.
+
+117
+00:06:03,670 --> 00:06:04,700
+And we'll talk about this a little bit
+
+118
+00:06:04,700 --> 00:06:07,240
+later when we get to the consequences
+section.
+
+119
+00:06:07,240 --> 00:06:11,800
+But is it the case that, every service is
+such that you can start
+
+120
+00:06:11,800 --> 00:06:16,670
+it on demand, or are there some services
+that may need to be prestarted?
+
+121
+00:06:16,670 --> 00:06:18,890
+Does anybody have any thoughts about that?
+
+122
+00:06:20,760 --> 00:06:23,280
+Why wouldn't you just always launch things
+on demand?
+
+123
+00:06:23,280 --> 00:06:24,850
+What would be a reason for that?
+
+124
+00:06:24,850 --> 00:06:26,270
+>> They take a long time to launch?
+
+125
+00:06:26,270 --> 00:06:27,430
+>> If they take a long time to launch,
+right.
+
+126
+00:06:27,430 --> 00:06:29,520
+Some things take a while to start up.
+
+127
+00:06:29,520 --> 00:06:32,900
+Back in the sort of the bad old days of,
+of Java,
+
+128
+00:06:32,900 --> 00:06:36,040
+before people did lots of clever
+optimizations to the VMs and so on.
+
+129
+00:06:36,040 --> 00:06:39,330
+When you first started the java
+application, it took a lot of run,
+
+130
+00:06:39,330 --> 00:06:42,400
+because it had to load in all the classes
+in the class library.
+
+131
+00:06:42,400 --> 00:06:43,830
+And that took a while.
+
+132
+00:06:43,830 --> 00:06:46,260
+And you know, imagine what would happen if
+you wanted
+
+133
+00:06:46,260 --> 00:06:49,015
+to launch an application in your android
+phone, and you push
+
+134
+00:06:49,015 --> 00:06:51,175
+that icon, and you have to wait for five
+seconds
+
+135
+00:06:51,175 --> 00:06:54,085
+for the thing to load, right, you will be
+pretty frustrated.
+
+136
+00:06:54,085 --> 00:06:58,071
+So, so clearly, you know somethings have
+to be able to be [SOUND] ready
+
+137
+00:06:58,071 --> 00:07:02,035
+to go, hit the ground running, People have
+solved that problem by various ways.
+
+138
+00:07:02,035 --> 00:07:05,889
+Typically the trick is either to load
+things partially, so they start out and
+
+139
+00:07:05,889 --> 00:07:08,142
+then they load incrementally, or to
+preload
+
+140
+00:07:08,142 --> 00:07:11,550
+them, to pre-load some things from the
+beginning.
+
+141
+00:07:11,550 --> 00:07:13,420
+What are some other reasons why you might
+
+142
+00:07:13,420 --> 00:07:16,980
+want to, to not have things launched on
+demand?
+
+143
+00:07:17,980 --> 00:07:19,879
+So starting up the, it, it's all, it's all
+
+144
+00:07:19,879 --> 00:07:21,844
+related to the idea of taking too long to
+start.
+
+145
+00:07:21,844 --> 00:07:24,815
+[BLANK_AUDIO]
+
+146
+00:07:24,815 --> 00:07:29,328
+So certain kinds of real time operations
+where you're sampling the temperature
+
+147
+00:07:29,328 --> 00:07:33,238
+of a nuclear reactor core, you probably
+want to make sure that you
+
+148
+00:07:33,238 --> 00:07:37,416
+have very high accuracy or your checking
+some condition in your anti-lock
+
+149
+00:07:37,416 --> 00:07:41,705
+braking system to see whether you car is
+skidding, or something like that.
+
+150
+00:07:41,705 --> 00:07:43,275
+You don't want to sit there and launch
+
+151
+00:07:43,275 --> 00:07:45,301
+these services on demand, they've gotta be
+up
+
+152
+00:07:45,301 --> 00:07:46,822
+and running because they may be part
+
+153
+00:07:46,822 --> 00:07:49,970
+of the safety critical, or mission
+critical part.
+
+154
+00:07:49,970 --> 00:07:51,110
+So the point of this is, is
+
+155
+00:07:51,110 --> 00:07:53,180
+that this patterns not always applicable,
+it's applicable
+
+156
+00:07:53,180 --> 00:07:55,360
+when there's situations where, you only
+need
+
+157
+00:07:55,360 --> 00:07:58,270
+to consume resources if somebody's
+actually using you.
+
+158
+00:07:58,270 --> 00:08:03,670
+And also if the client can benefit from
+being shielded from where services
+
+159
+00:08:03,670 --> 00:08:06,560
+are located, how they're deployed, when
+
+160
+00:08:06,560 --> 00:08:08,480
+they're deployed, how their life cycle's
+managed.
+
+161
+00:08:08,480 --> 00:08:12,440
+In other words we can decouple the client
+from some of these bookkeeping
+
+162
+00:08:12,440 --> 00:08:17,500
+life cycle kinds of issues, and sometimes
+that's possible, and sometimes it's not.
+
+163
+00:08:17,500 --> 00:08:21,180
+So you have to kind of decide in your
+environment what's the appropriate
+
+164
+00:08:21,180 --> 00:08:26,430
+consideration about latency of startup
+time, re, reaction time, and, and so on.
+
+165
+00:08:26,430 --> 00:08:28,210
+And we'll talk more about that a little
+bit further along.
+
+166
+00:08:29,620 --> 00:08:32,710
+So here's a view of the structure and
+participants to this pattern.
+
+167
+00:08:32,710 --> 00:08:33,800
+And there's a lot of pieces.
+
+168
+00:08:33,800 --> 00:08:36,290
+But they're all fairly straightforward.
+
+169
+00:08:36,290 --> 00:08:38,400
+So, especially in their mapping onto
+Android.
+
+170
+00:08:38,400 --> 00:08:39,290
+So there's a client.
+
+171
+00:08:39,290 --> 00:08:44,090
+And the clients, whomever's going to do
+something that requires a service to run.
+
+172
+00:08:44,090 --> 00:08:46,980
+So, in our environment, that would be like
+an activity, that
+
+173
+00:08:46,980 --> 00:08:50,960
+wants to start a service, by start service
+or bind service.
+
+174
+00:08:50,960 --> 00:08:53,070
+And then we have some way of identifying a
+service,
+
+175
+00:08:53,070 --> 00:08:55,590
+and there's lots and lots of ways to
+identify services.
+
+176
+00:08:55,590 --> 00:08:57,400
+If, for example, if we were programming
+
+177
+00:08:57,400 --> 00:09:00,590
+some kind of internet application, we
+would probably
+
+178
+00:09:00,590 --> 00:09:02,810
+identify the service by some combination
+of
+
+179
+00:09:02,810 --> 00:09:06,190
+IP address or hostname, and a port number.
+
+180
+00:09:06,190 --> 00:09:07,770
+That's how we might identify a service.
+
+181
+00:09:07,770 --> 00:09:11,370
+So the FTP services is at port 21, and so
+
+182
+00:09:11,370 --> 00:09:15,310
+on, the http services at port 80, and so
+on.
+
+183
+00:09:15,310 --> 00:09:18,770
+In the case of Android, we identify
+services by intents.
+
+184
+00:09:18,770 --> 00:09:21,090
+And we either do it through explicit
+intents or
+
+185
+00:09:21,090 --> 00:09:25,090
+we say, please go run this particular
+.class file.
+
+186
+00:09:25,090 --> 00:09:27,290
+Or we do it through so called implicit
+intents where
+
+187
+00:09:27,290 --> 00:09:29,920
+we say, here's an action I want you to
+perform
+
+188
+00:09:29,920 --> 00:09:33,000
+or, here's some data, go find someone who
+knows how
+
+189
+00:09:33,000 --> 00:09:37,400
+to launch a URL that starts with,
+maps.doogle, .google.com, alright?
+
+190
+00:09:37,400 --> 00:09:40,690
+You can, you can do it different ways,
+that's how you identify services.
+
+191
+00:09:41,790 --> 00:09:43,980
+There's then something called the service
+proxy, which
+
+192
+00:09:43,980 --> 00:09:46,300
+is what the client sees, in order to
+
+193
+00:09:46,300 --> 00:09:48,030
+be able to do an operation, that will
+
+194
+00:09:48,030 --> 00:09:51,550
+eventually cause a service to start up and
+run.
+
+195
+00:09:51,550 --> 00:09:54,370
+And in Android that's typically done by
+the context.
+
+196
+00:09:54,370 --> 00:09:58,680
+Right, so you have operations like bind
+service, or start service, which are done
+
+197
+00:09:58,680 --> 00:10:00,790
+through the service proxy, which is the,
+
+198
+00:10:00,790 --> 00:10:03,020
+which is the proxy, the context
+information.
+
+199
+00:10:04,060 --> 00:10:05,610
+Then you have the activator itself.
+
+200
+00:10:05,610 --> 00:10:10,740
+The activator itself is really this agent
+that interposes itself between the
+
+201
+00:10:10,740 --> 00:10:16,450
+client, who wants work done, and the
+service, that wants the work to be done.
+
+202
+00:10:16,450 --> 00:10:19,675
+Think of the activator as sort of a, like
+a Hollywood mogul,
+
+203
+00:10:19,675 --> 00:10:24,980
+whose job it is, is to connect producers
+with movie stars, right?
+
+204
+00:10:24,980 --> 00:10:29,680
+You don't necessarily call the movie stars
+directly, you call their agent.
+
+205
+00:10:29,680 --> 00:10:32,850
+Think about, you know, sports, sports
+stars.
+
+206
+00:10:32,850 --> 00:10:35,350
+You don't call the person directly, you
+call their agent, right?
+
+207
+00:10:35,350 --> 00:10:37,310
+So there's this intermediary role.
+
+208
+00:10:37,310 --> 00:10:38,920
+That's the activator.
+
+209
+00:10:38,920 --> 00:10:42,280
+And the activator makes use of something
+called the activation table.
+
+210
+00:10:42,280 --> 00:10:46,520
+And the activation table keeps track of,
+who's out there, that's actually up and
+
+211
+00:10:46,520 --> 00:10:50,748
+running, to be able, to handle, the new
+request that came in from the client.
+
+212
+00:10:50,748 --> 00:10:54,650
+And then we have something called the
+service execution
+
+213
+00:10:54,650 --> 00:10:57,980
+process, oh, and, and the activation table
+in, in
+
+214
+00:10:57,980 --> 00:11:00,810
+Android for what we're talking about, is
+something that's
+
+215
+00:11:00,810 --> 00:11:04,880
+part of the activity manager service
+called the service map.
+
+216
+00:11:04,880 --> 00:11:06,040
+And the activator in this case is
+
+217
+00:11:06,040 --> 00:11:09,470
+the activity manager, or activity manager
+service.
+
+218
+00:11:10,740 --> 00:11:13,890
+And then we have the service execution
+context.
+
+219
+00:11:13,890 --> 00:11:15,970
+That's where the actual work gets done,
+that's
+
+220
+00:11:15,970 --> 00:11:18,100
+the context in which the work gets done.
+
+221
+00:11:18,100 --> 00:11:22,170
+In the case of Android that's a LINUX
+process, or more precisely a thread
+
+222
+00:11:22,170 --> 00:11:23,730
+within a LINUX process, but it's something
+
+223
+00:11:23,730 --> 00:11:25,920
+that's managed by the underlying operating
+system.
+
+224
+00:11:25,920 --> 00:11:28,540
+And then, finally, we have the service
+itself
+
+225
+00:11:28,540 --> 00:11:31,470
+that does work on the behalf of whomever.
+
+226
+00:11:31,470 --> 00:11:33,890
+And so, an example of this would be some
+subclass or
+
+227
+00:11:33,890 --> 00:11:38,330
+some implementation that intent service,
+that's actually going to do the work.
+
+228
+00:11:38,330 --> 00:11:43,870
+So that's a nice, quick mapping of the
+contents of the pattern onto
+
+229
+00:11:43,870 --> 00:11:47,220
+all the various mechanisms that Android
+provides in order to carry that out.
+
+230
+00:11:47,220 --> 00:11:50,242
+What's so cool about this is, is it's
+really not a stretch at all.
+
+231
+00:11:50,242 --> 00:11:54,070
+I mean these are really all fairly
+straight forward mappings of Android
+
+232
+00:11:54,070 --> 00:11:58,240
+classes, Android mechanisms, directly onto
+the things that are on the pattern.
+
+233
+00:11:58,240 --> 00:12:01,600
+But the pattern was written, you know,
+many years before,
+
+234
+00:12:01,600 --> 00:12:05,470
+many years before Android was even a
+glimpse in someone's eye.
+
+235
+00:12:05,470 --> 00:12:07,370
+Showing once again the generality of
+patterns.
+
+236
+00:12:08,480 --> 00:12:10,550
+Here's an interaction diagram that kind of
+shows the
+
+237
+00:12:10,550 --> 00:12:15,110
+dynamic communication between the
+different roles and responsibilities here.
+
+238
+00:12:15,110 --> 00:12:19,350
+The client starts out by invoking an
+operation, and
+
+239
+00:12:19,350 --> 00:12:23,360
+perhaps unbeknownst to the client, perhaps
+beknownst to the client,.
+
+240
+00:12:23,360 --> 00:12:26,240
+There's an activator that's actually
+interposed between the
+
+241
+00:12:26,240 --> 00:12:29,940
+client's request and the actual service
+that gets run.
+
+242
+00:12:29,940 --> 00:12:33,260
+In the case of Android, it's kind of
+obvious that
+
+243
+00:12:33,260 --> 00:12:36,780
+there's somebody going in there, because
+you call start service.
+
+244
+00:12:36,780 --> 00:12:39,620
+Or you call bind service, so that it's
+kind of, it
+
+245
+00:12:39,620 --> 00:12:43,020
+kind of makes it clear that somebody's
+doing something to get things running.
+
+246
+00:12:43,020 --> 00:12:48,030
+In other environments, such as internet
+application development, where
+
+247
+00:12:48,030 --> 00:12:50,455
+you are connected to port 80, or to port
+
+248
+00:12:50,455 --> 00:12:53,252
+21, or what not, it's not quite so obvious
+
+249
+00:12:53,252 --> 00:12:55,780
+that there's somebody is getting involve
+as an intermediary.
+
+250
+00:12:55,780 --> 00:12:58,760
+And yet other middleware like Corba, as
+we'll talk about in a second.
+
+251
+00:12:58,760 --> 00:13:02,280
+It's totally hidden from you, that there's
+some intermediary that's getting involved.
+
+252
+00:13:02,280 --> 00:13:05,490
+So the degree in which the client actually
+know about this might or may
+
+253
+00:13:05,490 --> 00:13:08,030
+not be directly visible to the application
+
+254
+00:13:08,030 --> 00:13:11,500
+programmer, but the middleware knows
+what's going on.
+
+255
+00:13:13,600 --> 00:13:16,980
+When incoming requests arrive, the
+activator actually
+
+256
+00:13:16,980 --> 00:13:19,520
+handles them, and it goes and it checks.
+
+257
+00:13:19,520 --> 00:13:22,140
+It looks up in its activation map or table
+and
+
+258
+00:13:22,140 --> 00:13:25,360
+says hey, is there somebody here who's
+already handling this thing?
+
+259
+00:13:25,360 --> 00:13:27,080
+If so I'll just route it to them.
+
+260
+00:13:27,080 --> 00:13:31,830
+Otherwise I'll have to go ahead and
+activate the service execution context.
+
+261
+00:13:31,830 --> 00:13:34,260
+So that might involve forking a process,
+
+262
+00:13:34,260 --> 00:13:37,130
+or spawning a thread, or loading a
+container.
+
+263
+00:13:37,130 --> 00:13:39,070
+There's a couple different ways to do this
+type of thing.
+
+264
+00:13:41,070 --> 00:13:43,909
+The activator also can decide what the
+granularity
+
+265
+00:13:43,909 --> 00:13:46,880
+is it wants to activate and passivate
+things.
+
+266
+00:13:46,880 --> 00:13:52,280
+So it might for example, as is the case
+with, with start service.
+
+267
+00:13:52,280 --> 00:13:55,530
+It might go ahead and launch the service
+every time start service is called.
+
+268
+00:13:55,530 --> 00:13:59,090
+You call start service and it's probably
+going to launch something on your behalf.
+
+269
+00:13:59,090 --> 00:14:03,540
+conversely, with things like bound
+services, it'll launch it the first time,
+
+270
+00:14:03,540 --> 00:14:07,150
+and then a bunch of methods can be made
+back and forth.
+
+271
+00:14:07,150 --> 00:14:10,280
+And as long as the client hasn't gone away
+or as long as there's some
+
+272
+00:14:10,280 --> 00:14:12,960
+client that maintains a binding to the, to
+
+273
+00:14:12,960 --> 00:14:15,770
+the service, then the service will remain
+running.
+
+274
+00:14:15,770 --> 00:14:17,920
+So there's this granularity issue.
+
+275
+00:14:17,920 --> 00:14:20,400
+Do you launch things on a per method call
+basis,
+
+276
+00:14:20,400 --> 00:14:23,450
+do you do it on per binding, or
+connections, basis?
+
+277
+00:14:23,450 --> 00:14:24,900
+And there's no one right answer.
+
+278
+00:14:24,900 --> 00:14:28,290
+It's just the pattern gives you different
+tradeoffs between different
+
+279
+00:14:28,290 --> 00:14:33,510
+forces of fine grained versus coarse
+grained launching of activities.
+
+280
+00:14:35,180 --> 00:14:36,970
+The activation table's actually what keeps
+track
+
+281
+00:14:36,970 --> 00:14:39,120
+of all this stuff, it's implemented in
+Android
+
+282
+00:14:39,120 --> 00:14:43,070
+as you'll see as a map, or several maps, a
+couple of different hash maps.
+
+283
+00:14:43,070 --> 00:14:44,670
+And then finally we actually have the
+service
+
+284
+00:14:44,670 --> 00:14:47,370
+itself, which is the thing that does the
+work.
+
+285
+00:14:47,370 --> 00:14:49,560
+An android that really is something called
+a service.
+
+286
+00:14:49,560 --> 00:14:53,770
+In other environments it could be a
+function call, or a procedure call, or a
+
+287
+00:14:53,770 --> 00:14:58,330
+method call, or something that gets run in
+response to an indication by a client.
+
+288
+00:15:00,400 --> 00:15:03,460
+So that's kind of a quick tour through the
+pattern.
+
+289
+00:15:03,460 --> 00:15:05,400
+Let's talk a little bit about the
+consequences.
+
+290
+00:15:05,400 --> 00:15:07,820
+What we're going to do here is come back
+later,
+
+291
+00:15:07,820 --> 00:15:10,940
+next class and talk about the
+implementation details of this.
+
+292
+00:15:10,940 --> 00:15:14,970
+And I'll kind of neck down into how
+Android implements some of these things.
+
+293
+00:15:14,970 --> 00:15:17,180
+So for right now let us talk about the
+consequences.
+
+294
+00:15:17,180 --> 00:15:19,600
+So there's some good things about
+activator.
+
+295
+00:15:19,600 --> 00:15:21,760
+It utilizes resources more effectively.
+
+296
+00:15:21,760 --> 00:15:24,790
+From the point of view of not allocating
+stuff that isn't
+
+297
+00:15:24,790 --> 00:15:28,760
+actually being accessed by a client at
+that particular point in time.
+
+298
+00:15:28,760 --> 00:15:31,385
+So your, you're launching things on demand
+rather
+
+299
+00:15:31,385 --> 00:15:34,760
+than having to pre-spawn and keep them
+around.
+
+300
+00:15:34,760 --> 00:15:39,250
+Another thing you get from this is sort of
+a coarse grain concurrency,
+
+301
+00:15:39,250 --> 00:15:44,720
+so your launching processes your launching
+threads and those guys are able to run.
+
+302
+00:15:44,720 --> 00:15:49,450
+And if you've got a multicore machine, if
+you got an operating system and middleware
+
+303
+00:15:49,450 --> 00:15:52,700
+that supports concurrency and, and
+parallelism, then you're
+
+304
+00:15:52,700 --> 00:15:55,170
+actually running those things at the same
+time.
+
+305
+00:15:55,170 --> 00:15:58,760
+But it's a fairly coarse-grained approach,
+it's typically not at the finer
+
+306
+00:15:58,760 --> 00:16:02,210
+level granularity of thread, it's usually
+typically more at the level of processes.
+
+307
+00:16:03,340 --> 00:16:05,670
+And of course, the minute you start
+building your system out of
+
+308
+00:16:05,670 --> 00:16:09,450
+pieces that are more service-oriented,
+more
+
+309
+00:16:09,450 --> 00:16:12,140
+modular, then certain things get easier.
+
+310
+00:16:12,140 --> 00:16:15,880
+Testing becomes easier, because maybe you
+can test these things in isolation.
+
+311
+00:16:15,880 --> 00:16:18,690
+You can also, perhaps, be able to reuse
+stuff.
+
+312
+00:16:18,690 --> 00:16:20,720
+It's easier to understand because you're
+not building
+
+313
+00:16:20,720 --> 00:16:22,880
+a gigantic system, with lots of pieces
+that
+
+314
+00:16:22,880 --> 00:16:27,520
+are all wound together, like a big ball of
+mud or a big ball of spaghetti.
+
+315
+00:16:27,520 --> 00:16:29,660
+But instead, their more modularized.
+
+316
+00:16:29,660 --> 00:16:32,220
+So this allows you to think about things
+in isolation.
+
+317
+00:16:32,220 --> 00:16:34,280
+So those are some of the benefits.
+
+318
+00:16:34,280 --> 00:16:35,710
+There are some down sides.
+
+319
+00:16:35,710 --> 00:16:36,950
+One of the down sides is the
+
+320
+00:16:36,950 --> 00:16:41,010
+fact that the system becomes somewhat less
+deterministic.
+
+321
+00:16:41,010 --> 00:16:43,585
+So sort of, when stuff starts to run,
+
+322
+00:16:43,585 --> 00:16:46,620
+depending on the order in which clients
+make requests.
+
+323
+00:16:46,620 --> 00:16:51,130
+So your system may not always have the
+same resource utilization, sometimes it
+
+324
+00:16:51,130 --> 00:16:54,780
+may take more memory, sometimes it may
+take less, depends on the load.
+
+325
+00:16:54,780 --> 00:16:58,860
+So that's why certain kinds of real-time
+systems tend
+
+326
+00:16:58,860 --> 00:17:03,130
+not to use activator because they don't
+want nondeterminism.
+
+327
+00:17:03,130 --> 00:17:07,080
+They want to know what's the worst case
+execution time.
+
+328
+00:17:07,080 --> 00:17:10,105
+What's the worst case utilization of
+memory, so we can
+
+329
+00:17:10,105 --> 00:17:14,080
+pre-allocate those resources and make sure
+that we always have enough.
+
+330
+00:17:14,080 --> 00:17:16,540
+Whereas some systems say, you know, if we
+get
+
+331
+00:17:16,540 --> 00:17:19,030
+a big Bertha load, it'll slow down for a
+while
+
+332
+00:17:19,030 --> 00:17:20,840
+till the load gets done, and then we'll
+kind
+
+333
+00:17:20,840 --> 00:17:23,660
+of back out and, and go back to normal
+processing.
+
+334
+00:17:25,510 --> 00:17:27,860
+Some other tricky things, because you're
+spawning
+
+335
+00:17:27,860 --> 00:17:31,960
+things dynamically, there's potentially
+issues for security.
+
+336
+00:17:31,960 --> 00:17:35,430
+If you're not careful, someone might slip
+in a trojan
+
+337
+00:17:35,430 --> 00:17:39,590
+horse, so that when something gets spawned
+dynamically, rather than spawning
+
+338
+00:17:39,590 --> 00:17:43,290
+the official version of a service, it
+might actually end
+
+339
+00:17:43,290 --> 00:17:47,630
+up spawning some other sort of, malicious
+version of the service.
+
+340
+00:17:47,630 --> 00:17:50,300
+It might be a trojan horse, it might have
+some malware
+
+341
+00:17:50,300 --> 00:17:53,210
+or some other bad behavior, and that's
+just a little easier.
+
+342
+00:17:53,210 --> 00:17:56,720
+The more dynamism you give into your
+system, the easier it becomes for people
+
+343
+00:17:56,720 --> 00:17:59,100
+to slip in, trojan horses and back
+
+344
+00:17:59,100 --> 00:18:01,950
+doors, without people really noticing
+what's going on.
+
+345
+00:18:01,950 --> 00:18:05,390
+The other thing, of course, is when you
+start spawning things dynamically,
+
+346
+00:18:05,390 --> 00:18:08,910
+you often don't know what your system's
+going to do until it runs.
+
+347
+00:18:08,910 --> 00:18:12,780
+And there may be some subtleties about
+interactions between different services.
+
+348
+00:18:12,780 --> 00:18:14,550
+That will cause problems if they happen to
+get
+
+349
+00:18:14,550 --> 00:18:18,230
+spawned in a particular order at a
+particular time.
+
+350
+00:18:18,230 --> 00:18:22,540
+So this is the, the feature interaction
+effect problem, and so things may work
+
+351
+00:18:22,540 --> 00:18:27,440
+fine when you test them in isolation in
+the lab, but when you combine
+
+352
+00:18:27,440 --> 00:18:31,260
+them altogether in to the final integrated
+system, and you start spawning them and
+
+353
+00:18:31,260 --> 00:18:34,750
+they're coming up and going down and so
+on, you may have some surprises.
+
+354
+00:18:34,750 --> 00:18:36,050
+There's all kinds of subtleties that go in
+
+355
+00:18:38,160 --> 00:18:38,400
+there.
+
+356
+00:18:38,400 --> 00:18:40,110
+And of course the other issue is the
+
+357
+00:18:40,110 --> 00:18:42,670
+whole issue of, just, there's more stuff
+going on.
+
+358
+00:18:42,670 --> 00:18:47,380
+You've gotta have this extra, activator
+thing that sits around,
+
+359
+00:18:47,380 --> 00:18:49,170
+you have to configure it somehow, you have
+to manage it.
+
+360
+00:18:49,170 --> 00:18:50,890
+You have to know how to use it.
+
+361
+00:18:50,890 --> 00:18:53,710
+And so, people have to learn a few more
+pieces of the puzzle.
+
+362
+00:18:53,710 --> 00:18:57,150
+And so it's not always as easy just
+starting a service manually.
+
+363
+00:18:57,150 --> 00:19:00,570
+You may have to register it will some type
+kind of daemon
+
+364
+00:19:00,570 --> 00:19:03,640
+or some kind of manager that keeps track
+of this stuff for you.
+
+365
+00:19:03,640 --> 00:19:06,840
+So there's a number of interesting known
+uses.
+
+366
+00:19:06,840 --> 00:19:08,520
+One of the earlier known uses of
+
+367
+00:19:08,520 --> 00:19:12,320
+this particular pattern is something that,
+system administrators
+
+368
+00:19:12,320 --> 00:19:16,270
+are well versed in these days, but end
+users are typically not really aware of.
+
+369
+00:19:16,270 --> 00:19:18,710
+And it's something called INetd, which is
+
+370
+00:19:18,710 --> 00:19:21,290
+often referred to as the internet super
+server.
+
+371
+00:19:21,290 --> 00:19:25,860
+The internet super server provides two
+different kinds of services.
+
+372
+00:19:25,860 --> 00:19:30,200
+One different kind of service is internal
+services that
+
+373
+00:19:30,200 --> 00:19:33,500
+are linked in statically when the system
+starts, like on
+
+374
+00:19:33,500 --> 00:19:36,740
+a, on a server that's an INetd server, the
+
+375
+00:19:36,740 --> 00:19:40,660
+echo service and the daytime service are
+typically internal services.
+
+376
+00:19:40,660 --> 00:19:42,170
+Then there's also external services.
+
+377
+00:19:42,170 --> 00:19:46,750
+Services that can be dynamically forked
+and exact, or created on demand.
+
+378
+00:19:46,750 --> 00:19:50,798
+So things like HTTP demons are typically
+forked on demand.
+
+379
+00:19:50,798 --> 00:19:54,764
+Eh, FTP, Telnet, they're secure,
+SSH-equivalent
+
+380
+00:19:54,764 --> 00:19:57,550
+versions of these kinds of things.
+
+381
+00:19:57,550 --> 00:20:00,990
+These are processes that are spawned
+on-demand, by the super server.
+
+382
+00:20:00,990 --> 00:20:04,610
+It listens on all these ports, and, and
+spawns them, when requests come in.
+
+383
+00:20:04,610 --> 00:20:09,680
+So that's often called, a port manager, or
+a port listener, or a super server.
+
+384
+00:20:09,680 --> 00:20:13,550
+You can take a look here, at this link for
+more information about Inetd.
+
+385
+00:20:13,550 --> 00:20:15,050
+It's very cool capability.
+
+386
+00:20:16,640 --> 00:20:19,050
+Another feature, that, another thing, is
+
+387
+00:20:19,050 --> 00:20:23,640
+something that's called the CORBA
+Implementation Repository.
+
+388
+00:20:23,640 --> 00:20:25,470
+And so this is a very cool feature
+
+389
+00:20:25,470 --> 00:20:28,360
+that makes it possible to write
+application code.
+
+390
+00:20:28,360 --> 00:20:30,250
+Where the client has no earthly idea where
+the
+
+391
+00:20:30,250 --> 00:20:32,850
+service actually run, all it knows is it
+gets
+
+392
+00:20:32,850 --> 00:20:35,590
+an object reference, which is basically a
+URL on
+
+393
+00:20:35,590 --> 00:20:39,380
+steroids, and it evokes an operation on
+that object reference.
+
+394
+00:20:39,380 --> 00:20:41,840
+And that ends up going and talking to this
+thing
+
+395
+00:20:41,840 --> 00:20:45,540
+called an implementation repository, which
+is basically a super server.
+
+396
+00:20:45,540 --> 00:20:48,340
+And that guy keeps track of everybody
+who's registered.
+
+397
+00:20:48,340 --> 00:20:50,740
+Using a, an activation table.
+
+398
+00:20:50,740 --> 00:20:52,470
+And it checks to see whether or not
+there's a
+
+399
+00:20:52,470 --> 00:20:56,380
+server running to handle this, and if not
+it starts it.
+
+400
+00:20:56,380 --> 00:21:00,140
+And then the server passes back an
+address, which is called
+
+401
+00:21:00,140 --> 00:21:03,440
+an object reference, which is, again, like
+a URL on steroids.
+
+402
+00:21:03,440 --> 00:21:07,950
+And that gets back to the client and its
+cached away internal to the client.
+
+403
+00:21:07,950 --> 00:21:10,760
+And the call is actually redirected so it
+ends up going
+
+404
+00:21:10,760 --> 00:21:13,890
+over to the actual server, the one that
+was launched on demand.
+
+405
+00:21:13,890 --> 00:21:17,030
+That does it's thing and then sends the
+result back.
+
+406
+00:21:17,030 --> 00:21:21,580
+Any subsequent call to that service is
+directly routed
+
+407
+00:21:21,580 --> 00:21:25,370
+to the server without going through the
+implementation repository.
+
+408
+00:21:25,370 --> 00:21:28,210
+So CORBA has this really cool mechanism
+that optimizes
+
+409
+00:21:28,210 --> 00:21:30,200
+things so that the first time you use it.
+
+410
+00:21:30,200 --> 00:21:34,110
+It figures out where the correct
+implementation resides.
+
+411
+00:21:34,110 --> 00:21:36,500
+Launching it if necessary, and then
+redirects
+
+412
+00:21:36,500 --> 00:21:38,250
+the client, henceforth to go there without
+
+413
+00:21:38,250 --> 00:21:39,930
+having to make a trip through the
+
+414
+00:21:39,930 --> 00:21:42,870
+service, the implementation or repository
+each time.
+
+415
+00:21:42,870 --> 00:21:47,410
+And then of course the last piece of the
+puzzle that we already talked about.
+
+416
+00:21:47,410 --> 00:21:50,500
+Is Android's activity manager service.
+
+417
+00:21:50,500 --> 00:21:53,050
+So, as you can see here, that works by
+
+418
+00:21:53,050 --> 00:21:55,810
+bind service, which goes ahead and checks
+out the
+
+419
+00:21:55,810 --> 00:21:59,290
+service map that's run internal, which
+we'll look at
+
+420
+00:21:59,290 --> 00:22:03,830
+next time, and it starts the service by
+calling process.start.
+
+421
+00:22:03,830 --> 00:22:05,900
+Getting all the information it needs to
+load itself.
+
+422
+00:22:05,900 --> 00:22:10,510
+It starts up, loads in the various,
+components it needs and the
+
+423
+00:22:10,510 --> 00:22:14,270
+entry point and so on to it's activity,
+and, it, or it's service.
+
+424
+00:22:14,270 --> 00:22:15,120
+And away it goes.
+
+425
+00:22:15,120 --> 00:22:17,110
+The life cycle methods get called back
+etcetera, etcetera.
+
+426
+00:22:17,110 --> 00:22:22,600
+And then the calls you make get dispatched
+as appropriate, there.
+
+427
+00:22:22,600 --> 00:22:26,450
+So to summarize activator it basically
+allows you to free
+
+428
+00:22:26,450 --> 00:22:31,520
+the clients from the responsibility of
+activating the resources themselves.
+
+429
+00:22:31,520 --> 00:22:32,686
+They don't have to worry about that.
+
+430
+00:22:32,686 --> 00:22:34,750
+They just, say bind service, or they just
+
+431
+00:22:34,750 --> 00:22:37,380
+make a call and everything happens under
+the hood.
+
+432
+00:22:37,380 --> 00:22:41,850
+And it makes it look to them as if the
+resources were always available.
+
+433
+00:22:41,850 --> 00:22:46,160
+Now, how many people here have taken the
+Operating Systems course here?
+
+434
+00:22:47,440 --> 00:22:49,120
+Okay, so, so a few of you.
+
+435
+00:22:49,120 --> 00:22:52,040
+So do you remember the concept of virtual
+memory?
+
+436
+00:22:52,040 --> 00:22:53,758
+That we talked about, hopefully you talked
+about
+
+437
+00:22:53,758 --> 00:22:56,390
+Operating Systems course, depends who
+taught it of course.
+
+438
+00:22:56,390 --> 00:22:58,120
+But, depending on who taught it,
+
+439
+00:22:58,120 --> 00:22:59,990
+you hopefully learned something about
+virtual memory.
+
+440
+00:22:59,990 --> 00:23:04,280
+So virtual memory is this concept that
+says, I'm going to give the
+
+441
+00:23:04,280 --> 00:23:07,470
+processor an address, and I'm going to
+pretend
+
+442
+00:23:07,470 --> 00:23:09,990
+like there's a really large address space.
+
+443
+00:23:09,990 --> 00:23:13,250
+Think about how big the address spaces are
+today with 64-bit processors, right?
+
+444
+00:23:13,250 --> 00:23:13,750
+They're huge.
+
+445
+00:23:14,760 --> 00:23:16,390
+But I'm actually not going to have that
+much
+
+446
+00:23:16,390 --> 00:23:18,720
+main memory, even though there's a lot of
+memory you
+
+447
+00:23:18,720 --> 00:23:20,930
+could have nowadays, I'm not actually
+going to have, you
+
+448
+00:23:20,930 --> 00:23:24,960
+know, whatever, 2 to the 64 minus 1 memory
+ranges.
+
+449
+00:23:24,960 --> 00:23:27,690
+I might have eight gigabytes or something
+like that.
+
+450
+00:23:27,690 --> 00:23:30,490
+So, what you're doing is the, as
+
+451
+00:23:30,490 --> 00:23:33,180
+the processor runs, it takes a virtual
+address.
+
+452
+00:23:33,180 --> 00:23:35,650
+And it translates that into a physical
+address,
+
+453
+00:23:35,650 --> 00:23:37,740
+and through a bunch of low level hardware
+
+454
+00:23:37,740 --> 00:23:39,510
+magic, it goes and it checks to see
+
+455
+00:23:39,510 --> 00:23:43,180
+if that particular address is currently in
+physical memory.
+
+456
+00:23:43,180 --> 00:23:46,080
+And if it is, you, you run out of the
+memory, you're fine.
+
+457
+00:23:46,080 --> 00:23:47,900
+I mean, you run in that memory.
+
+458
+00:23:47,900 --> 00:23:50,410
+If it's not there, then what happens?
+
+459
+00:23:52,590 --> 00:23:55,830
+There's a fancy name for something that
+happens when, when you look
+
+460
+00:23:55,830 --> 00:24:00,320
+for something in, in the virtual memory
+system, and it's not found.
+
+461
+00:24:03,950 --> 00:24:05,480
+this, this is very depressing to think
+about
+
+462
+00:24:05,480 --> 00:24:08,030
+what you didn't learn in the operating
+systems course.
+
+463
+00:24:08,030 --> 00:24:11,150
+So what happens is you incur what's known
+as a page fault.
+
+464
+00:24:11,150 --> 00:24:14,520
+And a page fault basically goes out to
+secondary storage, like the
+
+465
+00:24:14,520 --> 00:24:18,820
+disk, or some special, you know, battery
+backed up RAM, or whatever.
+
+466
+00:24:18,820 --> 00:24:22,990
+And it reads in, that page in memory,
+stores it into
+
+467
+00:24:22,990 --> 00:24:26,040
+the main memory, fiddles around with the
+page tables and then
+
+468
+00:24:26,040 --> 00:24:28,620
+it goes ahead and gives you back something
+that is actually
+
+469
+00:24:28,620 --> 00:24:32,320
+that real place to run, and it's brought
+it in on demand.
+
+470
+00:24:32,320 --> 00:24:37,648
+So, virtual memory is an example of the
+activator pattern in a sense, it's, it's
+
+471
+00:24:37,648 --> 00:24:41,350
+a lower level more systems-y concept of,
+
+472
+00:24:41,350 --> 00:24:47,020
+basically, on-demand activation or, lazy,
+acquisition of resources.
+
+473
+00:24:47,020 --> 00:24:51,420
+You only acquire something when you
+actually need it, Back, way
+
+474
+00:24:51,420 --> 00:24:56,010
+back in the day, way back before we had
+ATM cards.
+
+475
+00:24:56,010 --> 00:24:58,830
+And, overdraft protection and stuff like
+that.
+
+476
+00:24:58,830 --> 00:25:01,310
+If you want, if you are a student at
+college and you
+
+477
+00:25:01,310 --> 00:25:05,780
+wanted to get money, you would go to the
+local student center, and
+
+478
+00:25:05,780 --> 00:25:10,140
+you would write them a check, and
+invariably the check you were
+
+479
+00:25:10,140 --> 00:25:13,490
+writing was probably for an account that
+didn't have enough money in it.
+
+480
+00:25:13,490 --> 00:25:17,370
+Back in those days, that was okay because
+it took a few days for the check to clear.
+
+481
+00:25:17,370 --> 00:25:20,320
+So what you would do is, this is the
+activator pattern, the same idea.
+
+482
+00:25:20,320 --> 00:25:22,240
+You'd write a check, give it to the
+student union.
+
+483
+00:25:22,240 --> 00:25:24,570
+They'd give you back, you know, 50 bucks
+or whatever it was.
+
+484
+00:25:24,570 --> 00:25:27,430
+Then you'd rush back to your dorm and call
+your folks, and you'd
+
+485
+00:25:27,430 --> 00:25:31,270
+say, deposit money in my account, you
+know, in the next 24 hours.
+
+486
+00:25:31,270 --> 00:25:33,170
+And, and assuming that they were happy
+with you and
+
+487
+00:25:33,170 --> 00:25:36,050
+your grades, they would deposit the money
+in the, the account.
+
+488
+00:25:36,050 --> 00:25:38,370
+And wala, the check would clear,
+everything was happy.
+
+489
+00:25:38,370 --> 00:25:40,960
+So that was a good example of doing things
+on demand, right?
+
+490
+00:25:40,960 --> 00:25:44,320
+You didn't actually have money in your
+account when you wrote the check.
+
+491
+00:25:44,320 --> 00:25:46,160
+But it gave you back the, you know,
+
+492
+00:25:46,160 --> 00:25:47,680
+you got something back that looked like
+you had
+
+493
+00:25:47,680 --> 00:25:50,110
+the check, and by the time the check
+
+494
+00:25:50,110 --> 00:25:53,120
+actually cleared, the resources were there
+to, to manage
+
+495
+00:25:55,440 --> 00:25:55,520
+it.
+
+496
+00:25:55,520 --> 00:26:00,360
+Activator also can be used to ensure that
+activating and reactivating a
+
+497
+00:26:00,360 --> 00:26:06,150
+resource will incur minimal overhead,
+which is,
+
+498
+00:26:06,150 --> 00:26:09,290
+is very important we, you, you don't want
+to, to
+
+499
+00:26:09,290 --> 00:26:13,160
+have to do a lot of work to reactivate
+stuff.
+
+500
+00:26:13,160 --> 00:26:15,610
+So you might for example have the
+
+501
+00:26:15,610 --> 00:26:18,770
+activator, you know pre-cache state for
+you.
+
+502
+00:26:18,770 --> 00:26:20,410
+Activators can do others things too,
+depends on
+
+503
+00:26:20,410 --> 00:26:22,850
+how fancy and sophisticated you want to
+make them.
+
+504
+00:26:22,850 --> 00:26:24,760
+Activators could actually take part in
+some
+
+505
+00:26:24,760 --> 00:26:30,210
+kind of replicated, cluster or cache
+management
+
+506
+00:26:30,210 --> 00:26:32,170
+system, or it could load balance, the
+
+507
+00:26:32,170 --> 00:26:34,020
+activator might actually do load balancing
+for your.
+
+508
+00:26:34,020 --> 00:26:36,240
+So you would ask the activator start me
+
+509
+00:26:36,240 --> 00:26:38,180
+a service and the activator would look
+around and
+
+510
+00:26:38,180 --> 00:26:39,960
+go, yeah, that guy over there, there's not
+much
+
+511
+00:26:39,960 --> 00:26:42,900
+load over there, I'll redirect the request
+over there.
+
+512
+00:26:42,900 --> 00:26:45,890
+And so, then you would get back something
+that you would use but it
+
+513
+00:26:45,890 --> 00:26:48,160
+would actually be running on some lightly
+
+514
+00:26:48,160 --> 00:26:51,630
+and loaded resource in your particular
+cluster.
+
+515
+00:26:51,630 --> 00:26:53,949
+So and you could also, you know,
+preallocate
+
+516
+00:26:53,949 --> 00:26:56,567
+stuffs so that when things were
+reactivated [SOUND] it
+
+517
+00:26:56,567 --> 00:26:59,972
+was ready to go and kept those things in a
+cache and so on and so forth.
+
+518
+00:26:59,972 --> 00:27:01,358
+And so we take a look at the
+
+519
+00:27:01,358 --> 00:27:05,058
+pattern description, take a look at the
+Android documentation.
+
+520
+00:27:05,058 --> 00:27:08,320
+And they talk a bit more about all those
+various things.
+
+521
+00:27:10,010 --> 00:27:14,600
+Okay, any questions about the, the
+activator pattern?
+
+522
+00:27:15,630 --> 00:27:19,350
+So you can see that pretty much everything
+we've talked about so far
+
+523
+00:27:19,350 --> 00:27:23,650
+having to do with services, touched on
+activator in one way or another, right.
+
+524
+00:27:23,650 --> 00:27:26,360
+So we talked about, we talked about the,
+the
+
+525
+00:27:26,360 --> 00:27:29,420
+started service, that was activator, to
+start it up.
+
+526
+00:27:29,420 --> 00:27:32,880
+We talked about the intense service.
+
+527
+00:27:32,880 --> 00:27:35,010
+Again, sort of activator, starting things
+up.
+
+528
+00:27:35,010 --> 00:27:38,390
+When we talked about bound services,
+activators being used
+
+529
+00:27:38,390 --> 00:27:40,550
+under the hood to start things up on
+demand.
+
+530
+00:27:40,550 --> 00:27:41,590
+And you see that over and over again.
+
+531
+00:27:41,590 --> 00:27:45,810
+And that's basically because Android is
+trying to be
+
+532
+00:27:45,810 --> 00:27:48,650
+cons, conservation oriented in its
+
+533
+00:27:48,650 --> 00:27:51,260
+utilization of resources, especially
+memory.
+
+534
+00:27:51,260 --> 00:27:54,355
+And it's trying to do things, you know, as
+it needs to, and
+
+535
+00:27:54,355 --> 00:27:57,834
+then get rid of those things so you don't
+clog up the memory system.
+
+536
+00:27:57,834 --> 00:28:05,579
+[MUSIC]
+
