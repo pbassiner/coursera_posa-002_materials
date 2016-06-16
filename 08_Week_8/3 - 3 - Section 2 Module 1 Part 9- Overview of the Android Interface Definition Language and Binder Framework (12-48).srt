@@ -1,0 +1,1007 @@
+1
+00:00:00,000 --> 00:00:08,238
+[MUSIC]
+
+2
+00:00:08,238 --> 00:00:10,288
+Welcome to the next part of the module on
+
+3
+00:00:10,288 --> 00:00:14,828
+Android Services and local inter-process
+communication mechanisms, which presents
+
+4
+00:00:14,828 --> 00:00:18,373
+an overview of the Android Interface
+Definition Language commonly
+
+5
+00:00:18,373 --> 00:00:23,060
+known as AIDL and the binder inter-process
+communication framework.
+
+6
+00:00:23,060 --> 00:00:27,660
+In this part, we'll summarize how these
+Android mechanisms enable activities to
+
+7
+00:00:27,660 --> 00:00:30,240
+communicate concurrently with objects
+residing in
+
+8
+00:00:30,240 --> 00:00:33,860
+bound services, either synchronously, or
+asynchronously.
+
+9
+00:00:34,990 --> 00:00:36,680
+The AIDL and Binder provide
+
+10
+00:00:36,680 --> 00:00:38,980
+powerful mechanisms for object-orientated
+inter-process
+
+11
+00:00:38,980 --> 00:00:44,060
+communication, that largely mimic typed
+method invocations on Java objects.
+
+12
+00:00:44,060 --> 00:00:47,550
+Throughout this video we'll motivate these
+mechanisms in the context of a
+
+13
+00:00:47,550 --> 00:00:51,700
+bound download application that uses the
+AIDL and Binder to interact with
+
+14
+00:00:51,700 --> 00:00:53,153
+a pair of bound services to
+
+15
+00:00:53,153 --> 00:00:56,327
+download images synchronously and
+asynchronously from
+
+16
+00:00:56,327 --> 00:01:00,045
+a remote web server and display them in
+the user interface thread.
+
+17
+00:01:00,045 --> 00:01:01,433
+[BLANK_AUDIO]
+
+18
+00:01:01,433 --> 00:01:03,113
+The design as the example application is
+
+19
+00:01:03,113 --> 00:01:05,940
+similar to the programming assignment
+available here.
+
+20
+00:01:05,940 --> 00:01:07,720
+So I encourage you to download it and
+
+21
+00:01:07,720 --> 00:01:10,090
+follow along with the video to understand
+common
+
+22
+00:01:10,090 --> 00:01:13,220
+methods and patterns of programming bound
+services using
+
+23
+00:01:13,220 --> 00:01:17,130
+the Android Interface Definition Language
+and Binder mechanisms.
+
+24
+00:01:17,130 --> 00:01:19,830
+Although these mechanisms are powerful,
+there are a number
+
+25
+00:01:19,830 --> 00:01:23,080
+of constructs and steps required to use
+them effectively.
+
+26
+00:01:23,080 --> 00:01:25,447
+So I also will recommend you watch these
+
+27
+00:01:25,447 --> 00:01:29,193
+optional videos to explore these
+mechanisms in more detail.
+
+28
+00:01:29,193 --> 00:01:32,597
+[BLANK_AUDIO]
+
+29
+00:01:32,597 --> 00:01:34,514
+[MUSIC]
+
+30
+00:01:34,514 --> 00:01:38,698
+Services may need to run in different
+processes in
+
+31
+00:01:38,698 --> 00:01:42,740
+their clients for the reasons discussed in
+a previous video.
+
+32
+00:01:42,740 --> 00:01:44,900
+However, to enhance security and
+
+33
+00:01:44,900 --> 00:01:47,840
+reliability, objects in one Android
+process
+
+34
+00:01:47,840 --> 00:01:51,289
+generally can't access objects in the
+address space of another process.
+
+35
+00:01:52,580 --> 00:01:54,770
+Since processes are intentionally designed
+to
+
+36
+00:01:54,770 --> 00:01:57,195
+protect their contents from access by
+other
+
+37
+00:01:57,195 --> 00:02:00,440
+processes, operating systems provide
+strictly mediated and
+
+38
+00:02:00,440 --> 00:02:04,160
+controlled inter-process communication
+mechanisms, as discussed here.
+
+39
+00:02:05,190 --> 00:02:08,070
+For example, activities in Android that
+communicate
+
+40
+00:02:08,070 --> 00:02:11,480
+with objects and services residing in
+other processes,
+
+41
+00:02:11,480 --> 00:02:14,720
+must perform several additional steps
+beyond what's needed
+
+42
+00:02:14,720 --> 00:02:16,915
+to communicate with objects in their own
+process.
+
+43
+00:02:16,915 --> 00:02:22,090
+In particular, they must decompose and
+transform the data
+
+44
+00:02:22,090 --> 00:02:26,940
+in their objects which may be arbitrarily
+complex into byte streams that
+
+45
+00:02:26,940 --> 00:02:31,120
+the underlying Linux operating system can
+understand, and then exchange these byte
+
+46
+00:02:31,120 --> 00:02:36,950
+streams across address spaces via Linux
+inter-process communication mechanisms.
+
+47
+00:02:36,950 --> 00:02:38,578
+At the heart of these steps are
+
+48
+00:02:38,578 --> 00:02:42,370
+marshaling and demarshaling mechanisms
+which are discussed here.
+
+49
+00:02:43,790 --> 00:02:47,540
+In the context of Android, marshaling
+converts the native
+
+50
+00:02:47,540 --> 00:02:52,960
+representation of Java Object Data, such
+as, ents, shorts, doubles,
+
+51
+00:02:52,960 --> 00:02:56,130
+and arrays of these types into a
+serialized byte stream
+
+52
+00:02:56,130 --> 00:03:01,460
+representation suitable for transmission
+to a different processes address base.
+
+53
+00:03:01,460 --> 00:03:05,560
+Conversely, demarshaling converts the data
+in a serialized byte stream
+
+54
+00:03:05,560 --> 00:03:09,740
+representation to reconstitute an object
+in a native Java representation.
+
+55
+00:03:10,880 --> 00:03:14,290
+For example, the activity and services
+processes in our bound
+
+56
+00:03:14,290 --> 00:03:18,590
+download application exchange Java
+strings, containing the desired URL of
+
+57
+00:03:18,590 --> 00:03:21,360
+an image on a remote server and the path
+name
+
+58
+00:03:21,360 --> 00:03:23,810
+to the file where the image is downloaded
+on the device.
+
+59
+00:03:25,560 --> 00:03:29,165
+The mechanisms in AIDL and Binder support
+the marshaling and
+
+60
+00:03:29,165 --> 00:03:32,415
+demarshaling of a much wider range of data
+types beyond
+
+61
+00:03:32,415 --> 00:03:35,950
+strings, including all the primitive data
+types in Java as
+
+62
+00:03:35,950 --> 00:03:39,719
+well as references to objects that reside
+in other processes.
+
+63
+00:03:39,719 --> 00:03:46,791
+[MUSIC]
+
+64
+00:03:46,791 --> 00:03:49,702
+Manually writing code to perform
+marshaling and
+
+65
+00:03:49,702 --> 00:03:53,000
+demarshaling is tedious and error prone
+since
+
+66
+00:03:53,000 --> 00:03:55,950
+programmers must understand low-level
+details of how
+
+67
+00:03:55,950 --> 00:03:58,870
+to convert every field of an object's data
+
+68
+00:03:58,870 --> 00:04:02,860
+into a byte stream on the client side, so
+that the byte stream can
+
+69
+00:04:02,860 --> 00:04:07,600
+later be correctly converted back into a
+copy of the object of the callee side.
+
+70
+00:04:08,810 --> 00:04:12,130
+To simplify this conversion process,
+Android defines an
+
+71
+00:04:12,130 --> 00:04:16,490
+interface definitional language called
+AIDL, and an associated
+
+72
+00:04:16,490 --> 00:04:20,210
+compiler that automatically generates
+proxies and stubs to
+
+73
+00:04:20,210 --> 00:04:25,850
+perform marshaling and demarshaling
+respectively, as covered here.
+
+74
+00:04:25,850 --> 00:04:30,110
+The syntax and semantics of AIDL are
+similar to Java interfaces,
+
+75
+00:04:30,110 --> 00:04:34,200
+plus some enhancements and restrictions
+covered by Professor Porter in this video.
+
+76
+00:04:35,360 --> 00:04:37,340
+For example, the bound download
+
+77
+00:04:37,340 --> 00:04:40,500
+application defined the downloader AIDL
+interface.
+
+78
+00:04:40,500 --> 00:04:42,660
+A caller passes its download image method,
+a
+
+79
+00:04:42,660 --> 00:04:45,550
+string, containing a URL as an input
+parameters to
+
+80
+00:04:45,550 --> 00:04:49,050
+callee, and the callee then returns a
+string containing
+
+81
+00:04:49,050 --> 00:04:51,090
+the downloaded image path name back to the
+caller.
+
+82
+00:04:52,120 --> 00:04:54,810
+When an application is built, Eclipse
+automatically
+
+83
+00:04:54,810 --> 00:04:56,930
+compiles the AIDL files in a project
+
+84
+00:04:56,930 --> 00:04:59,670
+source directory and stores the generated
+proxies
+
+85
+00:04:59,670 --> 00:05:02,970
+and stubs into the project's GEN
+directory.
+
+86
+00:05:02,970 --> 00:05:08,119
+The generated Java file name matches the
+AIDL file name but with a .Java extension.
+
+87
+00:05:08,119 --> 00:05:13,240
+For example, Downloader AIDL results in
+downloader Java as discussed here.
+
+88
+00:05:14,270 --> 00:05:17,030
+The actual transfer of marshaled data is
+performed
+
+89
+00:05:17,030 --> 00:05:20,070
+in conjunction with the Android binder
+framework, which implements
+
+90
+00:05:20,070 --> 00:05:22,610
+a lightweight remote method call mechanism
+designed for
+
+91
+00:05:22,610 --> 00:05:27,590
+high performance intra and inter-process
+communication, as covered here.
+
+92
+00:05:27,590 --> 00:05:32,430
+However, applications rarely access the
+underlying binder framework directly.
+
+93
+00:05:32,430 --> 00:05:35,485
+Instead, the proxies generated by the AIDL
+
+94
+00:05:35,485 --> 00:05:38,760
+compiler, marshal method parameters pass
+by callers.
+
+95
+00:05:38,760 --> 00:05:41,525
+The proxies then use binder mechanisms to
+transfer the
+
+96
+00:05:41,525 --> 00:05:44,710
+marshaled data to the target object in the
+callee's process.
+
+97
+00:05:45,940 --> 00:05:48,682
+The binder framework there then uses the
+generated
+
+98
+00:05:48,682 --> 00:05:51,678
+stubs to demarshal the data, and invoke
+the designated
+
+99
+00:05:51,678 --> 00:05:55,378
+method implementations, to perform
+computations in the callee's
+
+100
+00:05:55,378 --> 00:05:58,139
+process and return any results back to the
+caller.
+
+101
+00:05:58,139 --> 00:06:05,149
+[MUSIC].
+
+102
+00:06:05,149 --> 00:06:07,437
+The bulk of the Android binder framework
+
+103
+00:06:07,437 --> 00:06:10,051
+is implemented via a device driver that
+resides
+
+104
+00:06:10,051 --> 00:06:12,395
+in the Linux kernel and is optimized for
+
+105
+00:06:12,395 --> 00:06:17,240
+inter, and intra-process communication on
+an Android device.
+
+106
+00:06:17,240 --> 00:06:22,310
+Internally, it's implemented using shared
+memory, which minimizes data copying.
+
+107
+00:06:22,310 --> 00:06:25,070
+The Binder framework also provides a pool
+of threads
+
+108
+00:06:25,070 --> 00:06:28,710
+that run within each Linux process hosting
+Android applications
+
+109
+00:06:28,710 --> 00:06:32,180
+which enables multiple client requests to
+run concurrently and
+
+110
+00:06:32,180 --> 00:06:36,180
+scalably, especially on multicore devices
+that are becoming ubiquitous.
+
+111
+00:06:37,310 --> 00:06:40,370
+A detailed analysis of the Android Binder
+framework appears here.
+
+112
+00:06:41,670 --> 00:06:43,585
+The use of AIDL not only simplifies
+
+113
+00:06:43,585 --> 00:06:48,380
+inter-process communication, it also
+simplifies inter-language communication.
+
+114
+00:06:48,380 --> 00:06:52,770
+For example, although most application
+services are written in Java, it's also
+
+115
+00:06:52,770 --> 00:06:57,850
+possible to write services in other
+programming languages such C or C++.
+
+116
+00:06:57,850 --> 00:07:01,710
+Many Android system services are written
+in C++, including the media player
+
+117
+00:07:01,710 --> 00:07:07,020
+service, Sensor Service and Audio and
+Surface Flinger services, as shown here.
+
+118
+00:07:08,290 --> 00:07:12,260
+The proxies and stubs generated by the
+AIDL compiler are used
+
+119
+00:07:12,260 --> 00:07:15,390
+at several points in the path from caller
+to callee and back.
+
+120
+00:07:16,550 --> 00:07:20,400
+The proxies generated by the AIDL compiler
+marshal caller data into
+
+121
+00:07:20,400 --> 00:07:25,960
+parcels which are containers for data and
+object references, as shown here.
+
+122
+00:07:25,960 --> 00:07:29,830
+The binder framework on the caller side
+copies these parcels from the caller's
+
+123
+00:07:29,830 --> 00:07:34,410
+process to the callee's process, where the
+binder framework on the callee's side
+
+124
+00:07:34,410 --> 00:07:39,048
+uses the stubs generated by the AIDL
+compiler to demarshal the contents of
+
+125
+00:07:39,048 --> 00:07:41,919
+the parcels into the native representation
+
+126
+00:07:41,919 --> 00:07:44,807
+expected by methods in the callee's
+object.
+
+127
+00:07:44,807 --> 00:07:46,927
+[BLANK_AUDIO]
+
+128
+00:07:46,927 --> 00:07:48,120
+[MUSIC]
+
+129
+00:07:48,120 --> 00:07:54,217
+By default, methods defined in AIDL
+interfaces provide
+
+130
+00:07:54,217 --> 00:08:01,130
+two-way synchronous invocation semantics,
+where the caller sends input parameters
+
+131
+00:08:01,130 --> 00:08:04,370
+to the callee and then blocks
+synchronously until the
+
+132
+00:08:04,370 --> 00:08:07,480
+callee's method implementation returns
+results back to the caller.
+
+133
+00:08:08,820 --> 00:08:11,380
+When a caller invokes an AIDL method on an
+object that
+
+134
+00:08:11,380 --> 00:08:13,397
+spans process boundaries the method
+
+135
+00:08:13,397 --> 00:08:16,308
+implementation is dispatched in the
+callee's
+
+136
+00:08:16,308 --> 00:08:20,720
+process by the binder framework which runs
+the method implementation in
+
+137
+00:08:20,720 --> 00:08:24,580
+a thread selected from a per-process pool
+of threads that it manages.
+
+138
+00:08:25,650 --> 00:08:28,414
+In contrast, if an AIDL method is
+
+139
+00:08:28,414 --> 00:08:31,530
+pre-fixed with a one-way key word, the
+behavior
+
+140
+00:08:31,530 --> 00:08:33,590
+is different when a caller invokes this
+
+141
+00:08:33,590 --> 00:08:35,999
+method on an object that spans process
+boundaries.
+
+142
+00:08:37,240 --> 00:08:40,770
+In this case, the caller does not block
+synchronously waiting for the
+
+143
+00:08:40,770 --> 00:08:44,880
+results, but instead, it returns
+immediately
+
+144
+00:08:44,880 --> 00:08:47,130
+while the callee executes the method
+asynchronously.
+
+145
+00:08:47,130 --> 00:08:51,180
+Two-way asynchronous communication
+interactions can therefore be
+
+146
+00:08:51,180 --> 00:08:54,290
+implemented via the Binder framework by
+defining two
+
+147
+00:08:54,290 --> 00:08:57,230
+AIDL interfaces, one for requests and one
+
+148
+00:08:57,230 --> 00:09:01,630
+for results, each defined using one-way,
+non-blocking methods.
+
+149
+00:09:01,630 --> 00:09:04,720
+In this design, the caller creates a
+results object
+
+150
+00:09:04,720 --> 00:09:07,240
+and invokes a one-way call to pass a
+reference to
+
+151
+00:09:07,240 --> 00:09:09,780
+this object along with any input
+parameters to the
+
+152
+00:09:09,780 --> 00:09:13,679
+callee, but does not block synchronously
+waiting for the results.
+
+153
+00:09:15,530 --> 00:09:19,030
+The callee runs this method implementation
+in a thread selected by
+
+154
+00:09:19,030 --> 00:09:23,310
+the binder framework from the per-process
+pool of threads that it manages.
+
+155
+00:09:23,310 --> 00:09:25,950
+When the callee finishes executing, it
+sends the
+
+156
+00:09:25,950 --> 00:09:28,965
+results back to the caller by invoking a
+one-way
+
+157
+00:09:28,965 --> 00:09:31,420
+method call on the results object it
+originally
+
+158
+00:09:31,420 --> 00:09:35,178
+received, which essentially turns the
+callee into a caller.
+
+159
+00:09:35,178 --> 00:09:40,660
+Naturally, this one-way callback from the
+original callee back to the original
+
+160
+00:09:40,660 --> 00:09:46,230
+caller doesn't block either, making the
+two-way interactions fully asynchronous.
+
+161
+00:09:48,060 --> 00:09:49,540
+The Binder framework in the original
+
+162
+00:09:49,540 --> 00:09:52,070
+caller's process dispatches the method on
+the
+
+163
+00:09:52,070 --> 00:09:54,460
+results object in a thread selected from
+
+164
+00:09:54,460 --> 00:09:56,490
+the per-process pool of threads it
+manages.
+
+165
+00:09:57,840 --> 00:10:02,215
+Since AIDL invocations that span process
+boundaries are handled in threads
+
+166
+00:10:02,215 --> 00:10:06,723
+from the Binder's thread pool rather than
+from their user interface thread,
+
+167
+00:10:06,723 --> 00:10:11,302
+application developers must ensure that
+any object accessed via these calls,
+
+168
+00:10:11,302 --> 00:10:16,180
+are properly synchronized to avoid race
+conditions, if they access shared state.
+
+169
+00:10:16,180 --> 00:10:20,723
+[BLANK_AUDIO]
+
+170
+00:10:20,723 --> 00:10:23,278
+[MUSIC]
+
+171
+00:10:23,278 --> 00:10:26,377
+In summary, AIDL is a language that
+enables
+
+172
+00:10:26,377 --> 00:10:32,040
+developers to define Binder-based
+interfaces to bound services.
+
+173
+00:10:32,040 --> 00:10:34,190
+When the Android Interface Definition
+Language and
+
+174
+00:10:34,190 --> 00:10:37,380
+Binder framework are used together, they
+provide
+
+175
+00:10:37,380 --> 00:10:40,270
+several key capabilities to applications
+that communicate
+
+176
+00:10:40,270 --> 00:10:44,280
+with Bound services residing in separate
+processes.
+
+177
+00:10:44,280 --> 00:10:46,220
+First, they provide an object-oriented
+
+178
+00:10:46,220 --> 00:10:48,970
+IPC mechanism that simplifies
+communication between
+
+179
+00:10:48,970 --> 00:10:51,655
+activities and services, by largely
+mimicking
+
+180
+00:10:51,655 --> 00:10:54,870
+typed method invocations between Java
+objects.
+
+181
+00:10:54,870 --> 00:10:59,570
+In contrast, the generic messenger-based
+approach covered in previous videos,
+
+182
+00:10:59,570 --> 00:11:05,010
+requires applications to manually put and
+get data into and from messages, which can
+
+183
+00:11:05,010 --> 00:11:09,110
+be problematic since the schema of the
+messages may be more implicit
+
+184
+00:11:09,110 --> 00:11:10,840
+and thus tedious and error prone,
+
+185
+00:11:10,840 --> 00:11:13,870
+than the explicitly-typed interfaces
+defined using AIDL.
+
+186
+00:11:15,010 --> 00:11:19,780
+Second, the AIDL and Binder enable method
+calls, spanning process boundaries to
+
+187
+00:11:19,780 --> 00:11:24,230
+run concurrently in a pool of threads
+managed by the Binder framework.
+
+188
+00:11:24,230 --> 00:11:26,750
+As a result, application developers don't
+
+189
+00:11:26,750 --> 00:11:30,350
+have to explicitly manipulate threads,
+handlers, runables,
+
+190
+00:11:30,350 --> 00:11:33,330
+or messages, which reduces accidental
+complexity
+
+191
+00:11:33,330 --> 00:11:35,740
+and codifies a design space more
+consistently.
+
+192
+00:11:36,810 --> 00:11:41,170
+Third, the AIDL and Binder simplify the
+development of activities and services
+
+193
+00:11:41,170 --> 00:11:43,440
+that can communicate via two-way
+asynchronous
+
+194
+00:11:43,440 --> 00:11:47,700
+interactions that block neither callers
+nor callees.
+
+195
+00:11:47,700 --> 00:11:51,430
+Fully asynchronous programs can be more
+robust and scalable as long as
+
+196
+00:11:51,430 --> 00:11:54,050
+developers understand the relevant
+patterns, such
+
+197
+00:11:54,050 --> 00:11:57,120
+as state, asynchronous completion token
+and proacter.
+
+198
+00:11:58,160 --> 00:12:02,710
+The AIDL and Binder implementations apply
+the Broker pattern to connect clients with
+
+199
+00:12:02,710 --> 00:12:04,710
+objects residing in Bound services in a
+
+200
+00:12:04,710 --> 00:12:07,760
+different address base, and mediate method
+invocations
+
+201
+00:12:07,760 --> 00:12:09,520
+from clients to these objects by
+
+202
+00:12:09,520 --> 00:12:13,310
+encapsulating application code from
+low-level inter-process communication
+
+203
+00:12:13,310 --> 00:12:16,140
+details such as connection management,
+marshaling and
+
+204
+00:12:16,140 --> 00:12:20,460
+demarshaling, data transfer, concurrency
+and process crashes.
+
+205
+00:12:21,720 --> 00:12:25,400
+Other patterns are also applied in
+Android's implementation of Broker,
+
+206
+00:12:25,400 --> 00:12:29,020
+including proxy and activator as discussed
+in an upcoming section.
+
+207
+00:12:30,080 --> 00:12:33,643
+The AIDL and Binder are used extensively
+in Android, and
+
+208
+00:12:33,643 --> 00:12:39,071
+hundreds of AIDL files appear in Android's
+frameworks and packaged applications.
+
+209
+00:12:39,071 --> 00:12:47,834
+[BLANK_AUDIO]
+

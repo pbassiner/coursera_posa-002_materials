@@ -1,0 +1,988 @@
+1
+00:00:00,000 --> 00:00:08,249
+[MUSIC]
+
+2
+00:00:08,249 --> 00:00:10,303
+Welcome to the next part of the module,
+
+3
+00:00:10,303 --> 00:00:13,106
+which continues our discussion of the
+Monitor Object
+
+4
+00:00:13,106 --> 00:00:15,845
+Pattern, that forms the basis for many
+concurrency
+
+5
+00:00:15,845 --> 00:00:19,100
+libraries, applications and services in
+Java and Android.
+
+6
+00:00:20,200 --> 00:00:22,250
+This part provides a detailed analysis of
+how the
+
+7
+00:00:22,250 --> 00:00:24,889
+Monitor Object Pattern is implemented and
+applied in Android.
+
+8
+00:00:26,060 --> 00:00:29,160
+To make the discussion concrete, we'll
+examine the implementation
+
+9
+00:00:29,160 --> 00:00:32,950
+of the LinkedBlockingQueue class described
+at this link, which is
+
+10
+00:00:32,950 --> 00:00:36,070
+a bounded blocking queue based on linked
+nodes that
+
+11
+00:00:36,070 --> 00:00:39,360
+queues elements in first in, first out, or
+FIFA order.
+
+12
+00:00:40,720 --> 00:00:43,860
+The four steps used to implement the
+monitor object pattern are described
+
+13
+00:00:43,860 --> 00:00:47,100
+in detail in the POSA 2 book, and are
+summarized at this link.
+
+14
+00:00:48,330 --> 00:00:51,320
+These steps include defining the interface
+methods.
+
+15
+00:00:51,320 --> 00:00:53,760
+Defining the implementation methods,
+defining
+
+16
+00:00:53,760 --> 00:00:55,690
+the internal state and synchronization
+
+17
+00:00:55,690 --> 00:00:59,530
+and scheduling mechanisms, and
+implementing all methods and data members.
+
+18
+00:01:00,850 --> 00:01:05,772
+We'll examine each of these implementation
+steps next.
+
+19
+00:01:05,772 --> 00:01:10,790
+[MUSIC]
+
+20
+00:01:10,790 --> 00:01:14,406
+We'll start by defining the monitor
+objects' interface methods which
+
+21
+00:01:14,406 --> 00:01:18,150
+expose us to the public methods that are
+visible to clients.
+
+22
+00:01:18,150 --> 00:01:21,060
+These methods are typically synchronized
+so only one of them at
+
+23
+00:01:21,060 --> 00:01:23,689
+a time can be executed by a thread within
+the monitor object.
+
+24
+00:01:24,710 --> 00:01:27,740
+For example, the link blocking queue
+inherits from the
+
+25
+00:01:27,740 --> 00:01:30,300
+blocking queue interface as shown at this
+path name.
+
+26
+00:01:31,310 --> 00:01:34,140
+Blocking queue defines the put and take
+methods
+
+27
+00:01:34,140 --> 00:01:36,760
+along with other methods as described at
+this link.
+
+28
+00:01:38,100 --> 00:01:41,650
+The semantics of Put are to insert the
+specified element
+
+29
+00:01:41,650 --> 00:01:45,520
+into a queue waiting, if necessary, for
+space to become available.
+
+30
+00:01:46,570 --> 00:01:50,090
+Likewise, the semantics of take are to
+retrieve and to remove the
+
+31
+00:01:50,090 --> 00:01:54,120
+head of the queue, waiting if necessary,
+until an element becomes available.
+
+32
+00:01:55,630 --> 00:01:58,780
+The next step is to define implementation
+methods.
+
+33
+00:01:58,780 --> 00:02:01,300
+Which are private or protected and that's
+below
+
+34
+00:02:01,300 --> 00:02:03,680
+the surface of what's directly visible to
+clients.
+
+35
+00:02:05,000 --> 00:02:08,280
+The implementation of linkedBlockingQueue
+applies the thread safe
+
+36
+00:02:08,280 --> 00:02:11,925
+interface pattern which minimizes locking
+overhead by ensuring that
+
+37
+00:02:11,925 --> 00:02:15,350
+intra-object method calls do not
+re-acquire a lock held
+
+38
+00:02:15,350 --> 00:02:18,120
+by the object already, as described at
+this link.
+
+39
+00:02:19,530 --> 00:02:23,020
+Two implementation methods we describe are
+enqueue and dequeue.
+
+40
+00:02:24,330 --> 00:02:26,370
+Enqueue is called by Put.
+
+41
+00:02:26,370 --> 00:02:27,970
+It links a node at the end of the queue.
+
+42
+00:02:29,570 --> 00:02:31,600
+Dequeue is called by Take.
+
+43
+00:02:31,600 --> 00:02:33,060
+It removes a node from the head of the
+queue.
+
+44
+00:02:34,350 --> 00:02:37,740
+Both implementation methods assume the
+interface methods that call them.
+
+45
+00:02:37,740 --> 00:02:41,020
+Acquire and release the appropriate
+monitor lock
+
+46
+00:02:41,020 --> 00:02:43,080
+as designated by the thread safe interface
+
+47
+00:02:46,170 --> 00:02:46,790
+pattern.
+
+48
+00:02:50,400 --> 00:02:53,599
+A monitor object contains data members
+that define its internal state.
+
+49
+00:02:54,630 --> 00:02:56,480
+Which must be protected from corruption by
+
+50
+00:02:56,480 --> 00:02:59,740
+race conditions resulting from
+unserialized concurrent access.
+
+51
+00:03:00,830 --> 00:03:03,090
+A monitor object therefore also contains
+one or more
+
+52
+00:03:03,090 --> 00:03:06,460
+monitor locks, that serialize the
+execution of its synchronized
+
+53
+00:03:06,460 --> 00:03:09,390
+methods, as well as one or more monitor
+conditions
+
+54
+00:03:09,390 --> 00:03:12,229
+that coordinate and schedule the execution
+of its synchronized methods.
+
+55
+00:03:13,780 --> 00:03:15,740
+There's typically a separate monitor
+condition
+
+56
+00:03:15,740 --> 00:03:17,500
+for each of the following situations.
+
+57
+00:03:18,850 --> 00:03:22,150
+Cases in which a synchronized method must
+suspend its processing
+
+58
+00:03:22,150 --> 00:03:24,520
+to wait for some event or state change to
+occur.
+
+59
+00:03:25,740 --> 00:03:29,080
+Or cases in which a synchronized method
+must resume other threads
+
+60
+00:03:29,080 --> 00:03:30,680
+whose synchronized methods have suspended
+
+61
+00:03:30,680 --> 00:03:33,229
+themselves previously on the monitor
+condition.
+
+62
+00:03:35,060 --> 00:03:38,030
+Monitor object implementation is
+responsible for insuring it's
+
+63
+00:03:38,030 --> 00:03:40,370
+in a stable state for releasing its
+monitor lock.
+
+64
+00:03:41,450 --> 00:03:44,630
+Stable states can be described by
+invariants, such as a need for
+
+65
+00:03:44,630 --> 00:03:48,330
+all elements in a linked blocking queue to
+be connected by valid pointers.
+
+66
+00:03:49,940 --> 00:03:53,010
+The invariant must hold whenever a
+synchronized
+
+67
+00:03:53,010 --> 00:03:55,169
+method waits on a corresponding monitor
+condition.
+
+68
+00:03:56,560 --> 00:03:59,270
+Similarly, when the monitor object is
+modified
+
+69
+00:03:59,270 --> 00:04:01,390
+and the thread scheduler decides to resume
+awaiting
+
+70
+00:04:01,390 --> 00:04:04,650
+thread, the monitor object implementation
+is responsible for
+
+71
+00:04:04,650 --> 00:04:07,570
+ensuring the invariant is indeed satisfied
+before proceeding.
+
+72
+00:04:08,910 --> 00:04:11,230
+This check is necessary because other
+threads my
+
+73
+00:04:11,230 --> 00:04:13,350
+have changed the state of the monitor
+object.
+
+74
+00:04:13,350 --> 00:04:15,460
+Between the notification, and the
+resumption.
+
+75
+00:04:16,610 --> 00:04:19,380
+As a result, the monitor object must
+ensure the invariant
+
+76
+00:04:19,380 --> 00:04:20,780
+is satisfied, before allowing a
+
+77
+00:04:20,780 --> 00:04:22,750
+synchronized method to resume its
+execution.
+
+78
+00:04:24,230 --> 00:04:26,820
+The internal state of the
+LinkedBlockingQueue class, consists
+
+79
+00:04:26,820 --> 00:04:29,960
+of head and last data members of type
+node.
+
+80
+00:04:29,960 --> 00:04:33,390
+Which stores an element in a pointer to
+the next node in a linked queue.
+
+81
+00:04:34,680 --> 00:04:37,470
+It also contains a capacity member that
+indicates
+
+82
+00:04:37,470 --> 00:04:39,290
+the maximum number of elements that can be
+in
+
+83
+00:04:39,290 --> 00:04:42,830
+the queue before it's considered full and
+a count
+
+84
+00:04:42,830 --> 00:04:44,920
+of the number of elements currently in the
+queue.
+
+85
+00:04:46,500 --> 00:04:48,910
+Count is implemented as an atomic integer.
+
+86
+00:04:48,910 --> 00:04:51,300
+Wich cold be incremented and decrimented
+anatomically and
+
+87
+00:04:51,300 --> 00:04:54,380
+efficiently for multiple threads, as
+described this link.
+
+88
+00:04:55,930 --> 00:04:59,470
+Link blocking Q also uses the reaction
+log, the condition option
+
+89
+00:04:59,470 --> 00:05:02,580
+classes to find the job you took to in
+current package describing
+
+90
+00:05:02,580 --> 00:05:06,510
+this link, to protect it's internal state
+from race conditions and
+
+91
+00:05:06,510 --> 00:05:11,420
+coordinate interaction with the threads
+and put owner from the q currently.
+
+92
+00:05:13,010 --> 00:05:14,870
+It contains a pair of condition objects.
+
+93
+00:05:14,870 --> 00:05:16,780
+Not full, and not empty.
+
+94
+00:05:16,780 --> 00:05:19,440
+To enable blocking, put and take method
+calls
+
+95
+00:05:19,440 --> 00:05:21,390
+when the queue is full and empty,
+respectively.
+
+96
+00:05:22,680 --> 00:05:27,220
+Likewise, it can contains a pair of metric
+locks, a lock and take lock.
+
+97
+00:05:27,220 --> 00:05:30,650
+Which are used together with the atomic
+integer count to optimize
+
+98
+00:05:30,650 --> 00:05:33,910
+concurrent calls to put and take as
+described at this link.
+
+99
+00:05:41,430 --> 00:05:44,330
+The next step in implementing this pattern
+involves
+
+100
+00:05:44,330 --> 00:05:47,080
+developing all the monitor object's
+methods and data members.
+
+101
+00:05:48,190 --> 00:05:52,170
+We'll analyse a portion of the linked
+blocking queue implementation, so you may
+
+102
+00:05:52,170 --> 00:05:54,320
+want to download its source code,
+available
+
+103
+00:05:54,320 --> 00:05:56,230
+at this path name, and follow along.
+
+104
+00:05:56,230 --> 00:05:59,600
+There are two sub-steps involved in
+implementing
+
+105
+00:05:59,600 --> 00:06:02,040
+a monitor object's methods and data
+members.
+
+106
+00:06:02,040 --> 00:06:05,130
+The first sub step is to initialize its
+data members.
+
+107
+00:06:05,130 --> 00:06:07,890
+Including its monitor locks and monitor
+conditions.
+
+108
+00:06:08,930 --> 00:06:13,310
+For example, linked blocking queue
+initializes its reentrant locks, condition
+
+109
+00:06:13,310 --> 00:06:17,210
+objects, and the atomic integer in the
+class definition itself.
+
+110
+00:06:17,210 --> 00:06:20,040
+Likewise, its capacity, head, and last
+
+111
+00:06:20,040 --> 00:06:22,458
+data members are initialized in its
+constructor.
+
+112
+00:06:22,458 --> 00:06:27,310
+The second sub-step involves developing
+the interface and implementation methods
+
+113
+00:06:27,310 --> 00:06:30,820
+in accordance with the thread-safe
+interface pattern described at this link.
+
+114
+00:06:32,190 --> 00:06:35,290
+We'll examine portions of the put and take
+method implementation.
+
+115
+00:06:35,290 --> 00:06:38,470
+Which also applied the guarded suspension
+pattern described at this link.
+
+116
+00:06:39,490 --> 00:06:44,040
+The Put Method inserts its element E
+parameter into the queue using the guarded
+
+117
+00:06:44,040 --> 00:06:48,220
+suspension pattern to wait for space to
+become available if the queue is full.
+
+118
+00:06:50,160 --> 00:06:53,080
+Put initializes the AtomicInteger to the
+number of elements in the.
+
+119
+00:06:53,080 --> 00:06:55,150
+Queue and then acquires the putLock.
+
+120
+00:06:56,390 --> 00:07:00,090
+Once this lock is acquired, a try block is
+used to check if the queue is
+
+121
+00:07:00,090 --> 00:07:04,490
+full, which occurs as long as the number
+of nodes in the queue equals the capacity.
+
+122
+00:07:05,630 --> 00:07:07,410
+While the queue is full, the calling
+
+123
+00:07:07,410 --> 00:07:10,300
+thread waits on the not full condition
+object.
+
+124
+00:07:10,300 --> 00:07:13,380
+Once another thread notifies the queue
+it's no longer full,.
+
+125
+00:07:13,380 --> 00:07:16,310
+The loop exits, and the enqueue
+implementation method is
+
+126
+00:07:16,310 --> 00:07:19,220
+called, which links the newly created node
+into the queue.
+
+127
+00:07:20,920 --> 00:07:25,250
+Since enqueue is an implementation method,
+it assumes its caller hold the put lock.
+
+128
+00:07:26,590 --> 00:07:29,850
+After enqueue returns, the atomic integer
+is used to check if the queue
+
+129
+00:07:29,850 --> 00:07:34,910
+is still not full, in which case the not
+full condition object is signaled.
+
+130
+00:07:34,910 --> 00:07:37,780
+There by allowing other waiting threads
+successfully
+
+131
+00:07:37,780 --> 00:07:39,160
+put an element on to the queue.
+
+132
+00:07:40,550 --> 00:07:44,010
+When the tri block is done, the putlock is
+released automatically.
+
+133
+00:07:45,100 --> 00:07:49,530
+Finally, if local variable c equals 0,
+which indicates the queue is
+
+134
+00:07:49,530 --> 00:07:54,070
+no longer empty, since the actual kind of
+elements is c plus 1.
+
+135
+00:07:54,070 --> 00:07:55,609
+The signal not empty method is called.
+
+136
+00:07:56,810 --> 00:08:00,970
+This method acquires the takeLock and
+signals the notEmpty condition object to
+
+137
+00:08:00,970 --> 00:08:04,950
+notify any thread blocked on take that the
+queue is no longer empty.
+
+138
+00:08:06,710 --> 00:08:11,130
+We'll now briefly outline the take method
+implementation which retrieves and removes
+
+139
+00:08:11,130 --> 00:08:13,150
+the head of the queue, waiting
+
+140
+00:08:13,150 --> 00:08:15,409
+if necessary until an element becomes
+available.
+
+141
+00:08:17,160 --> 00:08:19,810
+The portion of its implementation shown on
+this slide
+
+142
+00:08:19,810 --> 00:08:22,600
+is similar to the put method we just
+analyzed.
+
+143
+00:08:22,600 --> 00:08:26,810
+For example Take acquires the takelock
+waits on the not empty
+
+144
+00:08:26,810 --> 00:08:30,720
+condition object while the number of
+elements in the queue equals 0.
+
+145
+00:08:30,720 --> 00:08:34,620
+And then dequeues and returns the head
+element in the queue to the caller.
+
+146
+00:08:36,330 --> 00:08:39,270
+Take also signals the notEmpty and
+notFullCondition objects
+
+147
+00:08:39,270 --> 00:08:41,650
+in a manner similar to the put method.
+
+148
+00:08:41,650 --> 00:08:43,660
+So you may want to examine the Android
+source
+
+149
+00:08:43,660 --> 00:08:46,150
+code for all the details that aren't
+covered here.
+
+150
+00:08:53,650 --> 00:08:55,070
+Now that we've shown how the link
+
+151
+00:08:55,070 --> 00:08:57,390
+blocking queue implements the monitor
+object pattern.
+
+152
+00:08:57,390 --> 00:08:59,380
+I'll show an example of where
+
+153
+00:08:59,380 --> 00:09:02,160
+this pattern-oriented queue is applied in
+Android.
+
+154
+00:09:03,330 --> 00:09:06,690
+This example is part of the Android
+calendar application located
+
+155
+00:09:06,690 --> 00:09:11,140
+at this path name which displays, creates,
+edits, and deletes events.
+
+156
+00:09:11,140 --> 00:09:14,230
+From each Google account that synchronizes
+with an Android device.
+
+157
+00:09:15,440 --> 00:09:18,860
+This application contains an event loader
+class shown at this path
+
+158
+00:09:18,860 --> 00:09:23,820
+name which contains a link blocking queue
+that's initialized in it's constructors.
+
+159
+00:09:25,320 --> 00:09:29,420
+Event loader methods running in the user
+interface thread can use this queue to
+
+160
+00:09:29,420 --> 00:09:33,900
+put requests for one or more days worth of
+events to a loader thread.
+
+161
+00:09:33,900 --> 00:09:35,410
+Which takes the request.
+
+162
+00:09:35,410 --> 00:09:37,990
+And queries the Android Calendar provider.
+
+163
+00:09:37,990 --> 00:09:41,275
+Describe at this link, to load the
+designated events
+
+164
+00:09:41,275 --> 00:09:44,420
+from an SQLA database and display them to
+the user.
+
+165
+00:09:46,020 --> 00:09:50,810
+The loader thread is created and launched
+in the Start Background Thread method.
+
+166
+00:09:50,810 --> 00:09:55,350
+For example, the Event loaders load events
+in background method, sends a
+
+167
+00:09:55,350 --> 00:09:59,490
+load request to the loader thread by the
+linked blocking used Quick Method.
+
+168
+00:10:00,690 --> 00:10:04,670
+Likewise, the loader threads run method
+blocks a
+
+169
+00:10:04,670 --> 00:10:08,160
+link blocking queues Take method, waiting
+for newer quests.
+
+170
+00:10:09,870 --> 00:10:14,050
+When the loader thread receives a request,
+it calls processed request.
+
+171
+00:10:15,510 --> 00:10:17,250
+This method triggers a series of method
+
+172
+00:10:17,250 --> 00:10:20,910
+calls, that ultimately query the Android
+calendar provider.
+
+173
+00:10:20,910 --> 00:10:23,710
+To load the requested events from a
+database on the device.
+
+174
+00:10:25,130 --> 00:10:28,450
+Query can be a long running call, so it
+should be done in a background
+
+175
+00:10:28,450 --> 00:10:30,690
+thread to avoid blocking the user
+interface
+
+176
+00:10:30,690 --> 00:10:33,640
+thread and triggering an application not
+responding exception.
+
+177
+00:10:34,930 --> 00:10:39,280
+When the query is done, the process
+request method posts a runable call back
+
+178
+00:10:39,280 --> 00:10:41,640
+to the user interface thread, which
+formats
+
+179
+00:10:41,640 --> 00:10:43,550
+and displays the calendar events to the
+user.
+
+180
+00:10:44,880 --> 00:10:48,550
+The next module in the section will
+explain how android concurrency frame
+
+181
+00:10:48,550 --> 00:10:52,590
+rates can post runnables from background
+threads to the use interface thread.
+
+182
+00:10:52,590 --> 00:10:55,570
+In the meantime this link provides an
+overview of
+
+183
+00:10:55,570 --> 00:10:59,750
+the Android application threading model
+that explains how post works.
+
+184
+00:10:59,750 --> 00:11:02,360
+So you might want to read this material
+
+185
+00:11:02,360 --> 00:11:05,959
+to prepare for our discussion in an
+upcoming video.
+
+186
+00:11:05,959 --> 00:11:11,086
+[MUSIC]
+
+187
+00:11:11,086 --> 00:11:15,511
+In summary, Android applies the monitor
+object pattern directly or indirectly to
+
+188
+00:11:15,511 --> 00:11:19,618
+many of its class libraries and frameworks
+that are accessed concurrently by
+
+189
+00:11:19,618 --> 00:11:22,210
+multiple threads; including the A-synch
+task
+
+190
+00:11:22,210 --> 00:11:24,485
+framework and various blocking queues and
+
+191
+00:11:24,485 --> 00:11:27,203
+decks, and thread pool executor
+implementations
+
+192
+00:11:27,203 --> 00:11:30,160
+provided by the Java Util Concurrent
+package.
+
+193
+00:11:30,160 --> 00:11:31,210
+Describe at this link.
+
+194
+00:11:32,300 --> 00:11:34,500
+In general, android implements monitor
+
+195
+00:11:34,500 --> 00:11:37,760
+objects via the Java.util.concurrency
+mechanisms, rather
+
+196
+00:11:37,760 --> 00:11:41,740
+than the synchronize methods provided by
+java built in monitor objects.
+
+197
+00:11:41,740 --> 00:11:43,310
+Thee mechanisms enable developers of
+
+198
+00:11:43,310 --> 00:11:46,000
+monitor objects more fine grained
+serialization
+
+199
+00:11:46,000 --> 00:11:49,310
+and provide greater flexibility and
+capabilities
+
+200
+00:11:49,310 --> 00:11:51,800
+than Java's built in monitor objects.
+
+201
+00:11:51,800 --> 00:11:54,422
+The key point, however, is that knowledge
+of
+
+202
+00:11:54,422 --> 00:11:58,125
+the monitor object pattern guided the
+design and implementation
+
+203
+00:11:58,125 --> 00:12:01,892
+of these Android software component,
+regardless of whether they
+
+204
+00:12:01,892 --> 00:12:05,547
+used the built-in or user defined monitor
+object mechanisms.
+
+205
+00:12:05,547 --> 00:12:13,559
+[MUSIC]
+

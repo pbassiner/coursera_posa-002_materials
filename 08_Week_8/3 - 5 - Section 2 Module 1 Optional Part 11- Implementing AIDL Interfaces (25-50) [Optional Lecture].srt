@@ -1,0 +1,2239 @@
+1
+00:00:00,697 --> 00:00:08,086
+[MUSIC]
+
+2
+00:00:08,086 --> 00:00:12,494
+Okay, so that's just a quick overview of
+essentially the type
+
+3
+00:00:12,494 --> 00:00:17,411
+system that you have with AIDL and using
+those basic building blocks.
+
+4
+00:00:17,411 --> 00:00:20,729
+Then we can make all kinds of other
+interesting things.
+
+5
+00:00:20,729 --> 00:00:24,263
+I did a little little experiment, just for
+fun I ran a search
+
+6
+00:00:24,263 --> 00:00:28,608
+through all the Android source code to see
+how often they use AIDL interfaces.
+
+7
+00:00:28,608 --> 00:00:29,988
+And I found hundreds and hundreds of
+
+8
+00:00:29,988 --> 00:00:32,140
+examples of where it's used in the
+frameworks.
+
+9
+00:00:32,140 --> 00:00:34,010
+It's used a little bit less over in
+
+10
+00:00:34,010 --> 00:00:37,520
+the apps and providers portion of the
+packages directory.
+
+11
+00:00:37,520 --> 00:00:38,600
+But it's still used there as well.
+
+12
+00:00:38,600 --> 00:00:40,230
+It's used probably a dozen or so times.
+
+13
+00:00:40,230 --> 00:00:43,180
+But it's used hundreds of times in the
+main part of Android.
+
+14
+00:00:43,180 --> 00:00:47,050
+Which means you are often accessing stuff
+as a, an app
+
+15
+00:00:47,050 --> 00:00:50,600
+developer, an Android that is using AIDL
+in one way or another.
+
+16
+00:00:50,600 --> 00:00:53,020
+So getting, getting to know how it works
+is useful.
+
+17
+00:00:53,020 --> 00:00:55,970
+All right the next thing I want to talk
+about is
+
+18
+00:00:55,970 --> 00:01:02,630
+how you go about actually implementing
+AIDL interfaces using, using eclipse.
+
+19
+00:01:02,630 --> 00:01:05,780
+And then, kind of talk about sort of
+what's going on under the hood.
+
+20
+00:01:05,780 --> 00:01:09,880
+Now, some of what we're going to talk
+about here is not strictly necessary.
+
+21
+00:01:09,880 --> 00:01:12,260
+You can get a long way in life as an
+Android
+
+22
+00:01:12,260 --> 00:01:15,600
+developer and not know some of things I'm
+going to tell you.
+
+23
+00:01:15,600 --> 00:01:16,680
+But I'm going to show some of it to you
+
+24
+00:01:16,680 --> 00:01:19,140
+because I think it's interesting to learn
+how it works.
+
+25
+00:01:19,140 --> 00:01:21,040
+And as I mentioned last time it's also
+useful because it
+
+26
+00:01:21,040 --> 00:01:27,150
+helps you appreciate the tedious and error
+prone programming you're not doing.
+
+27
+00:01:27,150 --> 00:01:29,480
+Because it's done for you by having a AIDL
+compiler.
+
+28
+00:01:30,810 --> 00:01:32,950
+All right, first let's talk about how you
+use eclipse.
+
+29
+00:01:32,950 --> 00:01:36,460
+So basically what you do, it's really
+easy, if you're not
+
+30
+00:01:36,460 --> 00:01:38,610
+using eclipse there's a few other steps
+you may have to do.
+
+31
+00:01:38,610 --> 00:01:40,500
+But if you're using eclipse it's really
+simple.
+
+32
+00:01:40,500 --> 00:01:43,380
+You go ahead and create a bunch of AIDL
+files.
+
+33
+00:01:43,380 --> 00:01:47,740
+So here's an example where I've got AIDL
+files that are in
+
+34
+00:01:47,740 --> 00:01:51,090
+my source directory and you can organize
+this as you see fit.
+
+35
+00:01:51,090 --> 00:01:53,090
+One common way to do it is you might put
+your
+
+36
+00:01:53,090 --> 00:01:58,360
+AIDL files in a separate sub folder under
+the source folder.
+
+37
+00:01:58,360 --> 00:02:03,770
+So that you can have AIDL files separate
+from the normal Java files.
+
+38
+00:02:03,770 --> 00:02:05,650
+That's just one thing you can do.
+
+39
+00:02:05,650 --> 00:02:11,100
+And so, what eclipse would then do is it
+will go ahead and automatically compile
+
+40
+00:02:11,100 --> 00:02:16,040
+every file that finds in the source
+directory that isn't a .AILD file.
+
+41
+00:02:16,040 --> 00:02:17,820
+It sticks those files.
+
+42
+00:02:17,820 --> 00:02:22,450
+Which are then converted into Java files
+in the gen directory.
+
+43
+00:02:22,450 --> 00:02:25,330
+So source and gen are basically peers.
+
+44
+00:02:25,330 --> 00:02:31,220
+They're siblings at the same level of the,
+the directory hierarchy of the Eclipse.
+
+45
+00:02:31,220 --> 00:02:34,760
+And the way the packages and projects work
+and so on.
+
+46
+00:02:34,760 --> 00:02:36,720
+And so if you go take a look at.
+
+47
+00:02:36,720 --> 00:02:38,560
+If you very quickly take a look at the gen
+
+48
+00:02:38,560 --> 00:02:41,230
+directory after you plop AIDL files into
+the source directory.
+
+49
+00:02:41,230 --> 00:02:44,340
+You will discover that the ADL, AIDL
+compiler has
+
+50
+00:02:44,340 --> 00:02:47,300
+run, and it's created Java files on your
+behalf.
+
+51
+00:02:47,300 --> 00:02:50,040
+And the Java files contain a bunch of
+things, and we'll talk about them.
+
+52
+00:02:50,040 --> 00:02:52,360
+One thing they contain is an actual
+interface,
+
+53
+00:02:52,360 --> 00:02:55,250
+a Java interface, that corresponds to your
+interface.
+
+54
+00:02:55,250 --> 00:02:57,310
+And that's very important for what you're
+doing.
+
+55
+00:02:57,310 --> 00:02:59,450
+Then they also contain a couple of other
+things as well.
+
+56
+00:02:59,450 --> 00:03:02,930
+They also contain a stub, which you're
+going to, is
+
+57
+00:03:02,930 --> 00:03:05,860
+going to be used by the service that
+implements this thing.
+
+58
+00:03:05,860 --> 00:03:08,480
+Or it doesnt always have to be a service,
+whoever the
+
+59
+00:03:08,480 --> 00:03:12,900
+implementor is, of the interface will be
+relating to the stub.
+
+60
+00:03:12,900 --> 00:03:17,350
+And there's also something called a proxy,
+and that's what the client will be using.
+
+61
+00:03:17,350 --> 00:03:20,920
+Now, when you're dealing with just
+conventional synchronous
+
+62
+00:03:20,920 --> 00:03:25,600
+communication between activities and
+services or services and services.
+
+63
+00:03:25,600 --> 00:03:28,320
+Then, in that case, the proxy is typically
+
+64
+00:03:28,320 --> 00:03:32,690
+used by the activity or the client, and
+the.
+
+65
+00:03:32,690 --> 00:03:35,070
+Stub is used by the service.
+
+66
+00:03:35,070 --> 00:03:37,640
+But as we'll see when we start doing
+asynchronous calls, the
+
+67
+00:03:37,640 --> 00:03:41,060
+concept of a client and service gets
+flipped around a little bit.
+
+68
+00:03:41,060 --> 00:03:44,390
+And so, you actually may have an activity
+that is also implementing a stub.
+
+69
+00:03:44,390 --> 00:03:48,370
+And that's so it can get call-backs that
+come back to it from the service.
+
+70
+00:03:48,370 --> 00:03:52,120
+Which is invoking one-way methods on
+call-back objects that where passed to it.
+
+71
+00:03:52,120 --> 00:03:54,540
+And we'll talk about that and I'll show
+you the examples.
+
+72
+00:03:54,540 --> 00:03:56,110
+That, that's one reason why I wanted to
+skip the
+
+73
+00:03:56,110 --> 00:03:57,910
+quiz, so I could cover all that stuff in
+detail.
+
+74
+00:03:58,960 --> 00:03:59,210
+Okay.
+
+75
+00:03:59,210 --> 00:04:01,260
+And if you take a look at the
+documentation here,
+
+76
+00:04:01,260 --> 00:04:05,150
+you'll find out lots more information
+about how AIDL works.
+
+77
+00:04:05,150 --> 00:04:07,360
+Now, there's a lot of different moving
+parts here, and it
+
+78
+00:04:07,360 --> 00:04:10,400
+helps to break them down by a number of
+different criteria.
+
+79
+00:04:10,400 --> 00:04:12,040
+So, let's kind of do this.
+
+80
+00:04:12,040 --> 00:04:17,210
+Assuming we have an interface, like the
+iDownload interface, then we're going to
+
+81
+00:04:17,210 --> 00:04:20,240
+go ahead and have a couple of different
+kinds of entities involved.
+
+82
+00:04:20,240 --> 00:04:22,150
+And when you take a look at your
+
+83
+00:04:22,150 --> 00:04:24,270
+implementation when you take look at the
+generated code.
+
+84
+00:04:24,270 --> 00:04:27,360
+You'll see all these things and how they,
+they appear.
+
+85
+00:04:27,360 --> 00:04:29,640
+So I'm just going to give you high level
+view first.
+
+86
+00:04:29,640 --> 00:04:33,020
+So there's some stuff that comes out of
+Android, out of the box.
+
+87
+00:04:33,020 --> 00:04:37,290
+There's this IBinder interface that's
+defined as part of Android.
+
+88
+00:04:37,290 --> 00:04:41,130
+There's a binder class which is defined as
+part of Android.
+
+89
+00:04:41,130 --> 00:04:43,980
+The binder is typically something that's
+local.
+
+90
+00:04:43,980 --> 00:04:46,300
+And the IBinder is an interface that
+allows you to be
+
+91
+00:04:46,300 --> 00:04:50,290
+able to access something whose
+implementation may in fact be remote.
+
+92
+00:04:50,290 --> 00:04:53,180
+Where remote means in a separate process.
+
+93
+00:04:53,180 --> 00:04:55,100
+So those are the things that Android gives
+
+94
+00:04:55,100 --> 00:04:57,140
+you out of the box, their always
+available.
+
+95
+00:04:57,140 --> 00:05:00,600
+Then there's certain things that are
+generated by the AIDLcompiler.
+
+96
+00:05:00,600 --> 00:05:05,050
+So the AIDL compiler will generate the
+stub class that's nested
+
+97
+00:05:05,050 --> 00:05:08,290
+inside of this other interface we're going
+to talk about later.
+
+98
+00:05:08,290 --> 00:05:10,930
+And then there's also proxy class which
+
+99
+00:05:10,930 --> 00:05:14,120
+is nested inside the stub for various
+reasons.
+
+100
+00:05:14,120 --> 00:05:16,740
+And we'll see how those guys get used in a
+second.
+
+101
+00:05:16,740 --> 00:05:19,950
+And then finally what you do as an
+implementer of the service.
+
+102
+00:05:19,950 --> 00:05:22,050
+That wants to define this interface that
+
+103
+00:05:22,050 --> 00:05:24,410
+wants to provide an implementation to this
+interface.
+
+104
+00:05:24,410 --> 00:05:28,920
+You come along and you inherit from the
+generated stub
+
+105
+00:05:28,920 --> 00:05:32,950
+and you override the methods that were
+defined in the interface.
+
+106
+00:05:32,950 --> 00:05:35,520
+So that you give implementations that are
+meaningful
+
+107
+00:05:35,520 --> 00:05:38,130
+in whatever it is your trying to do.
+
+108
+00:05:38,130 --> 00:05:39,460
+And it turns out that this particular
+
+109
+00:05:39,460 --> 00:05:42,340
+hierarchy here the one that goes like
+this.
+
+110
+00:05:43,660 --> 00:05:46,680
+These are all service related kinds of
+things and
+
+111
+00:05:46,680 --> 00:05:49,900
+then the proxy is something that the
+client uses.
+
+112
+00:05:49,900 --> 00:05:55,510
+So the client uses the proxy, the other
+service side, the server side.
+
+113
+00:05:55,510 --> 00:05:59,730
+Which, which might be a service or it may
+be a service that's a call back service.
+
+114
+00:05:59,730 --> 00:06:04,950
+Those things are inheriting from, from the
+the binder hierarchy.
+
+115
+00:06:04,950 --> 00:06:09,760
+And there's a real nice tutorial out there
+that talks about all this stuff.
+
+116
+00:06:09,760 --> 00:06:11,680
+There are a lot of great tutorials, by the
+way, on,
+
+117
+00:06:11,680 --> 00:06:15,920
+on binders and AIDL so if there's anything
+you're confused about.
+
+118
+00:06:15,920 --> 00:06:17,990
+And my conversation, you might want to
+take a look and there's
+
+119
+00:06:17,990 --> 00:06:21,220
+lots more material out there you can take
+a look at.
+
+120
+00:06:21,220 --> 00:06:23,260
+So let's take a little bit of time and
+kind of look at
+
+121
+00:06:23,260 --> 00:06:27,480
+what actually is spit out by the AIDL
+compactor, cause it's kind of cool.
+
+122
+00:06:27,480 --> 00:06:30,420
+So you'll see that what happens is that
+there's this
+
+123
+00:06:30,420 --> 00:06:37,010
+interface that's generated and that
+extends this I interface class.
+
+124
+00:06:37,010 --> 00:06:38,360
+Our interface.
+
+125
+00:06:38,360 --> 00:06:43,030
+And then there's a static abstract class
+called a stub
+
+126
+00:06:43,030 --> 00:06:45,730
+and as you can see here it extends the
+binder.
+
+127
+00:06:45,730 --> 00:06:47,920
+And it also implements your interface.
+
+128
+00:06:47,920 --> 00:06:49,470
+So in our case, that was the, the
+
+129
+00:06:49,470 --> 00:06:52,600
+I download interface which has the
+download image method.
+
+130
+00:06:52,600 --> 00:06:56,560
+So there's a class called stub and it
+inherits.
+
+131
+00:06:56,560 --> 00:07:01,510
+From binder, and it implements the
+download, interface.
+
+132
+00:07:02,680 --> 00:07:06,000
+And, then basically, this is this thing
+that's going to
+
+133
+00:07:06,000 --> 00:07:08,340
+be sort of on the implementation side of
+the house.
+
+134
+00:07:08,340 --> 00:07:12,590
+And then there's a constructor for stub,
+that's going to go ahead and register.
+
+135
+00:07:12,590 --> 00:07:16,360
+An instance of this object with the
+underlying binder framework.
+
+136
+00:07:16,360 --> 00:07:19,520
+So that's how the binder framework knows
+that
+
+137
+00:07:19,520 --> 00:07:21,660
+you've got an object that needs to be
+dispatched.
+
+138
+00:07:21,660 --> 00:07:24,770
+It registers it by using thing called
+attach interface.
+
+139
+00:07:26,630 --> 00:07:28,780
+There's also another method that's very
+important.
+
+140
+00:07:28,780 --> 00:07:31,670
+We see this getting used a couple
+different places called.
+
+141
+00:07:31,670 --> 00:07:35,890
+As interface, and as interface is used by,
+
+142
+00:07:35,890 --> 00:07:39,940
+typically used by the on service connected
+hook method.
+
+143
+00:07:39,940 --> 00:07:42,110
+That gets called back by the Android
+
+144
+00:07:42,110 --> 00:07:46,070
+binder framework and the bound service
+framework.
+
+145
+00:07:46,070 --> 00:07:50,240
+When the onbind method returns, and what
+that does is it allows you to
+
+146
+00:07:50,240 --> 00:07:55,180
+take a binder object or an IBinder object
+which is what comes back from.
+
+147
+00:07:55,180 --> 00:08:01,170
+The server side, the service side, and be
+able to narrow it, or downcast it down
+
+148
+00:08:01,170 --> 00:08:06,840
+to the appropriate underlying, interface
+that we're trying to define here.
+
+149
+00:08:06,840 --> 00:08:09,490
+Which in our case would be the IDownload
+service.
+
+150
+00:08:09,490 --> 00:08:11,270
+And you can see it's got a bunch of
+gobbledygook
+
+151
+00:08:11,270 --> 00:08:14,140
+code here where it's trying to check to
+see whether.
+
+152
+00:08:14,140 --> 00:08:17,770
+We need to have a proxy made, or whether
+we're the server side, whatnot.
+
+153
+00:08:17,770 --> 00:08:19,830
+And if we need a proxy, which we're going
+to in
+
+154
+00:08:19,830 --> 00:08:26,800
+this case, it goes ahead and it says, new
+IDownload.Stub.Proxy obj.
+
+155
+00:08:26,800 --> 00:08:27,570
+And that creates a proxy.
+
+156
+00:08:27,570 --> 00:08:30,260
+I'm going to look at the proxy on the next
+page, two, two pages from now.
+
+157
+00:08:31,750 --> 00:08:33,470
+In fact, lemme, I tell you what, Let's go
+take a look at
+
+158
+00:08:33,470 --> 00:08:35,910
+the proxy real quick and I'll come back
+and talk about the other stuff.
+
+159
+00:08:35,910 --> 00:08:37,670
+So, here's what the proxy looks like.
+
+160
+00:08:37,670 --> 00:08:42,100
+The proxy is nested inside of the stub.
+
+161
+00:08:42,100 --> 00:08:49,660
+And basically what the proxy does is, the
+proxy's going to stash away the IBinder.
+
+162
+00:08:49,660 --> 00:08:52,250
+And then it's going to use it shortly.
+
+163
+00:08:52,250 --> 00:08:59,560
+And it's going to use it when the client
+calls the method through the proxy.
+
+164
+00:08:59,560 --> 00:09:02,590
+The method, in our case, being
+downloadImage.
+
+165
+00:09:02,590 --> 00:09:06,830
+So when the client calls downloadImage on
+the proxy.
+
+166
+00:09:06,830 --> 00:09:09,930
+What happens is you can see here is that
+it takes in the string.
+
+167
+00:09:09,930 --> 00:09:13,180
+Which is the URI and this, this code by
+
+168
+00:09:13,180 --> 00:09:15,110
+the way is all autogenerated by the ALDI
+compiler.
+
+169
+00:09:15,110 --> 00:09:18,500
+And you can see as you look at it its all
+pretty low level and nasty.
+
+170
+00:09:18,500 --> 00:09:21,140
+And whats it essentially doing is its
+creating a pair of
+
+171
+00:09:21,140 --> 00:09:25,630
+parcels to contain the data that were
+going to send over there.
+
+172
+00:09:25,630 --> 00:09:27,560
+And to get the reply back, it's creating
+
+173
+00:09:27,560 --> 00:09:30,490
+these two parcels and then it's going
+ahead.
+
+174
+00:09:30,490 --> 00:09:33,510
+And it's going to take the URI that we
+pass in and
+
+175
+00:09:33,510 --> 00:09:38,278
+it's going to write it as a string into
+the underscored data parcel.
+
+176
+00:09:38,278 --> 00:09:41,820
+So that, [INAUDIBLE] basically doing is
+it's copying the, the bytes
+
+177
+00:09:41,820 --> 00:09:45,300
+in our URI that's coming, it's coming from
+the client side.
+
+178
+00:09:45,300 --> 00:09:50,420
+Into this parcel, which keeps track of
+it's type and other metadata.
+
+179
+00:09:50,420 --> 00:09:53,130
+Then it goes ahead and calls this method
+called transact.
+
+180
+00:09:53,130 --> 00:09:54,940
+And we'll cover that in a second.
+
+181
+00:09:54,940 --> 00:09:58,920
+And what transact does is it says, here's
+the operation that I want performed.
+
+182
+00:09:58,920 --> 00:10:00,250
+I want to do the.
+
+183
+00:10:00,250 --> 00:10:03,230
+Transaction download image operation.
+
+184
+00:10:03,230 --> 00:10:05,130
+And here's the data it should work on,
+which
+
+185
+00:10:05,130 --> 00:10:08,270
+in this case is the string containing the
+URI.
+
+186
+00:10:08,270 --> 00:10:10,150
+And here's where I want you to put the
+reply.
+
+187
+00:10:10,150 --> 00:10:13,840
+And we'll see what happens in a second in
+that method.
+
+188
+00:10:13,840 --> 00:10:16,660
+And then when it's done, when this thing
+returns, we take the
+
+189
+00:10:16,660 --> 00:10:22,680
+reply and we copy its result as a string
+into underscore result.
+
+190
+00:10:22,680 --> 00:10:27,390
+And that's what we return as the return
+value from that particular method.
+
+191
+00:10:27,390 --> 00:10:29,897
+So as I, as I say here I simplified this
+ever so much.
+
+192
+00:10:29,897 --> 00:10:33,810
+Just because I wanted to make sure that
+you would be able
+
+193
+00:10:33,810 --> 00:10:38,760
+to follow along with what it's doing
+without getting it too complicated.
+
+194
+00:10:39,820 --> 00:10:44,460
+Here then is the method called in response
+to the call to transact.
+
+195
+00:10:44,460 --> 00:10:47,398
+So as you can see here we call download
+image.
+
+196
+00:10:47,398 --> 00:10:53,370
+That calls mRemote, which is the remote
+binder object or a proxy to it.
+
+197
+00:10:54,760 --> 00:11:01,570
+transact, that ends up calling back in the
+stub, the on transact method.
+
+198
+00:11:01,570 --> 00:11:03,460
+And you can see what on transact does is
+it takes a
+
+199
+00:11:03,460 --> 00:11:07,710
+look at the code, keep in mind the code is
+shown over here.
+
+200
+00:11:07,710 --> 00:11:10,490
+Here's the code that was passed in the
+transaction.
+
+201
+00:11:10,490 --> 00:11:11,740
+Download image.
+
+202
+00:11:11,740 --> 00:11:12,700
+And it has a bunch of stuff.
+
+203
+00:11:12,700 --> 00:11:14,480
+I'm just showing the part that's
+important.
+
+204
+00:11:14,480 --> 00:11:17,740
+It says, if this is the transaction on
+download image, or
+
+205
+00:11:17,740 --> 00:11:23,490
+download image case, then go ahead, and
+read its data string.
+
+206
+00:11:23,490 --> 00:11:26,240
+And then, invoke an up call, on the
+
+207
+00:11:26,240 --> 00:11:30,670
+actual implementation method, that was
+defined by the user.
+
+208
+00:11:30,670 --> 00:11:32,780
+Who subclass this whole thing in the first
+place.
+
+209
+00:11:32,780 --> 00:11:34,870
+We'll look at that in a couple slides.
+
+210
+00:11:34,870 --> 00:11:37,570
+That's the actual call that does the
+actual work.
+
+211
+00:11:37,570 --> 00:11:41,870
+And so it demarshals the parameter and
+passes it to the call back.
+
+212
+00:11:41,870 --> 00:11:44,740
+And then when it comes back here as a
+string and it marshals that up
+
+213
+00:11:44,740 --> 00:11:48,960
+as a string and then that gets sent back
+over to the client as a reply.
+
+214
+00:11:50,910 --> 00:11:52,720
+Ok, so any questions about that?
+
+215
+00:11:52,720 --> 00:11:58,390
+So, that's basically the set of things
+that the proxy and stub
+
+216
+00:11:58,390 --> 00:12:04,290
+are doing under the hood to do stuff like
+register you.
+
+217
+00:12:05,320 --> 00:12:07,250
+So here's, I'll highlight this guy.
+
+218
+00:12:07,250 --> 00:12:14,500
+To go ahead and register, the stub
+instances, these, these binder objects
+
+219
+00:12:14,500 --> 00:12:19,550
+so that they can be dispatched ultimately
+by the, by the binder framework.
+
+220
+00:12:19,550 --> 00:12:21,050
+It has a way of being able to take
+
+221
+00:12:21,050 --> 00:12:22,880
+an IBinder and turning it back into your
+interface.
+
+222
+00:12:22,880 --> 00:12:26,980
+As part of that process it may have to
+create a proxy.
+
+223
+00:12:26,980 --> 00:12:30,948
+The proxy is an object that has a method,
+has the same name
+
+224
+00:12:30,948 --> 00:12:36,006
+as the receiver, but when it's invoked,
+it, it doesn't do the work.
+
+225
+00:12:36,006 --> 00:12:38,267
+It goes ahead and marshals the parameters,
+
+226
+00:12:38,267 --> 00:12:40,660
+calls this transact method to pass them
+over.
+
+227
+00:12:40,660 --> 00:12:44,010
+And then when it comes back it takes the
+return value and then cracks
+
+228
+00:12:44,010 --> 00:12:48,090
+it open and returns it back to something
+that's expected by the, the caller.
+
+229
+00:12:48,090 --> 00:12:54,150
+To notice what's going on here, is that
+this is Java land and this is sort of
+
+230
+00:12:54,150 --> 00:12:59,420
+goobledily gook, passing data around,
+possible between different languages land.
+
+231
+00:12:59,420 --> 00:13:01,950
+And so, this is the linearization stage.
+
+232
+00:13:01,950 --> 00:13:03,980
+So, I think I mentioned before that, what
+a.
+
+233
+00:13:03,980 --> 00:13:08,920
+What a proxy does is it converts a method
+call into a message.
+
+234
+00:13:08,920 --> 00:13:11,380
+And that message is something that
+represents the information in the
+
+235
+00:13:11,380 --> 00:13:14,920
+method call so that it can be passed over
+to a receiver.
+
+236
+00:13:14,920 --> 00:13:18,200
+And that receiver doesn't have to be
+written in the same language it
+
+237
+00:13:18,200 --> 00:13:21,010
+doesn't run in the same address phase and
+so on and so forth.
+
+238
+00:13:21,010 --> 00:13:22,400
+So, it gives you flexibility to
+
+239
+00:13:22,400 --> 00:13:26,219
+pass information correctly and efficiently
+across processes.
+
+240
+00:13:27,670 --> 00:13:31,570
+The receiver side, the stub side gets
+called back as the
+
+241
+00:13:31,570 --> 00:13:35,540
+objects come up, fall underneath the
+binder framework and [UNKNOWN] binder.
+
+242
+00:13:35,540 --> 00:13:39,040
+And the on transact method is called and
+that does this stuff.
+
+243
+00:13:39,040 --> 00:13:42,510
+And that ends up ultimately calling the
+download image method that we
+
+244
+00:13:42,510 --> 00:13:46,779
+have to implement as the people who want
+to define this service.
+
+245
+00:13:47,780 --> 00:13:49,340
+So let's take a look at that part.
+
+246
+00:13:49,340 --> 00:13:51,180
+So, now that we've talked about the
+
+247
+00:13:51,180 --> 00:13:53,970
+generated proxy and the generated stub,
+let's
+
+248
+00:13:53,970 --> 00:13:57,010
+talk a little bit more about what you
+actually do to use this stuff.
+
+249
+00:13:57,010 --> 00:13:59,540
+Everything I've talked about for the past
+ten minutes you really
+
+250
+00:13:59,540 --> 00:14:02,280
+don't have to know in order to use what
+I'm talking about.
+
+251
+00:14:02,280 --> 00:14:04,800
+But if useful as long as you understand
+the principles.
+
+252
+00:14:04,800 --> 00:14:06,960
+And by the way if you use other
+technologies like
+
+253
+00:14:06,960 --> 00:14:12,920
+Korbel or Microsoft com, or other things
+like enterprise java beans.
+
+254
+00:14:12,920 --> 00:14:14,520
+They're doing essentially is the same kind
+of thing.
+
+255
+00:14:14,520 --> 00:14:17,130
+The patterns they use which will be stuff
+like the
+
+256
+00:14:17,130 --> 00:14:21,030
+proxy pattern, the adaptor pattern, the
+broker patter and so on.
+
+257
+00:14:21,030 --> 00:14:24,000
+Those are all the sam patterns, just
+different realizations.
+
+258
+00:14:24,000 --> 00:14:28,110
+In different languages in different
+middleware, frameworks in different ways.
+
+259
+00:14:28,110 --> 00:14:31,960
+Okay, so if you take a close look at the
+generated code, by the AIDL compiler.
+
+260
+00:14:31,960 --> 00:14:37,120
+You'll see that there's an abstract method
+called, a set of abstract methods.
+
+261
+00:14:37,120 --> 00:14:42,340
+One for every method that was defined in
+the original AIDL interface.
+
+262
+00:14:42,340 --> 00:14:45,040
+So if we have download image then there's
+going
+
+263
+00:14:45,040 --> 00:14:48,200
+to be an abstract method called download
+image here.
+
+264
+00:14:48,200 --> 00:14:50,250
+And we have to implement this.
+
+265
+00:14:50,250 --> 00:14:52,530
+And you either implement it by
+sub-classing it
+
+266
+00:14:52,530 --> 00:14:55,130
+from Stub or creating an anonymous inner
+class.
+
+267
+00:14:55,130 --> 00:14:57,410
+Or sub-classing and then forwarding.
+
+268
+00:14:57,410 --> 00:14:59,170
+You know, however you want to do it.
+
+269
+00:14:59,170 --> 00:15:01,960
+When the, somebody has to implement
+download image to
+
+270
+00:15:01,960 --> 00:15:03,670
+do the thing that you actually have to get
+done.
+
+271
+00:15:04,720 --> 00:15:05,330
+So, here's what you do.
+
+272
+00:15:05,330 --> 00:15:07,650
+You start out by typically creating a
+
+273
+00:15:07,650 --> 00:15:13,180
+private instance of an, the AIDL-generated
+Stub class.
+
+274
+00:15:13,180 --> 00:15:15,200
+And again there's various ways to do this,
+the most common
+
+275
+00:15:15,200 --> 00:15:18,880
+way you'll typically see people do it is
+they'll go ahead and.
+
+276
+00:15:18,880 --> 00:15:23,370
+Use this format where you make a new
+anonymous object, and
+
+277
+00:15:23,370 --> 00:15:27,400
+you give the implementation here, just
+like you guys are doing.
+
+278
+00:15:27,400 --> 00:15:29,790
+And that gets created somewhere, either in
+the OnCreate method
+
+279
+00:15:29,790 --> 00:15:31,710
+or it gets created at class scope or what
+not.
+
+280
+00:15:32,710 --> 00:15:36,730
+And then you fill in the implementation of
+this stuff as you see fit,
+
+281
+00:15:36,730 --> 00:15:39,160
+either implementing it directly or
+delegating it
+
+282
+00:15:39,160 --> 00:15:40,180
+to someone else to do the work.
+
+283
+00:15:40,180 --> 00:15:44,030
+And then the final thing you do is you
+make sure that, that object.
+
+284
+00:15:44,030 --> 00:15:49,650
+Is returned as the result from the on bind
+method, so that binder,
+
+285
+00:15:49,650 --> 00:15:54,810
+which implements this interface, is
+going to get returned back to the caller.
+
+286
+00:15:54,810 --> 00:15:57,260
+And, and we'll see later that, you know,
+think about how this comes back to you.
+
+287
+00:15:57,260 --> 00:16:00,080
+This comes back via the on service
+connected
+
+288
+00:16:00,080 --> 00:16:02,900
+call, that'll come back as a, as an
+iBinder.
+
+289
+00:16:02,900 --> 00:16:04,970
+And then you're going to go ahead and say,
+hey,
+
+290
+00:16:04,970 --> 00:16:07,740
+take this thing, and treat it as an
+interface.
+
+291
+00:16:07,740 --> 00:16:11,250
+Which will, narrow it down, using a proxy,
+to get
+
+292
+00:16:11,250 --> 00:16:13,100
+you back a way to talk to the interface
+itself.
+
+293
+00:16:14,972 --> 00:16:16,990
+All right, so let's kind of see, how all
+
+294
+00:16:16,990 --> 00:16:20,120
+of these pieces, actually work, end to
+end.
+
+295
+00:16:20,120 --> 00:16:22,330
+Because there's a lot of moving parts.
+
+296
+00:16:22,330 --> 00:16:24,880
+And some of them are pretty easy to
+understand some of the
+
+297
+00:16:24,880 --> 00:16:27,630
+more harder to understand, not all of them
+you have to understand.
+
+298
+00:16:27,630 --> 00:16:29,080
+But I'm going to show you how it works
+sort of
+
+299
+00:16:29,080 --> 00:16:32,060
+end to end to a certain level of, of
+detail.
+
+300
+00:16:32,060 --> 00:16:33,740
+So here we have a client, the client is
+
+301
+00:16:33,740 --> 00:16:38,700
+going to go ahead and call download image
+on the stub.proxy.
+
+302
+00:16:38,700 --> 00:16:40,340
+So we've got this proxy.
+
+303
+00:16:40,340 --> 00:16:42,490
+And it's going to say download image.
+
+304
+00:16:42,490 --> 00:16:45,010
+And as we saw that's going to convert
+
+305
+00:16:45,010 --> 00:16:50,280
+the parameter and the return result into
+parcels.
+
+306
+00:16:50,280 --> 00:16:55,760
+And those are going to get used to pass to
+n remote.transact.
+
+307
+00:16:55,760 --> 00:16:59,510
+And that's going to take the data that
+goes there and it's going to be.
+
+308
+00:16:59,510 --> 00:17:03,010
+Submitted by a lower level mechanism
+probably written
+
+309
+00:17:03,010 --> 00:17:06,280
+in the, you know, native code at some
+level.
+
+310
+00:17:06,280 --> 00:17:09,790
+That works atop the underlying LINUX
+operating system.
+
+311
+00:17:09,790 --> 00:17:13,690
+And it uses an IO control, an ioctl which
+is basically
+
+312
+00:17:13,690 --> 00:17:17,330
+a way of passing information to the low
+level device drivers.
+
+313
+00:17:17,330 --> 00:17:20,200
+The low level device driver in this
+particular case, of course.
+
+314
+00:17:20,200 --> 00:17:22,480
+Is the binary driver and that's the guy
+that knows how
+
+315
+00:17:22,480 --> 00:17:26,430
+to move the data back and forth between
+sender and receiver.
+
+316
+00:17:26,430 --> 00:17:29,890
+The data comes up on the other side; which
+causes the thread that's sitting
+
+317
+00:17:29,890 --> 00:17:34,550
+there waiting for the data to unblock from
+a call to ioctl, from ioctl.
+
+318
+00:17:34,550 --> 00:17:35,920
+And keep in mind there's a pool of threads
+
+319
+00:17:35,920 --> 00:17:38,890
+and they just take turns waiting for work
+to do.
+
+320
+00:17:38,890 --> 00:17:40,990
+And so some thread is chosen.
+
+321
+00:17:40,990 --> 00:17:42,870
+It's, it's turned to run.
+
+322
+00:17:42,870 --> 00:17:46,960
+And it takes the data which is pretty low
+level at this point and it goes ahead
+
+323
+00:17:46,960 --> 00:17:49,620
+and cracks it open, looks inside it and
+
+324
+00:17:49,620 --> 00:17:53,180
+figures out which binder object is this
+actually for.
+
+325
+00:17:53,180 --> 00:17:55,000
+And it uses that information that was
+
+326
+00:17:55,000 --> 00:17:57,470
+registered earlier when we called the, the
+attach
+
+327
+00:17:57,470 --> 00:17:59,840
+interface method on the stub, or, that was
+
+328
+00:17:59,840 --> 00:18:01,860
+called forest by the constructor of the
+stub.
+
+329
+00:18:01,860 --> 00:18:03,300
+it uses that information to go find the
+
+330
+00:18:03,300 --> 00:18:06,840
+appropriate binder object, and call it's
+on transact.
+
+331
+00:18:06,840 --> 00:18:06,990
+Hook.
+
+332
+00:18:06,990 --> 00:18:13,250
+And the on transact hook as we saw does
+the de-martialing of the parameter.
+
+333
+00:18:13,250 --> 00:18:16,800
+And it goes ahead and it invokes the up
+call, it's called
+
+334
+00:18:16,800 --> 00:18:20,670
+an up call, to the download image method
+on our particular service.
+
+335
+00:18:20,670 --> 00:18:23,340
+So that goes ahead and does its work.
+
+336
+00:18:23,340 --> 00:18:27,150
+Now, I don't show the next set of things
+but what'll happen is.
+
+337
+00:18:27,150 --> 00:18:31,210
+On the way out of that method callback, on
+the way back from that up call.
+
+338
+00:18:31,210 --> 00:18:34,620
+The result is taken, so when, when
+Download Image
+
+339
+00:18:34,620 --> 00:18:39,400
+returns a string, the generated stub takes
+that string,
+
+340
+00:18:39,400 --> 00:18:42,100
+stuffs it back into the parcel that it was
+
+341
+00:18:42,100 --> 00:18:45,130
+sent along with the original called the on
+transact.
+
+342
+00:18:45,130 --> 00:18:47,570
+And then, it unwinds the whole thing, it
+goes backwards.
+
+343
+00:18:47,570 --> 00:18:50,370
+So it'll return everybody on blocks, and
+we
+
+344
+00:18:50,370 --> 00:18:53,340
+end up ultimately back at the original
+call site.
+
+345
+00:18:53,340 --> 00:18:55,780
+And the result comes back, as a return
+value
+
+346
+00:18:55,780 --> 00:19:01,500
+from, the download image in location, on
+the proxy itself.
+
+347
+00:19:01,500 --> 00:19:04,450
+So the proxy blocks, it looks just like a
+regular
+
+348
+00:19:04,450 --> 00:19:06,710
+method call, just like a regular two way
+method call.
+
+349
+00:19:06,710 --> 00:19:11,740
+But in fact, the processing was done by a
+different method in
+
+350
+00:19:11,740 --> 00:19:17,130
+a different process for the object that
+was the target of that invocation.
+
+351
+00:19:17,130 --> 00:19:19,090
+And that's what's commonly known as a
+remote procedure
+
+352
+00:19:19,090 --> 00:19:21,780
+call, or remote method call, or some
+variant on that.
+
+353
+00:19:23,460 --> 00:19:25,260
+Okay any questions about that?
+
+354
+00:19:25,260 --> 00:19:27,860
+So it's a good thing to know how all these
+things work.
+
+355
+00:19:27,860 --> 00:19:31,170
+By the way, lest you think this is only
+limited
+
+356
+00:19:31,170 --> 00:19:35,770
+to things running on the same hardware
+platform like the device.
+
+357
+00:19:35,770 --> 00:19:40,430
+Obviously, there's a long, long history
+going back to the 70's and
+
+358
+00:19:40,430 --> 00:19:44,580
+80's of people doing remote procedure
+call, where you span network boundaries.
+
+359
+00:19:44,580 --> 00:19:47,440
+And the abstractions are more or less the
+same as what we're talking about here.
+
+360
+00:19:47,440 --> 00:19:48,780
+It's just that you can talk with things
+that
+
+361
+00:19:48,780 --> 00:19:51,830
+are on physically different hosts
+connected to a network.
+
+362
+00:19:51,830 --> 00:19:57,320
+Android's AIDL and [UNKNOWN] RPC does not
+work that way, but the various
+
+363
+00:19:57,320 --> 00:20:00,890
+RPC mechanisms you might use if you were
+to use, say web services.
+
+364
+00:20:00,890 --> 00:20:06,450
+Or other types of middleware built in, to
+on top of the underline mechanisms.
+
+365
+00:20:06,450 --> 00:20:08,520
+You can use those to talk from an Android
+
+366
+00:20:08,520 --> 00:20:10,630
+device to something else using remote
+procedure calls as well.
+
+367
+00:20:11,930 --> 00:20:14,180
+There's a very nice article here that
+gives more
+
+368
+00:20:14,180 --> 00:20:17,650
+information about binders and, and shows
+lots of examples.
+
+369
+00:20:17,650 --> 00:20:21,870
+And, more code you can look at to see how
+all the various pieces fit together.
+
+370
+00:20:21,870 --> 00:20:24,100
+Something else that's important to talk
+about in
+
+371
+00:20:24,100 --> 00:20:28,810
+this context is the issue of call
+semantics.
+
+372
+00:20:28,810 --> 00:20:35,540
+So what are the appropriate call semantics
+for the AIDL and Binder RPC mechanisms.
+
+373
+00:20:35,540 --> 00:20:37,140
+And it turns out there's a couple
+subtleties
+
+374
+00:20:37,140 --> 00:20:38,760
+here that you need to be aware of.
+
+375
+00:20:38,760 --> 00:20:41,680
+So, if you are in the same address space.
+
+376
+00:20:41,680 --> 00:20:46,500
+And you invoke an operation on, on a,
+through a proxy.
+
+377
+00:20:46,500 --> 00:20:48,950
+What that does is that ends up just being
+a direct
+
+378
+00:20:48,950 --> 00:20:53,540
+method call to the receiver; which is in
+the same address space.
+
+379
+00:20:53,540 --> 00:20:56,070
+So if you're calling in the main thread of
+control, the UI
+
+380
+00:20:56,070 --> 00:21:00,220
+thread, the call will actually be run in
+the main thread of control.
+
+381
+00:21:00,220 --> 00:21:01,330
+So, it's just borrowing.
+
+382
+00:21:02,570 --> 00:21:03,190
+Excuse me.
+
+383
+00:21:03,190 --> 00:21:08,050
+It's borrowing the threat of control in
+order to be able to run the requests.
+
+384
+00:21:08,050 --> 00:21:09,400
+So that's just a direct call.
+
+385
+00:21:10,860 --> 00:21:12,610
+Likewise, if the caller is in a separate
+
+386
+00:21:12,610 --> 00:21:15,700
+thread of control, again the thread will
+be borrowed.
+
+387
+00:21:15,700 --> 00:21:19,560
+This is what's commonly called a
+co-location optimization.
+
+388
+00:21:19,560 --> 00:21:22,010
+So it's taking advantage of things when
+they're co-located in the same
+
+389
+00:21:22,010 --> 00:21:25,060
+address space, and it's removing a lot of
+overhead; which is great.
+
+390
+00:21:25,060 --> 00:21:25,850
+It's exactly what you want.
+
+391
+00:21:27,310 --> 00:21:31,050
+Conversely if you invoke operations on
+objects that run in a
+
+392
+00:21:31,050 --> 00:21:34,390
+separate address space; like another
+process,
+
+393
+00:21:34,390 --> 00:21:36,080
+then the semantics are slightly different.
+
+394
+00:21:36,080 --> 00:21:37,730
+Rather than just calling it directly;
+which it
+
+395
+00:21:37,730 --> 00:21:39,575
+can't do, because it can't get to the.
+
+396
+00:21:39,575 --> 00:21:41,870
+[UNKNOWN] the other process directory.
+
+397
+00:21:41,870 --> 00:21:44,970
+Instead what it's going to do, is it's
+going to go ahead and do all the steps
+
+398
+00:21:44,970 --> 00:21:49,360
+that we just talked about to marshal up
+the data, send it down through the layers.
+
+399
+00:21:49,360 --> 00:21:55,370
+And it'll pop up the other side, and it'll
+run in a thread from a pool of threads.
+
+400
+00:21:55,370 --> 00:21:58,000
+So the key thing to remember there is when
+you start calling
+
+401
+00:21:58,000 --> 00:22:02,910
+things that are going to run remotely with
+AIDL and bind to RPC,.
+
+402
+00:22:02,910 --> 00:22:05,320
+You have to make sure your objects are
+
+403
+00:22:05,320 --> 00:22:07,710
+thread safe, that they've got the proper
+synchronization.
+
+404
+00:22:07,710 --> 00:22:09,120
+And well take a look at some examples of
+how to do
+
+405
+00:22:09,120 --> 00:22:12,400
+that, and then you know the return value
+goes back the other direction.
+
+406
+00:22:13,800 --> 00:22:17,630
+The behavior of one way methods changes
+the symatix a bit.
+
+407
+00:22:17,630 --> 00:22:20,550
+The main difference being that when you do
+a one way method it
+
+408
+00:22:20,550 --> 00:22:25,220
+doesnt block the caller all the way until
+it gets to the other side.
+
+409
+00:22:25,220 --> 00:22:27,430
+In fact its that kind of a fire and forget
+model, it just sort
+
+410
+00:22:27,430 --> 00:22:28,880
+of says okay I pass it off
+
+411
+00:22:28,880 --> 00:22:30,940
+to the underlying operating system on the
+clients.
+
+412
+00:22:30,940 --> 00:22:34,710
+Side and then I return, and that call
+continues but I as the
+
+413
+00:22:34,710 --> 00:22:39,780
+client am not obliged to wait any longer
+for the data to, to occur.
+
+414
+00:22:39,780 --> 00:22:42,610
+So it returns right away and there is no
+actual return value.
+
+415
+00:22:42,610 --> 00:22:46,420
+Now just to be confusing, if you end up
+doing
+
+416
+00:22:46,420 --> 00:22:50,820
+a one way call that's co-located in the
+same address space.
+
+417
+00:22:50,820 --> 00:22:54,090
+Then that is actually going to be a two
+way call in the sense that.
+
+418
+00:22:54,090 --> 00:22:58,970
+The call doesn't return to the caller
+until the method finishes running.
+
+419
+00:22:58,970 --> 00:23:03,500
+But there will be no return values that
+come back or out parameters.
+
+420
+00:23:03,500 --> 00:23:08,550
+So, these are typically compromises people
+make just to simplify the implementation.
+
+421
+00:23:08,550 --> 00:23:11,600
+And, and make it work in ways that are
+going to be optimized.
+
+422
+00:23:11,600 --> 00:23:15,440
+Not always necessarily semantically
+consistent, but.
+
+423
+00:23:15,440 --> 00:23:16,630
+Optimal and easy to implement.
+
+424
+00:23:19,430 --> 00:23:25,090
+Okay, so to summarize this particular
+discussion, AIDL is the interface
+
+425
+00:23:25,090 --> 00:23:29,290
+definition language that we use and
+Android uses it to generate code.
+
+426
+00:23:29,290 --> 00:23:31,200
+And this code allows us to be able
+
+427
+00:23:31,200 --> 00:23:34,390
+to have multiple processes communicating
+back and forth.
+
+428
+00:23:34,390 --> 00:23:38,750
+On the same piece of physical hardware the
+device keep in mind
+
+429
+00:23:38,750 --> 00:23:41,130
+again that there's no reason to be limited
+to that in general.
+
+430
+00:23:41,130 --> 00:23:44,380
+That's just the way Android does it and if
+you
+
+431
+00:23:44,380 --> 00:23:48,060
+end up talking between processes that run
+on different processes.
+
+432
+00:23:48,060 --> 00:23:51,440
+You end up talking processes on this same
+machine then it's going to
+
+433
+00:23:51,440 --> 00:23:55,290
+have to generate the code the ADL
+compatible have to generate code.
+
+434
+00:23:55,290 --> 00:23:57,170
+To do the marshalling and de-marshalling.
+
+435
+00:23:57,170 --> 00:23:58,330
+And that was the stuff that we looked at.
+
+436
+00:23:58,330 --> 00:23:59,690
+That's the stuff you don't have to write.
+
+437
+00:23:59,690 --> 00:24:02,070
+The only way you would end up writing code
+like
+
+438
+00:24:02,070 --> 00:24:06,810
+that is either if you're going to write a
+parcelable class.
+
+439
+00:24:06,810 --> 00:24:09,770
+In which case you have to fill in the read
+from message
+
+440
+00:24:09,770 --> 00:24:13,680
+and write to message hook methods, and
+they would do all those steps.
+
+441
+00:24:13,680 --> 00:24:15,570
+Or if you don't want to use AIDL and
+you're
+
+442
+00:24:15,570 --> 00:24:18,120
+going to encode the data through a, some
+other means.
+
+443
+00:24:18,120 --> 00:24:20,580
+Like a, something that you would, like a
+parcel that you
+
+444
+00:24:20,580 --> 00:24:23,490
+would use if you were going to use
+messages and messengers.
+
+445
+00:24:26,270 --> 00:24:28,240
+Let's see, whoops, that's annoying, hold
+on.
+
+446
+00:24:28,240 --> 00:24:33,903
+Let me get rid of
+
+447
+00:24:33,903 --> 00:24:38,697
+this [SOUND].
+
+448
+00:24:38,697 --> 00:24:43,871
+All right, so, the interface definition
+language that's
+
+449
+00:24:43,871 --> 00:24:48,100
+defined by, by Android is very similar to
+Java.
+
+450
+00:24:48,100 --> 00:24:51,290
+It's also very similar to CORBA, and
+Microsoft IDL and so on.
+
+451
+00:24:51,290 --> 00:24:53,425
+It's a little bit lighter weight, they
+don't provide all of the
+
+452
+00:24:53,425 --> 00:24:56,700
+full-blown bells and whistles that some of
+these other, more powerful things do.
+
+453
+00:24:56,700 --> 00:25:00,030
+And it basically uses these proxies in
+order to be able to send
+
+454
+00:25:00,030 --> 00:25:04,050
+the values back and forth without having
+to worry about address space issues.
+
+455
+00:25:05,350 --> 00:25:07,260
+And as I mentioned before, if you.
+
+456
+00:25:07,260 --> 00:25:10,710
+Do a little searching in Android, you will
+find lots and lots and
+
+457
+00:25:10,710 --> 00:25:16,250
+lots of examples of AIDL used to pass
+information around for lots of things.
+
+458
+00:25:16,250 --> 00:25:18,990
+And that's because under the hood, Android
+is set
+
+459
+00:25:18,990 --> 00:25:21,680
+up to do a lot of communication between
+different processes.
+
+460
+00:25:21,680 --> 00:25:23,410
+So that can be handled in a way that's
+
+461
+00:25:23,410 --> 00:25:26,490
+very transparent to the applications for
+the most part.
+
+462
+00:25:26,490 --> 00:25:30,530
+But it allows for much greater flexibility
+in how the system is configured.
+
+463
+00:25:30,530 --> 00:25:35,440
+And how the system is able to be moved
+around and co-located or remoted.
+
+464
+00:25:35,440 --> 00:25:37,360
+Without changing the way in which the code
+is structured.
+
+465
+00:25:39,100 --> 00:25:41,625
+Okay, so any questions about that?
+
+466
+00:25:41,625 --> 00:25:42,930
+[SOUND]
+
+467
+00:25:42,930 --> 00:25:50,399
+[MUSIC]
+
